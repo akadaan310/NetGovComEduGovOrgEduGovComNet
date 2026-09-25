@@ -123,6 +123,19 @@ full matrix. In summary:
   addressed to someone else, mutate a closed resource, act on another
   owner's fork, or rewrite history.
 
+### Hosted database APIs (Supabase and similar)
+
+Some hosted Postgres platforms expose `public` tables over an automatic
+REST API, reachable with a publishable key. If that API reached ACSP's
+tables, anyone could bypass the protocol. Migration `0002` therefore:
+
+* enables row-level security with **no policies** on every ACSP table, and
+* revokes all grants and default privileges from the `anon` and
+  `authenticated` roles, when those roles exist.
+
+The application connects as the table owner, so RLS does not restrict it.
+ACSP never uses the platform's API keys, and none should be configured.
+
 ## 6. Integrity and concurrency
 
 * Per-resource writes are serialised with `SELECT … FOR UPDATE`, and

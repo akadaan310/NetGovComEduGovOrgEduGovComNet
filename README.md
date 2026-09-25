@@ -439,6 +439,16 @@ Tables: `resources`, `events` (the append-only history), `toks`,
    Postgres or any provider, and copy its **pooled** connection string:
    * Neon: the host containing `-pooler`
    * Supabase: the *Transaction pooler* URL (port 6543)
+   Supabase notes:
+   * Use the **pooler** URL, not `db.<ref>.supabase.co`. The direct host is
+     IPv6-only, and Vercel functions need IPv4. It looks like
+     `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres`
+     (find it under Connect → Transaction pooler).
+   * URL-encode special characters in the password (for example `*` → `%2A`,
+     `@` → `%40`).
+   * ACSP does not use the Supabase Data API or its publishable/anon key.
+     Migration `0002` revokes API-role access to ACSP tables even if
+     "Automatically expose new tables" was enabled.
 2. **Import the repository** into Vercel (New Project, then pick this GitHub
    repository). The framework preset is detected as Next.js.
 3. **Environment variables** (Project → Settings → Environment Variables):
