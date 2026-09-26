@@ -16,7 +16,8 @@
     "harness": "tsx harness/cli.ts",
     "serve:local": "tsx harness/serve.ts",
     "db:migrate": "tsx scripts/migrate.ts",
-    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build"
+    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build",
+    "schemas": "tsx scripts/schemas.ts"
   },
   "dependencies": {
     "next": "^16.3.6",

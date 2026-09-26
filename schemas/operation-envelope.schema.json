@@ -1,0 +1,88 @@
+{
+  "$id": "urn:acsp:schema:operation-envelope",
+  "title": "ACSP/0.2 operation-envelope",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "protocol": {
+      "type": "string",
+      "enum": [
+        "ACSP/0.1",
+        "ACSP/0.2"
+      ],
+      "description": "actor-supplied, required"
+    },
+    "operation": {
+      "type": "string",
+      "description": "actor-supplied, required: a core name (append or core:append) or a registered extension (ext:ns:name)"
+    },
+    "operation_version": {
+      "description": "actor-supplied, optional: pin an extension definition version",
+      "type": "string",
+      "maxLength": 32
+    },
+    "actor": {
+      "description": "actor-supplied; with a capability session_id must match it (security-sensitive)",
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:@-]{1,128}$"
+        },
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._:@-]{1,128}$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "human",
+            "system"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected_version": {
+      "description": "actor-supplied; required by update, supersede, resolve_proposal, close",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{8,128}$",
+      "description": "actor-supplied, required: request identity within the credential scope"
+    },
+    "causation_id": {
+      "description": "actor-supplied, optional: the operation this one responds to (validated, same resource)",
+      "type": "string",
+      "pattern": "^op-[0-9A-HJKMNP-TV-Z]{16}$"
+    },
+    "correlation_id": {
+      "description": "actor-supplied, optional: workflow id (inherited from causation when omitted)",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:@-]{1,128}$"
+    },
+    "payload": {
+      "description": "actor-supplied: operation-specific"
+    },
+    "capability": {
+      "description": "actor-supplied, security-sensitive: alternative to Authorization; never stored",
+      "type": "string",
+      "maxLength": 200
+    },
+    "create_key": {
+      "type": "string",
+      "maxLength": 500
+    }
+  },
+  "required": [
+    "protocol",
+    "operation",
+    "idempotency_key"
+  ],
+  "additionalProperties": false,
+  "description": "acsp.operation-envelope/0.2"
+}

@@ -1,0 +1,187 @@
+{
+  "$id": "urn:acsp:schema:continuation",
+  "title": "ACSP/0.2 continuation",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "continuation"
+    },
+    "schema": {
+      "type": "string",
+      "const": "acsp.continuation/0.2"
+    },
+    "notice": {
+      "type": "string"
+    },
+    "reference": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "acsp.continuation-reference/0.2"
+        },
+        "href": {
+          "type": "string",
+          "format": "uri"
+        },
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[0-9A-HJKMNP-TV-Z]{12}$"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^op-[0-9A-HJKMNP-TV-Z]{16}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "state_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "correlation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "href",
+        "resource_id",
+        "operation_id",
+        "version",
+        "state_sha256",
+        "correlation_id"
+      ],
+      "additionalProperties": false,
+      "description": "acsp.continuation-reference/0.2"
+    },
+    "produced_by": {
+      "anyOf": [
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "resource": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "current": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "moved_since_reference": {
+          "type": "boolean"
+        },
+        "operations_since": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "operations_since_truncated": {
+          "type": "boolean"
+        },
+        "diff": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "moved_since_reference",
+        "operations_since",
+        "operations_since_truncated",
+        "diff",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "viewer": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "how_to_continue": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "verification": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "links": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "type",
+    "schema",
+    "notice",
+    "reference",
+    "produced_by",
+    "resource",
+    "current",
+    "viewer",
+    "how_to_continue",
+    "verification",
+    "links"
+  ],
+  "additionalProperties": false,
+  "description": "acsp.continuation/0.2"
+}

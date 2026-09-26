@@ -1,0 +1,197 @@
+{
+  "$id": "urn:acsp:schema:operation-definition",
+  "title": "ACSP/0.2 operation-definition",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "acsp.operation-definition/0.2"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^ext:[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)*:[a-z][a-z0-9_]{0,63}$"
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)*$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "experimental",
+        "validated",
+        "promoted",
+        "deprecated",
+        "retired"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "input_schema": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "output": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "effects": {
+      "minItems": 1,
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "append",
+              "annotate",
+              "checkpoint",
+              "supersede"
+            ]
+          },
+          "payload": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        "required": [
+          "operation",
+          "payload"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "authority": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "idempotency": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "string",
+          "const": "replay"
+        },
+        "repeat": {
+          "type": "string",
+          "enum": [
+            "new_effect",
+            "refused"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "request",
+        "repeat",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "security": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "namespace",
+    "version",
+    "status",
+    "description",
+    "input_schema",
+    "output",
+    "effects",
+    "idempotency",
+    "security"
+  ],
+  "additionalProperties": false,
+  "description": "acsp.operation-definition/0.2",
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "$input": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            }
+          },
+          "required": [
+            "$input"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "$step": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$"
+            }
+          },
+          "required": [
+            "$step",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z_][a-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      ]
+    }
+  }
+}

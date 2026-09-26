@@ -1,0 +1,110 @@
+{
+  "$id": "urn:acsp:schema:extension-registration",
+  "title": "ACSP/0.2 extension-registration",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "acsp.extension-registration/0.2"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^ext:[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9]*)*:[a-z][a-z0-9_]{0,63}$"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "experimental",
+        "validated",
+        "promoted",
+        "deprecated",
+        "retired"
+      ]
+    },
+    "executable": {
+      "type": "boolean"
+    },
+    "enableable": {
+      "type": "boolean"
+    },
+    "registered_by": {
+      "type": "string",
+      "const": "service"
+    },
+    "history": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "experimental",
+              "validated",
+              "promoted",
+              "deprecated",
+              "retired"
+            ]
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "status",
+          "protocol",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "next_status_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requirement": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "requirement"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "name",
+    "version",
+    "status",
+    "executable",
+    "enableable",
+    "registered_by",
+    "history",
+    "next_status_requirements"
+  ],
+  "additionalProperties": false,
+  "description": "acsp.extension-registration/0.2"
+}
