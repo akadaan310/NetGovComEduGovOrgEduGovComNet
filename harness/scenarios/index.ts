@@ -1,5 +1,6 @@
 import type { Scenario } from '../scenario';
 import { authorityMatrix } from './authority';
+import { computationEnvelope } from './computation';
 import { coreDemonstration } from './core-demonstration';
 import { lifecycle } from './lifecycle';
 import { concurrency, failures, getSafety, humanFormPath, rateLimits, representations, restricted } from './robustness';
@@ -23,4 +24,5 @@ export const SCENARIOS: Scenario[] = [
   restricted,
   humanFormPath,
   rateLimits,
+  computationEnvelope,
 ];

@@ -88,6 +88,7 @@ This is how the harness models session isolation.
 | `checkpoint-resume` | resume from checkpoint N: the snapshot hash verifies, and the diff since N contains exactly the later changes. |
 | `human-form-path` | A GET-only agent composes an intent URL. The human submits the no-JS form. Double submission is an idempotent replay. |
 | `rate-limits` | unauthenticated writes are limited per client, reads never are, and the window resets. |
+| `computation-envelope` | the ACSP half of the ACSP × PURL composition bridge: a task whose refs are PURL URLs moves owner → A → B → owner. Refs stay verbatim and are never fetched (they use the `.invalid` TLD), checkpoint hashes recompute from served snapshots, B needs its own delegated capability to accept, and every contribution stays attributed to its own session. |
 
 ## Running
 
@@ -106,6 +107,16 @@ about 60 unauthenticated writes, so raise `ACSP_RATE_LIMIT_ANON_PER_HOUR` on
 the deployment while smoke-testing, or run `core-demonstration` alone.
 Idempotency keys are prefixed with a per-run ID so that repeated runs never
 replay each other.
+
+### A local HTTP server for multi-process experiments
+
+`npm run serve:local` (`harness/serve.ts`) serves the same handler over plain
+HTTP on `127.0.0.1`, backed by in-memory PGlite (or `--data <dir>`), with
+`--port` and `--seed` options. It prints `{"acsp":"http://127.0.0.1:<port>"}`
+when ready. The PURL repository's composition experiment
+(`npm run handoff` there) starts it so that separate agent processes can
+reach one ACSP instance. It is for local experiments only: ACSP must be served
+over HTTPS everywhere else.
 
 The verbose transcript prints each step as:
 

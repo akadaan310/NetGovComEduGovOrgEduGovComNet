@@ -404,7 +404,7 @@ Create a resource: open `http://localhost:3000/new`, or run
 ## Harness and testing
 
 ```bash
-npm run harness                        # 16 scenarios, ~400 checks, in-process, PGlite
+npm run harness                        # 17 scenarios, ~430 checks, in-process, PGlite
 npm run harness -- core-demonstration -v
 npm run harness -- --db postgres       # against ACSP_TEST_DATABASE_URL (fresh schema per scenario)
 npm run harness -- --base-url https://your-deployment.example   # smoke-test a deployment
@@ -494,6 +494,18 @@ works too: `npm run build && npm start`, with `DATABASE_URL` set.
    directly.
 5. Later, open the URL in **Session A** again. B's contribution is there,
    attributed to session B.
+
+### Composition with PURL (experiment exp-0002)
+
+The [PURL repository](https://github.com/akadaan310/purl) uses ACSP, unchanged,
+as the continuity envelope for computations whose operands and results are
+PURL resources. A task TOK carries the computation (as JSON text) and cites
+the PURL URLs in `refs`; agents record results as `finding` TOKs, check each
+other's work with `validation` or `dispute` annotations, and pass the task on
+with `handoff` + `acknowledge`. ACSP never fetches or interprets those URLs.
+The ACSP side is covered by the `computation-envelope` harness scenario; the
+end-to-end run (separate agent processes against `npm run serve:local`) and
+its results are in the PURL repository under `experiments/exp-0002`.
 
 ### Connecting the GitHub repository
 
