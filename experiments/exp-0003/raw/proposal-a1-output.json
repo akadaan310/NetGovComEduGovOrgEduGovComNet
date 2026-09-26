@@ -1,0 +1,33 @@
+{
+ "mode": "a-start",
+ "argv": [
+  "http://127.0.0.1:39931"
+ ],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/a-H9QmXk"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "a-start",
+  "session": "session-a",
+  "pid": 3213,
+  "received_capability_secret": true,
+  "statuses": [
+   201,
+   200,
+   200,
+   200
+  ],
+  "resource_id": "SYTRZXTDDAVH",
+  "first_cited_operation": "op-J3CQA38CE4G8JAJZ",
+  "operation_ids": [
+   "op-TG6D80QZNNVDJBXC",
+   "op-J3CQA38CE4G8JAJZ",
+   "op-9KFQYC751RGDV3TZ",
+   "op-0QB097WVR3H0ECF8"
+  ],
+  "delegated": false,
+  "continuation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8"
+ }
+}

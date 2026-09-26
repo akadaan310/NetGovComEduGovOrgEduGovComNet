@@ -1,0 +1,2820 @@
+{
+ "mode": "a-review",
+ "session": "session-a",
+ "pid": 3273,
+ "transcript": [
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "continuation",
+    "schema": "acsp.continuation/0.2",
+    "notice": "This is a continuation reference: it identifies a persisted state of an ACSP resource from which another, independent session may continue. It does not identify you with the session that produced it, it transfers no memory and no identity, and it grants no authority. Your own authority is evaluated in \"viewer\".",
+    "invariants": [
+     "Continuity does not imply identity.",
+     "Reference does not imply ownership.",
+     "Awareness does not imply authority.",
+     "Handoff does not imply merger.",
+     "Access does not imply control.",
+     "Observation does not imply interpretation.",
+     "Interpretation does not imply conclusion.",
+     "Delegation does not erase provenance.",
+     "Forking does not destroy lineage.",
+     "Supersession does not require deletion.",
+     "Preparation does not imply execution.",
+     "Operation reference does not imply operation authority.",
+     "Capability is explicit.",
+     "Authority is scoped.",
+     "State transitions are attributable.",
+     "Replay does not imply re-execution.",
+     "Definition does not imply execution."
+    ],
+    "reference": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "version": 5,
+     "state_sha256": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ"
+    },
+    "produced_by": {
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "sequence": 5,
+     "operation_type": "propose",
+     "actor": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b"
+     },
+     "identity_assurance": "asserted",
+     "capability_id": null,
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "from_version": 4,
+     "to_version": 5,
+     "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+     "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+     "parent_operation_id": "op-0QB097WVR3H0ECF8",
+     "causation_id": "op-0QB097WVR3H0ECF8",
+     "causation_source": "actor",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ",
+     "created_at": "2026-09-26T02:25:24.422Z",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+     "executed_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-b",
+      "session_id": "session-b"
+     },
+     "authority": {
+      "via": "none",
+      "scopes": [],
+      "capability_id": null,
+      "capability_kind": null
+     }
+    },
+    "resource": {
+     "id": "SYTRZXTDDAVH",
+     "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "title": "exp-0003: inter-session operational communication",
+     "owner": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start"
+     },
+     "lifecycle": "active",
+     "visibility": "unlisted",
+     "accepts_proposals": true,
+     "checkpoint_at_reference": {
+      "number": 1,
+      "version": 4,
+      "label": "A stops here",
+      "note": "",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints/1"
+     }
+    },
+    "current": {
+     "version": 5,
+     "moved_since_reference": false,
+     "operations_since": [],
+     "operations_since_truncated": false,
+     "diff": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?from=5",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state"
+    },
+    "viewer": {
+     "authenticated": true,
+     "capability_id": "cap_CY5XXPZ1Q6",
+     "session_id": "session-a",
+     "is_owner": true,
+     "scopes": [
+      "read",
+      "append",
+      "annotate",
+      "checkpoint",
+      "supersede",
+      "handoff",
+      "owner"
+     ],
+     "expires_at": null,
+     "credential_error": null,
+     "identity_assurance": "capability",
+     "summary": "You hold the OWNER capability (cap_CY5XXPZ1Q6) for session \"session-a\"."
+    },
+    "how_to_continue": {
+     "principle": "Decide from \"viewer\" what YOU may do. Act under your own session_id. Cite this reference; do not claim to be its producer.",
+     "cite": {
+      "causation_id": "op-38DAXWHRV4DET1KN",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "expected_version": 5,
+     "permitted_operations": [
+      "append",
+      "annotate",
+      "update",
+      "supersede",
+      "checkpoint",
+      "fork",
+      "delegate",
+      "revoke",
+      "handoff",
+      "propose",
+      "resolve_proposal",
+      "close"
+     ],
+     "next_valid_actions": [
+      {
+       "action": "read knowledge",
+       "why": "2 TOK(s) are published here; read them before contributing.",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH#knowledge"
+      },
+      {
+       "action": "resume from checkpoint",
+       "why": "Checkpoint 1 (\"A stops here\") is the latest boundary; read it, then the diff since.",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?since_checkpoint=1"
+      },
+      {
+       "action": "append",
+       "why": "You may publish new TOKs.",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=prepare_append&causation_id=op-38DAXWHRV4DET1KN&correlation_id=op-J3CQA38CE4G8JAJZ"
+      },
+      {
+       "action": "fork",
+       "why": "Branch the research independently. The parent is not modified.",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=prepare_fork&causation_id=op-38DAXWHRV4DET1KN&correlation_id=op-J3CQA38CE4G8JAJZ"
+      }
+     ],
+     "envelope_template": {
+      "protocol": "ACSP/0.2",
+      "operation": "<one of permitted_operations>",
+      "actor": {
+       "session_id": "<your own session id>",
+       "agent_id": "<optional>",
+       "kind": "agent"
+      },
+      "expected_version": 5,
+      "idempotency_key": "<unique, 8-128 chars>",
+      "causation_id": "op-38DAXWHRV4DET1KN",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "payload": {}
+     },
+     "execute": {
+      "method": "POST",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+      "authorization": "Authorization: Bearer <YOUR capability>, only if you were given one"
+     }
+    },
+    "verification": {
+     "steps": [
+      "GET http://127.0.0.1:39931/r/SYTRZXTDDAVH/op and check, for each operation in sequence, that state_before equals the previous state_after and from_version equals the previous to_version.",
+      "Check that the operation op-38DAXWHRV4DET1KN has to_version 5 and state_after sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e.",
+      "GET http://127.0.0.1:39931/r/SYTRZXTDDAVH/state and recompute sha256 of its \"state\"; it must equal the latest operation's state_after.",
+      "Checkpoints: recompute each checkpoint's sha256 from its snapshot (GET /r/{id}/checkpoints/{n})."
+     ],
+     "trust": "These digests are computed and served by this ACSP service. They show internal consistency of the history it serves; they are not signatures and do not prove the service is honest."
+    },
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation_record_list",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "resource_id": "SYTRZXTDDAVH",
+    "current_version": 5,
+    "semantics": "Every accepted mutation request is one operation, in sequence order. Each record carries the operational-state digest before and after it: state_before of each operation equals state_after of the previous one, and the latest state_after equals the SHA-256 of GET /r/{id}/state. Poll with ?after=<sequence> to follow changes.",
+    "after": 0,
+    "correlation_id": null,
+    "operations": [
+     {
+      "operation_id": "op-TG6D80QZNNVDJBXC",
+      "sequence": 1,
+      "operation_type": "create",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-TG6D80QZNNVDJBXC",
+      "created_at": "2026-09-26T02:25:23.771Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC"
+     },
+     {
+      "operation_id": "op-J3CQA38CE4G8JAJZ",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.816Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+     },
+     {
+      "operation_id": "op-9KFQYC751RGDV3TZ",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.843Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+     },
+     {
+      "operation_id": "op-0QB097WVR3H0ECF8",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+     },
+     {
+      "operation_id": "op-38DAXWHRV4DET1KN",
+      "sequence": 5,
+      "operation_type": "propose",
+      "actor": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+      "parent_operation_id": "op-0QB097WVR3H0ECF8",
+      "causation_id": "op-0QB097WVR3H0ECF8",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:24.422Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN"
+     }
+    ],
+    "next": null,
+    "legacy_events_without_operation": 0,
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-TG6D80QZNNVDJBXC",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 1,
+     "operation_type": "create",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "asserted",
+     "authority": {
+      "via": "none",
+      "scopes": [],
+      "capability_id": null,
+      "capability_kind": null
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "asserted"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "focus": "B continues from A's persisted state; C reconstructs why.",
+      "title": "exp-0003: inter-session operational communication"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-d969fe7e84fcd05b",
+     "request_hash": "sha256:9f46d8967055349c22e3f257939befb87d6ad0f71bb696d4ab29f6f0b550034c",
+     "transition": {
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@1",
+        "version": 1,
+        "operation": "create"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-TG6D80QZNNVDJBXC"
+     },
+     "executed": true,
+     "result": {
+      "resource": {
+       "id": "SYTRZXTDDAVH",
+       "title": "exp-0003: inter-session operational communication",
+       "version": 1,
+       "lifecycle": "active",
+       "visibility": "unlisted"
+      },
+      "checkpoint": {
+       "note": "Created with the resource.",
+       "label": "genesis",
+       "number": 0,
+       "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23",
+       "version": 1,
+       "created_at": "2026-09-26T02:25:23.771Z",
+       "created_by": {
+        "session_id": "session-a"
+       }
+      },
+      "owner_capability": {
+       "id": "cap_CY5XXPZ1Q6",
+       "kind": "owner",
+       "token": null,
+       "notice": "This token is shown ONCE and is not stored in recoverable form. Treat it as a secret.",
+       "scopes": [
+        "owner"
+       ],
+       "agent_id": "exp-0003-a-start",
+       "expires_at": null,
+       "session_id": "session-a",
+       "token_redacted": true
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.771Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-TG6D80QZNNVDJBXC",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [],
+     "consequences": [],
+     "parent": null,
+     "next": {
+      "operation_id": "op-J3CQA38CE4G8JAJZ",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.816Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+     },
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-TG6D80QZNNVDJBXC"
+    },
+    "event_refs": [
+     {
+      "version": 1,
+      "operation": "create",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/1"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-TG6D80QZNNVDJBXC",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-J3CQA38CE4G8JAJZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 2,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "task",
+      "title": "Check the finding and add a counter-observation"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-b4bc9a20b0fe6dc8",
+     "request_hash": "sha256:de46bccd008cd7b984ead391deec987d8495354261e31f14093c5c7c08162802",
+     "transition": {
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@2",
+        "version": 2,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-001",
+       "refs": [],
+       "task": {
+        "responsible_session_id": "session-a"
+       },
+       "type": "task",
+       "title": "Check the finding and add a counter-observation",
+       "origin": null,
+       "source": {
+        "kind": "agent",
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a",
+        "identity_assurance": "capability"
+       },
+       "status": "active",
+       "content": "",
+       "summary": "",
+       "version": 2,
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "supersedes": null,
+       "annotations": [],
+       "proposal_id": null,
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "superseded_by": null,
+       "after_checkpoint": 0,
+       "stated_confidence": "unclassified",
+       "supersession_reason": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.816Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J3CQA38CE4G8JAJZ",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [],
+     "consequences": [
+      {
+       "operation_id": "op-9KFQYC751RGDV3TZ",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-TG6D80QZNNVDJBXC",
+      "sequence": 1,
+      "operation_type": "create",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-TG6D80QZNNVDJBXC",
+      "created_at": "2026-09-26T02:25:23.771Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC"
+     },
+     "next": {
+      "operation_id": "op-9KFQYC751RGDV3TZ",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.843Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+     },
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-J3CQA38CE4G8JAJZ"
+    },
+    "event_refs": [
+     {
+      "version": 2,
+      "operation": "append",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/2"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J3CQA38CE4G8JAJZ",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-9KFQYC751RGDV3TZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 3,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "finding",
+      "title": "Queue depth predicts p99 latency",
+      "stated_confidence": "medium"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-e7dc6ff79920e637",
+     "request_hash": "sha256:56c240efee76d09d34a3c708fa45cb44e9c12ba2b565f8d93e1d7c422663d85b",
+     "transition": {
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@3",
+        "version": 3,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-002",
+       "refs": [],
+       "task": null,
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency",
+       "origin": null,
+       "source": {
+        "kind": "agent",
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a",
+        "identity_assurance": "capability"
+       },
+       "status": "active",
+       "content": "",
+       "summary": "",
+       "version": 3,
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "supersedes": null,
+       "annotations": [],
+       "proposal_id": null,
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "superseded_by": null,
+       "after_checkpoint": 0,
+       "stated_confidence": "medium",
+       "supersession_reason": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.843Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-9KFQYC751RGDV3TZ",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-J3CQA38CE4G8JAJZ",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+       "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+      }
+     ],
+     "consequences": [
+      {
+       "operation_id": "op-0QB097WVR3H0ECF8",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 3,
+       "to_version": 4,
+       "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+       "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.868Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-J3CQA38CE4G8JAJZ",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.816Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+     },
+     "next": {
+      "operation_id": "op-0QB097WVR3H0ECF8",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+     },
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-J3CQA38CE4G8JAJZ"
+    },
+    "event_refs": [
+     {
+      "version": 3,
+      "operation": "append",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/3"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-9KFQYC751RGDV3TZ",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-0QB097WVR3H0ECF8",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "label": "A stops here"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-6554e1b90a96ab07",
+     "request_hash": "sha256:a1535599632c3e43a7e4448089678c040a68240857aaa5b37c325b59d3891a6c",
+     "transition": {
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@4",
+        "version": 4,
+        "operation": "checkpoint"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "checkpoint": {
+       "note": "",
+       "label": "A stops here",
+       "number": 1,
+       "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8",
+       "version": 4,
+       "created_at": "2026-09-26T02:25:23.868Z",
+       "created_by": {
+        "session_id": "session-a"
+       }
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.868Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-9KFQYC751RGDV3TZ",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+      },
+      {
+       "operation_id": "op-J3CQA38CE4G8JAJZ",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+       "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+      }
+     ],
+     "consequences": [
+      {
+       "operation_id": "op-38DAXWHRV4DET1KN",
+       "sequence": 5,
+       "operation_type": "propose",
+       "actor": {
+        "session_id": "session-b",
+        "agent_id": "exp-0003-b"
+       },
+       "identity_assurance": "asserted",
+       "capability_id": null,
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 4,
+       "to_version": 5,
+       "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+       "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+       "parent_operation_id": "op-0QB097WVR3H0ECF8",
+       "causation_id": "op-0QB097WVR3H0ECF8",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:24.422Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-9KFQYC751RGDV3TZ",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.843Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+     },
+     "next": {
+      "operation_id": "op-38DAXWHRV4DET1KN",
+      "sequence": 5,
+      "operation_type": "propose",
+      "actor": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+      "parent_operation_id": "op-0QB097WVR3H0ECF8",
+      "causation_id": "op-0QB097WVR3H0ECF8",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:24.422Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN"
+     },
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-J3CQA38CE4G8JAJZ"
+    },
+    "event_refs": [
+     {
+      "version": 4,
+      "operation": "checkpoint",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/4"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 5,
+     "operation_type": "propose",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-b",
+      "session_id": "session-b"
+     },
+     "identity_assurance": "asserted",
+     "authority": {
+      "via": "none",
+      "scopes": [],
+      "capability_id": null,
+      "capability_kind": null
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-b",
+      "session_id": "session-b",
+      "identity_assurance": "asserted"
+     },
+     "executed_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "payload": {
+       "refs": [
+        {
+         "tok": "TOK-002"
+        }
+       ],
+       "type": "observation",
+       "title": "Counter-observation: depth lags latency by 2 s"
+      },
+      "operation": "append",
+      "rationale": "B has no capability; asking the owner to record this."
+     },
+     "expected_version": 4,
+     "idempotency_key": "session-b-aee432304c221796",
+     "request_hash": "sha256:c1012de898f220b27212bf587729fe1262a54226f4ae63bc15d7506d3de2ad66",
+     "transition": {
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@5",
+        "version": 5,
+        "operation": "propose"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-0QB097WVR3H0ECF8",
+      "causation_id": "op-0QB097WVR3H0ECF8",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "notice": "Proposed, not performed. The owner decides whether to execute it.",
+      "proposal": {
+       "id": "P-001",
+       "type": "operation_intent",
+       "result": null,
+       "status": "pending",
+       "payload": {
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "content": "",
+        "summary": "",
+        "stated_confidence": "unclassified"
+       },
+       "operation": "append",
+       "rationale": "B has no capability; asking the owner to record this.",
+       "created_at": "2026-09-26T02:25:24.422Z",
+       "base_version": 4,
+       "operation_id": "op-38DAXWHRV4DET1KN",
+       "requested_by": {
+        "kind": "agent",
+        "agent_id": "exp-0003-b",
+        "session_id": "session-b",
+        "identity_assurance": "asserted"
+       },
+       "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+       "created_version": 5,
+       "resolution_note": null,
+       "resolved_version": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:24.422Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-0QB097WVR3H0ECF8",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 3,
+       "to_version": 4,
+       "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+       "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.868Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+      },
+      {
+       "operation_id": "op-9KFQYC751RGDV3TZ",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+      },
+      {
+       "operation_id": "op-J3CQA38CE4G8JAJZ",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+       "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+      }
+     ],
+     "consequences": [],
+     "parent": {
+      "operation_id": "op-0QB097WVR3H0ECF8",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+     },
+     "next": null,
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-J3CQA38CE4G8JAJZ"
+    },
+    "event_refs": [
+     {
+      "version": 5,
+      "operation": "propose",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/5"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operational_state",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 5,
+    "sha256": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+    "latest_operation": {
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN"
+    },
+    "verification": "sha256 = \"sha256:\" + hex(SHA-256(canonical JSON of \"state\")), canonical JSON = keys sorted, no whitespace. It must equal latest_operation.state_after.",
+    "state": {
+     "schema": "acsp.operational-state/0.2",
+     "resource": {
+      "id": "SYTRZXTDDAVH",
+      "version": 5,
+      "title": "exp-0003: inter-session operational communication",
+      "description": "",
+      "focus": "B continues from A's persisted state; C reconstructs why.",
+      "lifecycle": "active",
+      "owner": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "human": null
+      },
+      "parent": null,
+      "created_at": "2026-09-26T02:25:23.771Z",
+      "visibility": "unlisted",
+      "accepts_proposals": true,
+      "enabled_extensions": []
+     },
+     "knowledge": [
+      {
+       "id": "TOK-001",
+       "type": "task",
+       "title": "Check the finding and add a counter-observation",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "unclassified",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 2,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "task": {
+        "responsible_session_id": "session-a"
+       },
+       "origin": null,
+       "annotations": []
+      },
+      {
+       "id": "TOK-002",
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "medium",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 3,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "task": null,
+       "origin": null,
+       "annotations": []
+      }
+     ],
+     "handoffs": [],
+     "proposals": [
+      {
+       "id": "P-001",
+       "type": "operation_intent",
+       "operation": "append",
+       "payload": {
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "content": "",
+        "summary": "",
+        "stated_confidence": "unclassified"
+       },
+       "rationale": "B has no capability; asking the owner to record this.",
+       "requested_by": {
+        "session_id": "session-b",
+        "agent_id": "exp-0003-b",
+        "kind": "agent",
+        "identity_assurance": "asserted"
+       },
+       "status": "pending",
+       "created_version": 5,
+       "resolved_version": null,
+       "resolution_note": null,
+       "result": null,
+       "created_at": "2026-09-26T02:25:24.422Z",
+       "operation_id": "op-38DAXWHRV4DET1KN",
+       "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+       "base_version": 4
+      }
+     ],
+     "capabilities": [
+      {
+       "id": "cap_CY5XXPZ1Q6",
+       "kind": "owner",
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "scopes": [
+        "owner"
+       ],
+       "created_version": 1,
+       "expires_at": null,
+       "revoked_at": null,
+       "revoked_version": null
+      }
+     ],
+     "checkpoints": [
+      {
+       "number": 0,
+       "version": 1,
+       "label": "genesis",
+       "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23"
+      },
+      {
+       "number": 1,
+       "version": 4,
+       "label": "A stops here",
+       "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8"
+      }
+     ]
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint_list",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "SYTRZXTDDAVH",
+    "semantics": "A checkpoint is a deliberate, hashed boundary of the externally persisted state at one version. To resume: read the checkpoint, then the diff since it.",
+    "checkpoints": [
+     {
+      "number": 0,
+      "version": 1,
+      "label": "genesis",
+      "note": "Created with the resource.",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:23.771Z",
+      "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints/0",
+      "diff_since": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?since_checkpoint=0"
+     },
+     {
+      "number": 1,
+      "version": 4,
+      "label": "A stops here",
+      "note": "",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints/1",
+      "diff_since": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?since_checkpoint=1"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "html": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "status": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=status",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "checkpoints": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/explorer",
+     "execute": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints/0.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "SYTRZXTDDAVH",
+    "verification": "sha256 is \"sha256:\" + hex(SHA-256(canonical JSON of snapshot)), where canonical JSON sorts object keys and has no whitespace.",
+    "checkpoint": {
+     "number": 0,
+     "version": 1,
+     "label": "genesis",
+     "note": "Created with the resource.",
+     "created_by": {
+      "session_id": "session-a"
+     },
+     "created_at": "2026-09-26T02:25:23.771Z",
+     "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23",
+     "snapshot": {
+      "handoffs": [],
+      "protocol": "ACSP/0.2",
+      "resource": {
+       "id": "SYTRZXTDDAVH",
+       "focus": "B continues from A's persisted state; C reconstructs why.",
+       "owner": {
+        "human": null,
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a"
+       },
+       "title": "exp-0003: inter-session operational communication",
+       "parent": null,
+       "version": 1,
+       "lifecycle": "active",
+       "created_at": "2026-09-26T02:25:23.771Z",
+       "description": ""
+      },
+      "knowledge": []
+     }
+    },
+    "diff_since": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?since_checkpoint=0",
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "html": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "status": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=status",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "checkpoints": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/explorer",
+     "execute": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints/1.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "SYTRZXTDDAVH",
+    "verification": "sha256 is \"sha256:\" + hex(SHA-256(canonical JSON of snapshot)), where canonical JSON sorts object keys and has no whitespace.",
+    "checkpoint": {
+     "number": 1,
+     "version": 4,
+     "label": "A stops here",
+     "note": "",
+     "created_by": {
+      "session_id": "session-a"
+     },
+     "created_at": "2026-09-26T02:25:23.868Z",
+     "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8",
+     "snapshot": {
+      "handoffs": [],
+      "protocol": "ACSP/0.2",
+      "resource": {
+       "id": "SYTRZXTDDAVH",
+       "focus": "B continues from A's persisted state; C reconstructs why.",
+       "owner": {
+        "human": null,
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a"
+       },
+       "title": "exp-0003: inter-session operational communication",
+       "parent": null,
+       "version": 4,
+       "lifecycle": "active",
+       "created_at": "2026-09-26T02:25:23.771Z",
+       "description": ""
+      },
+      "knowledge": [
+       {
+        "id": "TOK-001",
+        "refs": [],
+        "task": {
+         "responsible_session_id": "session-a"
+        },
+        "type": "task",
+        "title": "Check the finding and add a counter-observation",
+        "origin": null,
+        "source": {
+         "kind": "agent",
+         "agent_id": "exp-0003-a-start",
+         "session_id": "session-a",
+         "identity_assurance": "capability"
+        },
+        "status": "active",
+        "content": "",
+        "summary": "",
+        "version": 2,
+        "created_at": "2026-09-26T02:25:23.816Z",
+        "supersedes": null,
+        "annotations": [],
+        "proposal_id": null,
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "superseded_by": null,
+        "after_checkpoint": 0,
+        "stated_confidence": "unclassified",
+        "supersession_reason": null
+       },
+       {
+        "id": "TOK-002",
+        "refs": [],
+        "task": null,
+        "type": "finding",
+        "title": "Queue depth predicts p99 latency",
+        "origin": null,
+        "source": {
+         "kind": "agent",
+         "agent_id": "exp-0003-a-start",
+         "session_id": "session-a",
+         "identity_assurance": "capability"
+        },
+        "status": "active",
+        "content": "",
+        "summary": "",
+        "version": 3,
+        "created_at": "2026-09-26T02:25:23.843Z",
+        "supersedes": null,
+        "annotations": [],
+        "proposal_id": null,
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "superseded_by": null,
+        "after_checkpoint": 0,
+        "stated_confidence": "medium",
+        "supersession_reason": null
+       }
+      ]
+     }
+    },
+    "diff_since": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?since_checkpoint=1",
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "html": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "status": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=status",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "checkpoints": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/explorer",
+     "execute": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 5,
+     "operation_type": "propose",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-b",
+      "session_id": "session-b"
+     },
+     "identity_assurance": "asserted",
+     "authority": {
+      "via": "none",
+      "scopes": [],
+      "capability_id": null,
+      "capability_kind": null
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-b",
+      "session_id": "session-b",
+      "identity_assurance": "asserted"
+     },
+     "executed_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "payload": {
+       "refs": [
+        {
+         "tok": "TOK-002"
+        }
+       ],
+       "type": "observation",
+       "title": "Counter-observation: depth lags latency by 2 s"
+      },
+      "operation": "append",
+      "rationale": "B has no capability; asking the owner to record this."
+     },
+     "expected_version": 4,
+     "idempotency_key": "session-b-aee432304c221796",
+     "request_hash": "sha256:c1012de898f220b27212bf587729fe1262a54226f4ae63bc15d7506d3de2ad66",
+     "transition": {
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "state_after": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@5",
+        "version": 5,
+        "operation": "propose"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-0QB097WVR3H0ECF8",
+      "causation_id": "op-0QB097WVR3H0ECF8",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "notice": "Proposed, not performed. The owner decides whether to execute it.",
+      "proposal": {
+       "id": "P-001",
+       "type": "operation_intent",
+       "result": null,
+       "status": "pending",
+       "payload": {
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "content": "",
+        "summary": "",
+        "stated_confidence": "unclassified"
+       },
+       "operation": "append",
+       "rationale": "B has no capability; asking the owner to record this.",
+       "created_at": "2026-09-26T02:25:24.422Z",
+       "base_version": 4,
+       "operation_id": "op-38DAXWHRV4DET1KN",
+       "requested_by": {
+        "kind": "agent",
+        "agent_id": "exp-0003-b",
+        "session_id": "session-b",
+        "identity_assurance": "asserted"
+       },
+       "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+       "created_version": 5,
+       "resolution_note": null,
+       "resolved_version": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:24.422Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-0QB097WVR3H0ECF8",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 3,
+       "to_version": 4,
+       "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+       "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.868Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+      },
+      {
+       "operation_id": "op-9KFQYC751RGDV3TZ",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+       "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ"
+      },
+      {
+       "operation_id": "op-J3CQA38CE4G8JAJZ",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_CY5XXPZ1Q6",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+       "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+       "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ"
+      }
+     ],
+     "consequences": [],
+     "parent": {
+      "operation_id": "op-0QB097WVR3H0ECF8",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ",
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8"
+     },
+     "next": null,
+     "correlation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op?correlation_id=op-J3CQA38CE4G8JAJZ"
+    },
+    "event_refs": [
+     {
+      "version": 5,
+      "operation": "propose",
+      "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events/5"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN.json",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN",
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/proposals/P-001.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "proposal",
+    "notice": "A proposal is an operation someone asked to have performed. It is stored, not executed. Only the owner can accept (execute) or reject it.",
+    "proposal": {
+     "id": "P-001",
+     "type": "operation_intent",
+     "operation": "append",
+     "payload": {
+      "refs": [
+       {
+        "tok": "TOK-002"
+       }
+      ],
+      "type": "observation",
+      "title": "Counter-observation: depth lags latency by 2 s",
+      "content": "",
+      "summary": "",
+      "stated_confidence": "unclassified"
+     },
+     "rationale": "B has no capability; asking the owner to record this.",
+     "requested_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "status": "pending",
+     "created_version": 5,
+     "resolved_version": null,
+     "resolution_note": null,
+     "result": null,
+     "created_at": "2026-09-26T02:25:24.422Z",
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+     "base_version": 4
+    },
+    "proposed_operation": {
+     "schema": "acsp.proposed-operation/0.2",
+     "operation": "append",
+     "payload": {
+      "refs": [
+       {
+        "tok": "TOK-002"
+       }
+      ],
+      "type": "observation",
+      "title": "Counter-observation: depth lags latency by 2 s",
+      "content": "",
+      "summary": "",
+      "stated_confidence": "unclassified"
+     },
+     "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+     "binding": "On acceptance exactly this payload is executed; its hash is recorded at proposal time and checked before execution.",
+     "requested_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "base_version": 4,
+     "proposed_in_operation": "op-38DAXWHRV4DET1KN"
+    },
+    "resolution": null,
+    "how_to_resolve": {
+     "who": "the owner capability only",
+     "accept": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=prepare_resolve_proposal&proposal_id=P-001&decision=accept&causation_id=op-38DAXWHRV4DET1KN",
+     "reject": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?action=prepare_resolve_proposal&proposal_id=P-001&decision=reject&causation_id=op-38DAXWHRV4DET1KN"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+     "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "proposed_in": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-38DAXWHRV4DET1KN"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "resolve_proposal",
+    "actor": {
+     "session_id": "session-a",
+     "agent_id": "exp-0003-a-review",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-a-10988fa068ed17a1",
+    "payload": {
+     "proposal_id": "P-001",
+     "decision": "accept",
+     "note": "Checked by session-a."
+    },
+    "expected_version": 5
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "resolve_proposal",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 7,
+    "events": [
+     {
+      "id": "SYTRZXTDDAVH@6",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 6,
+      "parent_version": 5,
+      "resulting_version": 6,
+      "operation": "resolve_proposal",
+      "occurred_at": "2026-09-26T02:25:25.406Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-review",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-a accepted P-001 (append from session-b)",
+      "data": {
+       "proposal_id": "P-001",
+       "decision": "accept",
+       "note": "Checked by session-a."
+      },
+      "request_hash": "sha256:9ca42351f3ba606c60836085daf0cdf97d56d0aee85a9dd568a51b7dc3e02d7d",
+      "idempotency_key": "session-a-10988fa068ed17a1",
+      "operation_id": "op-J79HQ7J7Y3PCF3KM"
+     },
+     {
+      "id": "SYTRZXTDDAVH@7",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 7,
+      "parent_version": 6,
+      "resulting_version": 7,
+      "operation": "append",
+      "occurred_at": "2026-09-26T02:25:25.406Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-review",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b",
+       "kind": "agent",
+       "identity_assurance": "asserted"
+      },
+      "proposal_id": "P-001",
+      "summary": "session-b appended observation TOK-003 \"Counter-observation: depth lags latency by 2 s\"",
+      "data": {
+       "tok_id": "TOK-003",
+       "type": "observation",
+       "title": "Counter-observation: depth lags latency by 2 s"
+      },
+      "request_hash": "sha256:9ca42351f3ba606c60836085daf0cdf97d56d0aee85a9dd568a51b7dc3e02d7d",
+      "idempotency_key": "session-a-10988fa068ed17a1",
+      "operation_id": "op-J79HQ7J7Y3PCF3KM"
+     }
+    ],
+    "result": {
+     "proposal": {
+      "id": "P-001",
+      "type": "operation_intent",
+      "operation": "append",
+      "payload": {
+       "refs": [
+        {
+         "tok": "TOK-002"
+        }
+       ],
+       "type": "observation",
+       "title": "Counter-observation: depth lags latency by 2 s",
+       "content": "",
+       "summary": "",
+       "stated_confidence": "unclassified"
+      },
+      "rationale": "B has no capability; asking the owner to record this.",
+      "requested_by": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b",
+       "kind": "agent",
+       "identity_assurance": "asserted"
+      },
+      "status": "accepted",
+      "created_version": 5,
+      "resolved_version": 6,
+      "resolution_note": "Checked by session-a.",
+      "result": {
+       "tok": {
+        "id": "TOK-003",
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "summary": "",
+        "content": "",
+        "stated_confidence": "unclassified",
+        "status": "active",
+        "supersedes": null,
+        "superseded_by": null,
+        "supersession_reason": null,
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "source": {
+         "session_id": "session-b",
+         "agent_id": "exp-0003-b",
+         "kind": "agent",
+         "identity_assurance": "asserted"
+        },
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "proposal_id": "P-001",
+        "version": 7,
+        "after_checkpoint": 1,
+        "created_at": "2026-09-26T02:25:25.406Z",
+        "task": null,
+        "origin": null,
+        "annotations": []
+       }
+      },
+      "created_at": "2026-09-26T02:25:24.422Z",
+      "operation_id": "op-38DAXWHRV4DET1KN",
+      "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+      "base_version": 4
+     },
+     "executed": {
+      "tok": {
+       "id": "TOK-003",
+       "type": "observation",
+       "title": "Counter-observation: depth lags latency by 2 s",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "unclassified",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [
+        {
+         "tok": "TOK-002"
+        }
+       ],
+       "source": {
+        "session_id": "session-b",
+        "agent_id": "exp-0003-b",
+        "kind": "agent",
+        "identity_assurance": "asserted"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": "P-001",
+       "version": 7,
+       "after_checkpoint": 1,
+       "created_at": "2026-09-26T02:25:25.406Z",
+       "task": null,
+       "origin": null,
+       "annotations": []
+      }
+     }
+    },
+    "replayed": false,
+    "operation_id": "op-J79HQ7J7Y3PCF3KM",
+    "previous_version": 5,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-J79HQ7J7Y3PCF3KM",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 6,
+     "operation_type": "resolve_proposal",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-review",
+      "kind": "agent"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ]
+     },
+     "requested_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-review",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-review",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "proposal_id": "P-001",
+     "payload": {
+      "proposal_id": "P-001",
+      "decision": "accept",
+      "note": "Checked by session-a."
+     },
+     "expected_version": 5,
+     "idempotency_key": "session-a-10988fa068ed17a1",
+     "request_hash": "sha256:9ca42351f3ba606c60836085daf0cdf97d56d0aee85a9dd568a51b7dc3e02d7d",
+     "transition": {
+      "from_version": 5,
+      "to_version": 7,
+      "state_before": "sha256:53a2b3acc54dc4fdee0b8982179f036660d281ead330b585cb7e872b2521af5e",
+      "state_after": "sha256:6fd032aa6a3e342177335d5d417408171c6d8dd4430cd44c98dff780df92666b",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@6",
+        "version": 6,
+        "operation": "resolve_proposal"
+       },
+       {
+        "id": "SYTRZXTDDAVH@7",
+        "version": 7,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-38DAXWHRV4DET1KN",
+      "causation_id": "op-38DAXWHRV4DET1KN",
+      "causation_source": "derived",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "proposal": {
+       "id": "P-001",
+       "type": "operation_intent",
+       "operation": "append",
+       "payload": {
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "content": "",
+        "summary": "",
+        "stated_confidence": "unclassified"
+       },
+       "rationale": "B has no capability; asking the owner to record this.",
+       "requested_by": {
+        "session_id": "session-b",
+        "agent_id": "exp-0003-b",
+        "kind": "agent",
+        "identity_assurance": "asserted"
+       },
+       "status": "accepted",
+       "created_version": 5,
+       "resolved_version": 6,
+       "resolution_note": "Checked by session-a.",
+       "result": {
+        "tok": {
+         "id": "TOK-003",
+         "type": "observation",
+         "title": "Counter-observation: depth lags latency by 2 s",
+         "summary": "",
+         "content": "",
+         "stated_confidence": "unclassified",
+         "status": "active",
+         "supersedes": null,
+         "superseded_by": null,
+         "supersession_reason": null,
+         "refs": [
+          {
+           "tok": "TOK-002"
+          }
+         ],
+         "source": {
+          "session_id": "session-b",
+          "agent_id": "exp-0003-b",
+          "kind": "agent",
+          "identity_assurance": "asserted"
+         },
+         "recorded_by": {
+          "session_id": "session-a"
+         },
+         "proposal_id": "P-001",
+         "version": 7,
+         "after_checkpoint": 1,
+         "created_at": "2026-09-26T02:25:25.406Z",
+         "task": null,
+         "origin": null,
+         "annotations": []
+        }
+       },
+       "created_at": "2026-09-26T02:25:24.422Z",
+       "operation_id": "op-38DAXWHRV4DET1KN",
+       "payload_sha256": "sha256:f8db2d153d92b5099021f6017749ee9378be1ddbe5977a6c4d0815c524eaf75b",
+       "base_version": 4
+      },
+      "executed": {
+       "tok": {
+        "id": "TOK-003",
+        "type": "observation",
+        "title": "Counter-observation: depth lags latency by 2 s",
+        "summary": "",
+        "content": "",
+        "stated_confidence": "unclassified",
+        "status": "active",
+        "supersedes": null,
+        "superseded_by": null,
+        "supersession_reason": null,
+        "refs": [
+         {
+          "tok": "TOK-002"
+         }
+        ],
+        "source": {
+         "session_id": "session-b",
+         "agent_id": "exp-0003-b",
+         "kind": "agent",
+         "identity_assurance": "asserted"
+        },
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "proposal_id": "P-001",
+        "version": 7,
+        "after_checkpoint": 1,
+        "created_at": "2026-09-26T02:25:25.406Z",
+        "task": null,
+        "origin": null,
+        "annotations": []
+       }
+      }
+     },
+     "created_at": "2026-09-26T02:25:25.406Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J79HQ7J7Y3PCF3KM",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J79HQ7J7Y3PCF3KM.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J79HQ7J7Y3PCF3KM",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J79HQ7J7Y3PCF3KM",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-J79HQ7J7Y3PCF3KM",
+     "version": 7,
+     "state_sha256": "sha256:6fd032aa6a3e342177335d5d417408171c6d8dd4430cd44c98dff780df92666b",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "operation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J79HQ7J7Y3PCF3KM",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J79HQ7J7Y3PCF3KM",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  }
+ ]
+}

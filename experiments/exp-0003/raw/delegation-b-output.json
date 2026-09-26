@@ -1,0 +1,122 @@
+{
+ "mode": "b",
+ "argv": [
+  "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY"
+ ],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/db-KEf0yp",
+  "ACSP_CAPABILITY": "[REDACTED CAPABILITY]"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "b",
+  "session": "session-b",
+  "pid": 3333,
+  "received_capability_secret": false,
+  "continuation_schema_valid": true,
+  "verification": {
+   "resource_id": "4MYVCWJV96HP",
+   "operations": 5,
+   "chain_ok": true,
+   "versions_contiguous": true,
+   "state_matches_latest": true,
+   "checkpoints_ok": true,
+   "records_schema_valid": true,
+   "problems": [],
+   "graph": [
+    {
+     "operation_id": "op-6SHT346FTN1H7SHW",
+     "sequence": 1,
+     "operation_type": "create",
+     "actor": "session-a",
+     "identity_assurance": "asserted",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-6SHT346FTN1H7SHW",
+     "from_version": 0,
+     "to_version": 1
+    },
+    {
+     "operation_id": "op-S9ENP5MCDDE6R60E",
+     "sequence": 2,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 1,
+     "to_version": 2
+    },
+    {
+     "operation_id": "op-5061FHYZ0YVFR7PV",
+     "sequence": 3,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-S9ENP5MCDDE6R60E",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 2,
+     "to_version": 3
+    },
+    {
+     "operation_id": "op-4H3DKC1KPXYJ5J8W",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-5061FHYZ0YVFR7PV",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 3,
+     "to_version": 4
+    },
+    {
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "sequence": 5,
+     "operation_type": "delegate",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-4H3DKC1KPXYJ5J8W",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 4,
+     "to_version": 5
+    }
+   ]
+  },
+  "authority": {
+   "authenticated": true,
+   "session_id": "session-b",
+   "scopes": [
+    "read",
+    "append"
+   ],
+   "permitted": [
+    "append",
+    "fork",
+    "propose"
+   ]
+  },
+  "reference": {
+   "schema": "acsp.continuation-reference/0.2",
+   "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY",
+   "resource_id": "4MYVCWJV96HP",
+   "operation_id": "op-AB8VG4H330SHP3DY",
+   "version": 5,
+   "state_sha256": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+   "correlation_id": "op-S9ENP5MCDDE6R60E"
+  },
+  "produced_by": "session-a",
+  "append": {
+   "status": 200,
+   "operation_id": "op-4TVZNHR4ND93QN95",
+   "identity_assurance": "capability",
+   "capability_kind": "delegation",
+   "causation_id": "op-AB8VG4H330SHP3DY"
+  },
+  "continuation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4TVZNHR4ND93QN95"
+ }
+}

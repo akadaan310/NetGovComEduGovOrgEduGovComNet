@@ -1,0 +1,866 @@
+{
+ "mode": "a-start",
+ "session": "session-a",
+ "pid": 3213,
+ "transcript": [
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r",
+   "authorization": null,
+   "status": 201,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "create",
+    "actor": {
+     "session_id": "session-a",
+     "agent_id": "exp-0003-a-start",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-a-d969fe7e84fcd05b",
+    "payload": {
+     "title": "exp-0003: inter-session operational communication",
+     "focus": "B continues from A's persisted state; C reconstructs why."
+    }
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "create",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 1,
+    "events": [
+     {
+      "id": "SYTRZXTDDAVH@1",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 1,
+      "parent_version": 0,
+      "resulting_version": 1,
+      "operation": "create",
+      "occurred_at": "2026-09-26T02:25:23.771Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-a created resource \"exp-0003: inter-session operational communication\"",
+      "data": {
+       "title": "exp-0003: inter-session operational communication",
+       "visibility": "unlisted",
+       "accepts_proposals": true,
+       "owner": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "human": null
+       }
+      },
+      "request_hash": "sha256:9f46d8967055349c22e3f257939befb87d6ad0f71bb696d4ab29f6f0b550034c",
+      "idempotency_key": "session-a-d969fe7e84fcd05b",
+      "operation_id": "op-TG6D80QZNNVDJBXC"
+     }
+    ],
+    "result": {
+     "resource": {
+      "id": "SYTRZXTDDAVH",
+      "title": "exp-0003: inter-session operational communication",
+      "visibility": "unlisted",
+      "lifecycle": "active",
+      "version": 1
+     },
+     "owner_capability": {
+      "id": "cap_CY5XXPZ1Q6",
+      "token": "[REDACTED CAPABILITY]",
+      "kind": "owner",
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "scopes": [
+       "owner"
+      ],
+      "expires_at": null,
+      "notice": "This token is shown ONCE and is not stored in recoverable form. Treat it as a secret."
+     },
+     "checkpoint": {
+      "number": 0,
+      "version": 1,
+      "label": "genesis",
+      "note": "Created with the resource.",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:23.771Z",
+      "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23"
+     },
+     "owner_capability_url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH?cap=[REDACTED CAPABILITY]"
+    },
+    "replayed": false,
+    "operation_id": "op-TG6D80QZNNVDJBXC",
+    "previous_version": 0,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-TG6D80QZNNVDJBXC",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 1,
+     "operation_type": "create",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent"
+     },
+     "identity_assurance": "asserted",
+     "authority": {
+      "via": "none",
+      "capability_id": null,
+      "capability_kind": null,
+      "scopes": []
+     },
+     "requested_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "title": "exp-0003: inter-session operational communication",
+      "focus": "B continues from A's persisted state; C reconstructs why."
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-d969fe7e84fcd05b",
+     "request_hash": "sha256:9f46d8967055349c22e3f257939befb87d6ad0f71bb696d4ab29f6f0b550034c",
+     "transition": {
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@1",
+        "version": 1,
+        "operation": "create"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-TG6D80QZNNVDJBXC"
+     },
+     "executed": true,
+     "result": {
+      "resource": {
+       "id": "SYTRZXTDDAVH",
+       "title": "exp-0003: inter-session operational communication",
+       "visibility": "unlisted",
+       "lifecycle": "active",
+       "version": 1
+      },
+      "owner_capability": {
+       "id": "cap_CY5XXPZ1Q6",
+       "token": null,
+       "token_redacted": true,
+       "kind": "owner",
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "scopes": [
+        "owner"
+       ],
+       "expires_at": null,
+       "notice": "This token is shown ONCE and is not stored in recoverable form. Treat it as a secret."
+      },
+      "checkpoint": {
+       "number": 0,
+       "version": 1,
+       "label": "genesis",
+       "note": "Created with the resource.",
+       "created_by": {
+        "session_id": "session-a"
+       },
+       "created_at": "2026-09-26T02:25:23.771Z",
+       "sha256": "sha256:4988b15aa4a0ae82102896293eedc9d42676fb43215f6d5809d1615be3340a23"
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.771Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-TG6D80QZNNVDJBXC",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-TG6D80QZNNVDJBXC",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-TG6D80QZNNVDJBXC",
+     "version": 1,
+     "state_sha256": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+     "correlation_id": "op-TG6D80QZNNVDJBXC"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "operation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-TG6D80QZNNVDJBXC",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-TG6D80QZNNVDJBXC",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": true
+  },
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "actor": {
+     "session_id": "session-a",
+     "agent_id": "exp-0003-a-start",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-a-b4bc9a20b0fe6dc8",
+    "payload": {
+     "type": "task",
+     "title": "Check the finding and add a counter-observation"
+    }
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 2,
+    "events": [
+     {
+      "id": "SYTRZXTDDAVH@2",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 2,
+      "parent_version": 1,
+      "resulting_version": 2,
+      "operation": "append",
+      "occurred_at": "2026-09-26T02:25:23.816Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-a appended task TOK-001 \"Check the finding and add a counter-observation\"",
+      "data": {
+       "tok_id": "TOK-001",
+       "type": "task",
+       "title": "Check the finding and add a counter-observation"
+      },
+      "request_hash": "sha256:de46bccd008cd7b984ead391deec987d8495354261e31f14093c5c7c08162802",
+      "idempotency_key": "session-a-b4bc9a20b0fe6dc8",
+      "operation_id": "op-J3CQA38CE4G8JAJZ"
+     }
+    ],
+    "result": {
+     "tok": {
+      "id": "TOK-001",
+      "type": "task",
+      "title": "Check the finding and add a counter-observation",
+      "summary": "",
+      "content": "",
+      "stated_confidence": "unclassified",
+      "status": "active",
+      "supersedes": null,
+      "superseded_by": null,
+      "supersession_reason": null,
+      "refs": [],
+      "source": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent",
+       "identity_assurance": "capability"
+      },
+      "recorded_by": {
+       "session_id": "session-a"
+      },
+      "proposal_id": null,
+      "version": 2,
+      "after_checkpoint": 0,
+      "created_at": "2026-09-26T02:25:23.816Z",
+      "task": {
+       "responsible_session_id": "session-a"
+      },
+      "origin": null,
+      "annotations": []
+     }
+    },
+    "replayed": false,
+    "operation_id": "op-J3CQA38CE4G8JAJZ",
+    "previous_version": 1,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-J3CQA38CE4G8JAJZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 2,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ]
+     },
+     "requested_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "task",
+      "title": "Check the finding and add a counter-observation"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-b4bc9a20b0fe6dc8",
+     "request_hash": "sha256:de46bccd008cd7b984ead391deec987d8495354261e31f14093c5c7c08162802",
+     "transition": {
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:e359297e963260e01c72b098b3baae5dfbbf5f6f8f925d23e3ace41c6331f5d8",
+      "state_after": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@2",
+        "version": 2,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-TG6D80QZNNVDJBXC",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-001",
+       "type": "task",
+       "title": "Check the finding and add a counter-observation",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "unclassified",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 2,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:23.816Z",
+       "task": {
+        "responsible_session_id": "session-a"
+       },
+       "origin": null,
+       "annotations": []
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.816Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J3CQA38CE4G8JAJZ",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J3CQA38CE4G8JAJZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-J3CQA38CE4G8JAJZ",
+     "version": 2,
+     "state_sha256": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "operation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-J3CQA38CE4G8JAJZ",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J3CQA38CE4G8JAJZ",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "actor": {
+     "session_id": "session-a",
+     "agent_id": "exp-0003-a-start",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-a-e7dc6ff79920e637",
+    "payload": {
+     "type": "finding",
+     "title": "Queue depth predicts p99 latency",
+     "stated_confidence": "medium"
+    },
+    "causation_id": "op-J3CQA38CE4G8JAJZ"
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 3,
+    "events": [
+     {
+      "id": "SYTRZXTDDAVH@3",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 3,
+      "parent_version": 2,
+      "resulting_version": 3,
+      "operation": "append",
+      "occurred_at": "2026-09-26T02:25:23.843Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-a appended finding TOK-002 \"Queue depth predicts p99 latency\"",
+      "data": {
+       "tok_id": "TOK-002",
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency"
+      },
+      "request_hash": "sha256:56c240efee76d09d34a3c708fa45cb44e9c12ba2b565f8d93e1d7c422663d85b",
+      "idempotency_key": "session-a-e7dc6ff79920e637",
+      "operation_id": "op-9KFQYC751RGDV3TZ"
+     }
+    ],
+    "result": {
+     "tok": {
+      "id": "TOK-002",
+      "type": "finding",
+      "title": "Queue depth predicts p99 latency",
+      "summary": "",
+      "content": "",
+      "stated_confidence": "medium",
+      "status": "active",
+      "supersedes": null,
+      "superseded_by": null,
+      "supersession_reason": null,
+      "refs": [],
+      "source": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent",
+       "identity_assurance": "capability"
+      },
+      "recorded_by": {
+       "session_id": "session-a"
+      },
+      "proposal_id": null,
+      "version": 3,
+      "after_checkpoint": 0,
+      "created_at": "2026-09-26T02:25:23.843Z",
+      "task": null,
+      "origin": null,
+      "annotations": []
+     }
+    },
+    "replayed": false,
+    "operation_id": "op-9KFQYC751RGDV3TZ",
+    "previous_version": 2,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-9KFQYC751RGDV3TZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 3,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ]
+     },
+     "requested_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "finding",
+      "title": "Queue depth predicts p99 latency",
+      "stated_confidence": "medium"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-e7dc6ff79920e637",
+     "request_hash": "sha256:56c240efee76d09d34a3c708fa45cb44e9c12ba2b565f8d93e1d7c422663d85b",
+     "transition": {
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:c63a263b25272577322482b2a2c7635d24d62b6bfb9a6dcf66f82f4e6c786a6d",
+      "state_after": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@3",
+        "version": 3,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_id": "op-J3CQA38CE4G8JAJZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-002",
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "medium",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 3,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:23.843Z",
+       "task": null,
+       "origin": null,
+       "annotations": []
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.843Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-9KFQYC751RGDV3TZ",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-9KFQYC751RGDV3TZ",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-9KFQYC751RGDV3TZ",
+     "version": 3,
+     "state_sha256": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "operation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-9KFQYC751RGDV3TZ",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-9KFQYC751RGDV3TZ",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "checkpoint",
+    "actor": {
+     "session_id": "session-a",
+     "agent_id": "exp-0003-a-start",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-a-6554e1b90a96ab07",
+    "payload": {
+     "label": "A stops here"
+    },
+    "causation_id": "op-9KFQYC751RGDV3TZ"
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "checkpoint",
+    "resource_id": "SYTRZXTDDAVH",
+    "version": 4,
+    "events": [
+     {
+      "id": "SYTRZXTDDAVH@4",
+      "resource_id": "SYTRZXTDDAVH",
+      "version": 4,
+      "parent_version": 3,
+      "resulting_version": 4,
+      "operation": "checkpoint",
+      "occurred_at": "2026-09-26T02:25:23.868Z",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-a created checkpoint 1 \"A stops here\"",
+      "data": {
+       "number": 1,
+       "label": "A stops here",
+       "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8"
+      },
+      "request_hash": "sha256:a1535599632c3e43a7e4448089678c040a68240857aaa5b37c325b59d3891a6c",
+      "idempotency_key": "session-a-6554e1b90a96ab07",
+      "operation_id": "op-0QB097WVR3H0ECF8"
+     }
+    ],
+    "result": {
+     "checkpoint": {
+      "number": 1,
+      "version": 4,
+      "label": "A stops here",
+      "note": "",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:23.868Z",
+      "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8"
+     }
+    },
+    "replayed": false,
+    "operation_id": "op-0QB097WVR3H0ECF8",
+    "previous_version": 3,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-0QB097WVR3H0ECF8",
+     "resource_id": "SYTRZXTDDAVH",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "capability_id": "cap_CY5XXPZ1Q6",
+      "capability_kind": "owner",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ]
+     },
+     "requested_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "label": "A stops here"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-6554e1b90a96ab07",
+     "request_hash": "sha256:a1535599632c3e43a7e4448089678c040a68240857aaa5b37c325b59d3891a6c",
+     "transition": {
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:b87edcd3cd5270e4ebd30cf847cb0764fd2463bd5d61d37ddd9f0cd39b785cd4",
+      "state_after": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+      "events": [
+       {
+        "id": "SYTRZXTDDAVH@4",
+        "version": 4,
+        "operation": "checkpoint"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_id": "op-9KFQYC751RGDV3TZ",
+      "causation_source": "actor",
+      "correlation_id": "op-J3CQA38CE4G8JAJZ"
+     },
+     "executed": true,
+     "result": {
+      "checkpoint": {
+       "number": 1,
+       "version": 4,
+       "label": "A stops here",
+       "note": "",
+       "created_by": {
+        "session_id": "session-a"
+       },
+       "created_at": "2026-09-26T02:25:23.868Z",
+       "sha256": "sha256:fe8490ef4c3a8718bedb6c031b07313b116b009974ddbe07060df94d03a216c8"
+      }
+     },
+     "created_at": "2026-09-26T02:25:23.868Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8",
+      "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8.json",
+      "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8",
+      "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+      "resource_json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+      "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op",
+      "state": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/state",
+      "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8",
+     "resource_id": "SYTRZXTDDAVH",
+     "operation_id": "op-0QB097WVR3H0ECF8",
+     "version": 4,
+     "state_sha256": "sha256:35927a48467e5b8d88d4d39b7e7599d40abc1cea2421e52da6afa87426e29917",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/SYTRZXTDDAVH",
+     "json": "http://127.0.0.1:39931/r/SYTRZXTDDAVH.json",
+     "events": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/events",
+     "operations": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/operations",
+     "operation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/op/op-0QB097WVR3H0ECF8",
+     "continue": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-0QB097WVR3H0ECF8",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  }
+ ]
+}

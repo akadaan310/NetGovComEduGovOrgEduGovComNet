@@ -1,0 +1,105 @@
+{
+ "mode": "a-review",
+ "argv": [
+  "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-38DAXWHRV4DET1KN"
+ ],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/a-H9QmXk"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "a-review",
+  "session": "session-a",
+  "pid": 3273,
+  "received_capability_secret": false,
+  "viewer_is_owner": true,
+  "verification": {
+   "resource_id": "SYTRZXTDDAVH",
+   "operations": 5,
+   "chain_ok": true,
+   "versions_contiguous": true,
+   "state_matches_latest": true,
+   "checkpoints_ok": true,
+   "records_schema_valid": true,
+   "problems": [],
+   "graph": [
+    {
+     "operation_id": "op-TG6D80QZNNVDJBXC",
+     "sequence": 1,
+     "operation_type": "create",
+     "actor": "session-a",
+     "identity_assurance": "asserted",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-TG6D80QZNNVDJBXC",
+     "from_version": 0,
+     "to_version": 1
+    },
+    {
+     "operation_id": "op-J3CQA38CE4G8JAJZ",
+     "sequence": 2,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-J3CQA38CE4G8JAJZ",
+     "from_version": 1,
+     "to_version": 2
+    },
+    {
+     "operation_id": "op-9KFQYC751RGDV3TZ",
+     "sequence": 3,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-J3CQA38CE4G8JAJZ",
+     "causation_source": "actor",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ",
+     "from_version": 2,
+     "to_version": 3
+    },
+    {
+     "operation_id": "op-0QB097WVR3H0ECF8",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-9KFQYC751RGDV3TZ",
+     "causation_source": "actor",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ",
+     "from_version": 3,
+     "to_version": 4
+    },
+    {
+     "operation_id": "op-38DAXWHRV4DET1KN",
+     "sequence": 5,
+     "operation_type": "propose",
+     "actor": "session-b",
+     "identity_assurance": "asserted",
+     "causation_id": "op-0QB097WVR3H0ECF8",
+     "causation_source": "actor",
+     "correlation_id": "op-J3CQA38CE4G8JAJZ",
+     "from_version": 4,
+     "to_version": 5
+    }
+   ]
+  },
+  "proposal": {
+   "id": "P-001",
+   "requested_by": "session-b",
+   "payload_hash_ok": true,
+   "proposed_in": "op-38DAXWHRV4DET1KN"
+  },
+  "accept": {
+   "status": 200,
+   "operation_id": "op-J79HQ7J7Y3PCF3KM",
+   "causation_id": "op-38DAXWHRV4DET1KN",
+   "causation_source": "derived",
+   "events": 2,
+   "on_behalf_of": "session-b"
+  },
+  "continuation": "http://127.0.0.1:39931/r/SYTRZXTDDAVH/continue/op-J79HQ7J7Y3PCF3KM"
+ }
+}

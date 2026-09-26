@@ -1,0 +1,2241 @@
+{
+ "mode": "b",
+ "session": "session-b",
+ "pid": 3333,
+ "transcript": [
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "continuation",
+    "schema": "acsp.continuation/0.2",
+    "notice": "This is a continuation reference: it identifies a persisted state of an ACSP resource from which another, independent session may continue. It does not identify you with the session that produced it, it transfers no memory and no identity, and it grants no authority. Your own authority is evaluated in \"viewer\".",
+    "invariants": [
+     "Continuity does not imply identity.",
+     "Reference does not imply ownership.",
+     "Awareness does not imply authority.",
+     "Handoff does not imply merger.",
+     "Access does not imply control.",
+     "Observation does not imply interpretation.",
+     "Interpretation does not imply conclusion.",
+     "Delegation does not erase provenance.",
+     "Forking does not destroy lineage.",
+     "Supersession does not require deletion.",
+     "Preparation does not imply execution.",
+     "Operation reference does not imply operation authority.",
+     "Capability is explicit.",
+     "Authority is scoped.",
+     "State transitions are attributable.",
+     "Replay does not imply re-execution.",
+     "Definition does not imply execution."
+    ],
+    "reference": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY",
+     "resource_id": "4MYVCWJV96HP",
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "version": 5,
+     "state_sha256": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+     "correlation_id": "op-S9ENP5MCDDE6R60E"
+    },
+    "produced_by": {
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "sequence": 5,
+     "operation_type": "delegate",
+     "actor": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start"
+     },
+     "identity_assurance": "capability",
+     "capability_id": "cap_8AM05KRKR8",
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "from_version": 4,
+     "to_version": 5,
+     "state_before": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+     "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+     "parent_operation_id": "op-4H3DKC1KPXYJ5J8W",
+     "causation_id": "op-4H3DKC1KPXYJ5J8W",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "created_at": "2026-09-26T02:25:26.371Z",
+     "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY",
+     "executed_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_8AM05KRKR8",
+      "capability_kind": "owner"
+     }
+    },
+    "resource": {
+     "id": "4MYVCWJV96HP",
+     "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "title": "exp-0003: inter-session operational communication",
+     "owner": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start"
+     },
+     "lifecycle": "active",
+     "visibility": "unlisted",
+     "accepts_proposals": true,
+     "checkpoint_at_reference": {
+      "number": 1,
+      "version": 4,
+      "label": "A stops here",
+      "note": "",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:26.351Z",
+      "sha256": "sha256:35f45b958c7f9bfaffe8d9c5373848054ee910df0664dbf8005368612a8873d4",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints/1"
+     }
+    },
+    "current": {
+     "version": 5,
+     "moved_since_reference": false,
+     "operations_since": [],
+     "operations_since_truncated": false,
+     "diff": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?from=5",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state"
+    },
+    "viewer": {
+     "authenticated": true,
+     "capability_id": "cap_J1DEZ5CXM1",
+     "session_id": "session-b",
+     "is_owner": false,
+     "scopes": [
+      "read",
+      "append"
+     ],
+     "expires_at": "2026-09-27T02:25:26.371Z",
+     "credential_error": null,
+     "identity_assurance": "capability",
+     "summary": "You hold delegated capability cap_J1DEZ5CXM1 for session \"session-b\" with scopes [append]."
+    },
+    "how_to_continue": {
+     "principle": "Decide from \"viewer\" what YOU may do. Act under your own session_id. Cite this reference; do not claim to be its producer.",
+     "cite": {
+      "causation_id": "op-AB8VG4H330SHP3DY",
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "expected_version": 5,
+     "permitted_operations": [
+      "append",
+      "fork",
+      "propose"
+     ],
+     "next_valid_actions": [
+      {
+       "action": "read knowledge",
+       "why": "2 TOK(s) are published here; read them before contributing.",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP#knowledge"
+      },
+      {
+       "action": "resume from checkpoint",
+       "why": "Checkpoint 1 (\"A stops here\") is the latest boundary; read it, then the diff since.",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?since_checkpoint=1"
+      },
+      {
+       "action": "append",
+       "why": "You may publish new TOKs.",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP?action=prepare_append&causation_id=op-AB8VG4H330SHP3DY&correlation_id=op-S9ENP5MCDDE6R60E"
+      },
+      {
+       "action": "fork",
+       "why": "Branch the research independently. The parent is not modified.",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP?action=prepare_fork&causation_id=op-AB8VG4H330SHP3DY&correlation_id=op-S9ENP5MCDDE6R60E"
+      }
+     ],
+     "envelope_template": {
+      "protocol": "ACSP/0.2",
+      "operation": "<one of permitted_operations>",
+      "actor": {
+       "session_id": "<your own session id>",
+       "agent_id": "<optional>",
+       "kind": "agent"
+      },
+      "expected_version": 5,
+      "idempotency_key": "<unique, 8-128 chars>",
+      "causation_id": "op-AB8VG4H330SHP3DY",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "payload": {}
+     },
+     "execute": {
+      "method": "POST",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+      "authorization": "Authorization: Bearer <YOUR capability>, only if you were given one"
+     }
+    },
+    "verification": {
+     "steps": [
+      "GET http://127.0.0.1:39931/r/4MYVCWJV96HP/op and check, for each operation in sequence, that state_before equals the previous state_after and from_version equals the previous to_version.",
+      "Check that the operation op-AB8VG4H330SHP3DY has to_version 5 and state_after sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7.",
+      "GET http://127.0.0.1:39931/r/4MYVCWJV96HP/state and recompute sha256 of its \"state\"; it must equal the latest operation's state_after.",
+      "Checkpoints: recompute each checkpoint's sha256 from its snapshot (GET /r/{id}/checkpoints/{n})."
+     ],
+     "trust": "These digests are computed and served by this ACSP service. They show internal consistency of the history it serves; they are not signatures and do not prove the service is honest."
+    },
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation_record_list",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "resource_id": "4MYVCWJV96HP",
+    "current_version": 5,
+    "semantics": "Every accepted mutation request is one operation, in sequence order. Each record carries the operational-state digest before and after it: state_before of each operation equals state_after of the previous one, and the latest state_after equals the SHA-256 of GET /r/{id}/state. Poll with ?after=<sequence> to follow changes.",
+    "after": 0,
+    "correlation_id": null,
+    "operations": [
+     {
+      "operation_id": "op-6SHT346FTN1H7SHW",
+      "sequence": 1,
+      "operation_type": "create",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-6SHT346FTN1H7SHW",
+      "created_at": "2026-09-26T02:25:26.290Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW"
+     },
+     {
+      "operation_id": "op-S9ENP5MCDDE6R60E",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "parent_operation_id": "op-6SHT346FTN1H7SHW",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.313Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+     },
+     {
+      "operation_id": "op-5061FHYZ0YVFR7PV",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.332Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+     },
+     {
+      "operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.351Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W"
+     },
+     {
+      "operation_id": "op-AB8VG4H330SHP3DY",
+      "sequence": 5,
+      "operation_type": "delegate",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+      "parent_operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.371Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY"
+     }
+    ],
+    "next": null,
+    "legacy_events_without_operation": 0,
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-6SHT346FTN1H7SHW",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 1,
+     "operation_type": "create",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "asserted",
+     "authority": {
+      "via": "none",
+      "scopes": [],
+      "capability_id": null,
+      "capability_kind": null
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "asserted"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "asserted"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "focus": "B continues from A's persisted state; C reconstructs why.",
+      "title": "exp-0003: inter-session operational communication"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-66cdfc3b382b932f",
+     "request_hash": "sha256:9f46d8967055349c22e3f257939befb87d6ad0f71bb696d4ab29f6f0b550034c",
+     "transition": {
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@1",
+        "version": 1,
+        "operation": "create"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-6SHT346FTN1H7SHW"
+     },
+     "executed": true,
+     "result": {
+      "resource": {
+       "id": "4MYVCWJV96HP",
+       "title": "exp-0003: inter-session operational communication",
+       "version": 1,
+       "lifecycle": "active",
+       "visibility": "unlisted"
+      },
+      "checkpoint": {
+       "note": "Created with the resource.",
+       "label": "genesis",
+       "number": 0,
+       "sha256": "sha256:7b8fd946ed21da0d78d55e512d6ba8d15cd4828b443d66bc38f9072d6e2b3c36",
+       "version": 1,
+       "created_at": "2026-09-26T02:25:26.290Z",
+       "created_by": {
+        "session_id": "session-a"
+       }
+      },
+      "owner_capability": {
+       "id": "cap_8AM05KRKR8",
+       "kind": "owner",
+       "token": null,
+       "notice": "This token is shown ONCE and is not stored in recoverable form. Treat it as a secret.",
+       "scopes": [
+        "owner"
+       ],
+       "agent_id": "exp-0003-a-start",
+       "expires_at": null,
+       "session_id": "session-a",
+       "token_redacted": true
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.290Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-6SHT346FTN1H7SHW",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [],
+     "consequences": [],
+     "parent": null,
+     "next": {
+      "operation_id": "op-S9ENP5MCDDE6R60E",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "parent_operation_id": "op-6SHT346FTN1H7SHW",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.313Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+     },
+     "correlation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op?correlation_id=op-6SHT346FTN1H7SHW"
+    },
+    "event_refs": [
+     {
+      "version": 1,
+      "operation": "create",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events/1"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-6SHT346FTN1H7SHW",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-S9ENP5MCDDE6R60E",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 2,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_8AM05KRKR8",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "task",
+      "title": "Check the finding and add a counter-observation"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-2ac4b9084b1245b7",
+     "request_hash": "sha256:461b22b810e80d01588d1bfd5ebf21c989911ecf4fee586093858ca1b6646dce",
+     "transition": {
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@2",
+        "version": 2,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-6SHT346FTN1H7SHW",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-001",
+       "refs": [],
+       "task": {
+        "responsible_session_id": "session-a"
+       },
+       "type": "task",
+       "title": "Check the finding and add a counter-observation",
+       "origin": null,
+       "source": {
+        "kind": "agent",
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a",
+        "identity_assurance": "capability"
+       },
+       "status": "active",
+       "content": "",
+       "summary": "",
+       "version": 2,
+       "created_at": "2026-09-26T02:25:26.313Z",
+       "supersedes": null,
+       "annotations": [],
+       "proposal_id": null,
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "superseded_by": null,
+       "after_checkpoint": 0,
+       "stated_confidence": "unclassified",
+       "supersession_reason": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.313Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-S9ENP5MCDDE6R60E",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [],
+     "consequences": [
+      {
+       "operation_id": "op-5061FHYZ0YVFR7PV",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+       "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.332Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-6SHT346FTN1H7SHW",
+      "sequence": 1,
+      "operation_type": "create",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "asserted",
+      "capability_id": null,
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 0,
+      "to_version": 1,
+      "state_before": null,
+      "state_after": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "parent_operation_id": null,
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-6SHT346FTN1H7SHW",
+      "created_at": "2026-09-26T02:25:26.290Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-6SHT346FTN1H7SHW"
+     },
+     "next": {
+      "operation_id": "op-5061FHYZ0YVFR7PV",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.332Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+     },
+     "correlation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op?correlation_id=op-S9ENP5MCDDE6R60E"
+    },
+    "event_refs": [
+     {
+      "version": 2,
+      "operation": "append",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events/2"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-S9ENP5MCDDE6R60E",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-5061FHYZ0YVFR7PV",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 3,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_8AM05KRKR8",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "finding",
+      "title": "Queue depth predicts p99 latency",
+      "stated_confidence": "medium"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-71d04494691117b5",
+     "request_hash": "sha256:a9f392147352f6891a866d650162355df7383907c309c3ce2fc8abd53e855df4",
+     "transition": {
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@3",
+        "version": 3,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-002",
+       "refs": [],
+       "task": null,
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency",
+       "origin": null,
+       "source": {
+        "kind": "agent",
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a",
+        "identity_assurance": "capability"
+       },
+       "status": "active",
+       "content": "",
+       "summary": "",
+       "version": 3,
+       "created_at": "2026-09-26T02:25:26.332Z",
+       "supersedes": null,
+       "annotations": [],
+       "proposal_id": null,
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "superseded_by": null,
+       "after_checkpoint": 0,
+       "stated_confidence": "medium",
+       "supersession_reason": null
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.332Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-5061FHYZ0YVFR7PV",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-S9ENP5MCDDE6R60E",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+       "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "parent_operation_id": "op-6SHT346FTN1H7SHW",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.313Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+      }
+     ],
+     "consequences": [
+      {
+       "operation_id": "op-4H3DKC1KPXYJ5J8W",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 3,
+       "to_version": 4,
+       "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+       "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+       "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+       "causation_id": "op-5061FHYZ0YVFR7PV",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.351Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-S9ENP5MCDDE6R60E",
+      "sequence": 2,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 1,
+      "to_version": 2,
+      "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+      "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "parent_operation_id": "op-6SHT346FTN1H7SHW",
+      "causation_id": null,
+      "causation_source": null,
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.313Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+     },
+     "next": {
+      "operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.351Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W"
+     },
+     "correlation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op?correlation_id=op-S9ENP5MCDDE6R60E"
+    },
+    "event_refs": [
+     {
+      "version": 3,
+      "operation": "append",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events/3"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-5061FHYZ0YVFR7PV",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-4H3DKC1KPXYJ5J8W",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_8AM05KRKR8",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "label": "A stops here"
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-6028df308faa2cd3",
+     "request_hash": "sha256:10e560ed22fa01ce20fefc8204831ec817780d135ec01db89a1641a353e9721b",
+     "transition": {
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@4",
+        "version": 4,
+        "operation": "checkpoint"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "executed": true,
+     "result": {
+      "checkpoint": {
+       "note": "",
+       "label": "A stops here",
+       "number": 1,
+       "sha256": "sha256:35f45b958c7f9bfaffe8d9c5373848054ee910df0664dbf8005368612a8873d4",
+       "version": 4,
+       "created_at": "2026-09-26T02:25:26.351Z",
+       "created_by": {
+        "session_id": "session-a"
+       }
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.351Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4H3DKC1KPXYJ5J8W",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-5061FHYZ0YVFR7PV",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+       "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.332Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+      },
+      {
+       "operation_id": "op-S9ENP5MCDDE6R60E",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+       "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "parent_operation_id": "op-6SHT346FTN1H7SHW",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.313Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+      }
+     ],
+     "consequences": [
+      {
+       "operation_id": "op-AB8VG4H330SHP3DY",
+       "sequence": 5,
+       "operation_type": "delegate",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 4,
+       "to_version": 5,
+       "state_before": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+       "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+       "parent_operation_id": "op-4H3DKC1KPXYJ5J8W",
+       "causation_id": "op-4H3DKC1KPXYJ5J8W",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.371Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY"
+      }
+     ],
+     "parent": {
+      "operation_id": "op-5061FHYZ0YVFR7PV",
+      "sequence": 3,
+      "operation_type": "append",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 2,
+      "to_version": 3,
+      "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+      "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_id": "op-S9ENP5MCDDE6R60E",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.332Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+     },
+     "next": {
+      "operation_id": "op-AB8VG4H330SHP3DY",
+      "sequence": 5,
+      "operation_type": "delegate",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+      "parent_operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.371Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY"
+     },
+     "correlation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op?correlation_id=op-S9ENP5MCDDE6R60E"
+    },
+    "event_refs": [
+     {
+      "version": 4,
+      "operation": "checkpoint",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events/4"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4H3DKC1KPXYJ5J8W",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operation",
+    "notice": "This is the record of an operation that was executed on an ACSP resource. It is persisted protocol state, not a message and not a conversation. Reading it grants no authority, and re-submitting it does not re-execute it.",
+    "operation": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 5,
+     "operation_type": "delegate",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "scopes": [
+       "read",
+       "append",
+       "annotate",
+       "checkpoint",
+       "supersede",
+       "handoff",
+       "owner"
+      ],
+      "capability_id": "cap_8AM05KRKR8",
+      "capability_kind": "owner"
+     },
+     "requested_by": {
+      "kind": "agent",
+      "agent_id": "exp-0003-a-start",
+      "session_id": "session-a",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-a",
+      "agent_id": "exp-0003-a-start",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "to": {
+       "session_id": "session-b"
+      },
+      "label": "exp-0003 delegation run",
+      "scopes": [
+       "append"
+      ]
+     },
+     "expected_version": null,
+     "idempotency_key": "session-a-0614157beb923417",
+     "request_hash": "sha256:1553f8d6e4ed54ac9bd899d99891311a508539867c8c626eb86064b8bb6abe7f",
+     "transition": {
+      "from_version": 4,
+      "to_version": 5,
+      "state_before": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@5",
+        "version": 5,
+        "operation": "delegate"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_id": "op-4H3DKC1KPXYJ5J8W",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "executed": true,
+     "result": {
+      "capability": {
+       "id": "cap_J1DEZ5CXM1",
+       "kind": "delegation",
+       "label": "exp-0003 delegation run",
+       "token": null,
+       "notice": "This token is shown ONCE and is not stored in recoverable form. Treat it as a secret.",
+       "scopes": [
+        "append"
+       ],
+       "agent_id": null,
+       "expires_at": "2026-09-27T02:25:26.371Z",
+       "session_id": "session-b",
+       "token_redacted": true,
+       "created_version": 5
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.371Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "lineage": {
+     "semantics": "causation: the operation this one responds to (why it exists). correlation: the workflow it belongs to. parent: the operation immediately before it on this resource (order). This is protocol provenance, not conversation history.",
+     "causation_chain": [
+      {
+       "operation_id": "op-4H3DKC1KPXYJ5J8W",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 3,
+       "to_version": 4,
+       "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+       "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+       "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+       "causation_id": "op-5061FHYZ0YVFR7PV",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.351Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W"
+      },
+      {
+       "operation_id": "op-5061FHYZ0YVFR7PV",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 2,
+       "to_version": 3,
+       "state_before": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "state_after": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+       "parent_operation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_id": "op-S9ENP5MCDDE6R60E",
+       "causation_source": "actor",
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.332Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-5061FHYZ0YVFR7PV"
+      },
+      {
+       "operation_id": "op-S9ENP5MCDDE6R60E",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start"
+       },
+       "identity_assurance": "capability",
+       "capability_id": "cap_8AM05KRKR8",
+       "on_behalf_of": null,
+       "proposal_id": null,
+       "from_version": 1,
+       "to_version": 2,
+       "state_before": "sha256:74c051b2b8f452a13befbb779b04f8fcbf2c5768de7daa3d9ff687f4fef20257",
+       "state_after": "sha256:f7fbe070fcecac5cbed3a0b0702da1ce7a5bb5b433e913a32deb6e75bb5bba76",
+       "parent_operation_id": "op-6SHT346FTN1H7SHW",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-S9ENP5MCDDE6R60E",
+       "created_at": "2026-09-26T02:25:26.313Z",
+       "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-S9ENP5MCDDE6R60E"
+      }
+     ],
+     "consequences": [],
+     "parent": {
+      "operation_id": "op-4H3DKC1KPXYJ5J8W",
+      "sequence": 4,
+      "operation_type": "checkpoint",
+      "actor": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_8AM05KRKR8",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "from_version": 3,
+      "to_version": 4,
+      "state_before": "sha256:2fa8aa2249e3b8a6ba87049d4d7a910d9fa7f2bdd48783237c112ee6ee7c325c",
+      "state_after": "sha256:a4df6b27f4103170c6c8f10db0276c69f6b9d23a3b99ff91bc20d66faf2615cb",
+      "parent_operation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_id": "op-5061FHYZ0YVFR7PV",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E",
+      "created_at": "2026-09-26T02:25:26.351Z",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4H3DKC1KPXYJ5J8W"
+     },
+     "next": null,
+     "correlation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op?correlation_id=op-S9ENP5MCDDE6R60E"
+    },
+    "event_refs": [
+     {
+      "version": 5,
+      "operation": "delegate",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events/5"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY.json",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY",
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "operational_state",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "4MYVCWJV96HP",
+    "version": 5,
+    "sha256": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+    "latest_operation": {
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "state_after": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+     "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-AB8VG4H330SHP3DY"
+    },
+    "verification": "sha256 = \"sha256:\" + hex(SHA-256(canonical JSON of \"state\")), canonical JSON = keys sorted, no whitespace. It must equal latest_operation.state_after.",
+    "state": {
+     "schema": "acsp.operational-state/0.2",
+     "resource": {
+      "id": "4MYVCWJV96HP",
+      "version": 5,
+      "title": "exp-0003: inter-session operational communication",
+      "description": "",
+      "focus": "B continues from A's persisted state; C reconstructs why.",
+      "lifecycle": "active",
+      "owner": {
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "human": null
+      },
+      "parent": null,
+      "created_at": "2026-09-26T02:25:26.290Z",
+      "visibility": "unlisted",
+      "accepts_proposals": true,
+      "enabled_extensions": []
+     },
+     "knowledge": [
+      {
+       "id": "TOK-001",
+       "type": "task",
+       "title": "Check the finding and add a counter-observation",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "unclassified",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 2,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:26.313Z",
+       "task": {
+        "responsible_session_id": "session-a"
+       },
+       "origin": null,
+       "annotations": []
+      },
+      {
+       "id": "TOK-002",
+       "type": "finding",
+       "title": "Queue depth predicts p99 latency",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "medium",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [],
+       "source": {
+        "session_id": "session-a",
+        "agent_id": "exp-0003-a-start",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-a"
+       },
+       "proposal_id": null,
+       "version": 3,
+       "after_checkpoint": 0,
+       "created_at": "2026-09-26T02:25:26.332Z",
+       "task": null,
+       "origin": null,
+       "annotations": []
+      }
+     ],
+     "handoffs": [],
+     "proposals": [],
+     "capabilities": [
+      {
+       "id": "cap_8AM05KRKR8",
+       "kind": "owner",
+       "session_id": "session-a",
+       "agent_id": "exp-0003-a-start",
+       "scopes": [
+        "owner"
+       ],
+       "created_version": 1,
+       "expires_at": null,
+       "revoked_at": null,
+       "revoked_version": null
+      },
+      {
+       "id": "cap_J1DEZ5CXM1",
+       "kind": "delegation",
+       "session_id": "session-b",
+       "agent_id": null,
+       "scopes": [
+        "append"
+       ],
+       "created_version": 5,
+       "expires_at": "2026-09-27T02:25:26.371Z",
+       "revoked_at": null,
+       "revoked_version": null
+      }
+     ],
+     "checkpoints": [
+      {
+       "number": 0,
+       "version": 1,
+       "label": "genesis",
+       "sha256": "sha256:7b8fd946ed21da0d78d55e512d6ba8d15cd4828b443d66bc38f9072d6e2b3c36"
+      },
+      {
+       "number": 1,
+       "version": 4,
+       "label": "A stops here",
+       "sha256": "sha256:35f45b958c7f9bfaffe8d9c5373848054ee910df0664dbf8005368612a8873d4"
+      }
+     ]
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+     "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint_list",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "4MYVCWJV96HP",
+    "semantics": "A checkpoint is a deliberate, hashed boundary of the externally persisted state at one version. To resume: read the checkpoint, then the diff since it.",
+    "checkpoints": [
+     {
+      "number": 0,
+      "version": 1,
+      "label": "genesis",
+      "note": "Created with the resource.",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:26.290Z",
+      "sha256": "sha256:7b8fd946ed21da0d78d55e512d6ba8d15cd4828b443d66bc38f9072d6e2b3c36",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints/0",
+      "diff_since": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?since_checkpoint=0"
+     },
+     {
+      "number": 1,
+      "version": 4,
+      "label": "A stops here",
+      "note": "",
+      "created_by": {
+       "session_id": "session-a"
+      },
+      "created_at": "2026-09-26T02:25:26.351Z",
+      "sha256": "sha256:35f45b958c7f9bfaffe8d9c5373848054ee910df0664dbf8005368612a8873d4",
+      "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints/1",
+      "diff_since": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?since_checkpoint=1"
+     }
+    ],
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "html": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "status": "http://127.0.0.1:39931/r/4MYVCWJV96HP?action=status",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "checkpoints": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/4MYVCWJV96HP/explorer",
+     "execute": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints/0.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "4MYVCWJV96HP",
+    "verification": "sha256 is \"sha256:\" + hex(SHA-256(canonical JSON of snapshot)), where canonical JSON sorts object keys and has no whitespace.",
+    "checkpoint": {
+     "number": 0,
+     "version": 1,
+     "label": "genesis",
+     "note": "Created with the resource.",
+     "created_by": {
+      "session_id": "session-a"
+     },
+     "created_at": "2026-09-26T02:25:26.290Z",
+     "sha256": "sha256:7b8fd946ed21da0d78d55e512d6ba8d15cd4828b443d66bc38f9072d6e2b3c36",
+     "snapshot": {
+      "handoffs": [],
+      "protocol": "ACSP/0.2",
+      "resource": {
+       "id": "4MYVCWJV96HP",
+       "focus": "B continues from A's persisted state; C reconstructs why.",
+       "owner": {
+        "human": null,
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a"
+       },
+       "title": "exp-0003: inter-session operational communication",
+       "parent": null,
+       "version": 1,
+       "lifecycle": "active",
+       "created_at": "2026-09-26T02:25:26.290Z",
+       "description": ""
+      },
+      "knowledge": []
+     }
+    },
+    "diff_since": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?since_checkpoint=0",
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "html": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "status": "http://127.0.0.1:39931/r/4MYVCWJV96HP?action=status",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "checkpoints": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/4MYVCWJV96HP/explorer",
+     "execute": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints/1.json",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": null,
+   "response": {
+    "protocol": {
+     "name": "ACSP",
+     "version": "ACSP/0.2",
+     "title": "Agent Continuity & Session Protocol",
+     "spec": "http://127.0.0.1:39931/protocol",
+     "spec_json": "http://127.0.0.1:39931/protocol.json",
+     "invariants": [
+      "Continuity does not imply identity.",
+      "Reference does not imply ownership.",
+      "Awareness does not imply authority.",
+      "Handoff does not imply merger."
+     ]
+    },
+    "type": "checkpoint",
+    "notice": "You are an AI agent accessing an Agent Continuity Resource. This is externally persisted state that independent sessions deliberately published under the ACSP/0.2 protocol. It is not your conversation history and not your memory.",
+    "resource_id": "4MYVCWJV96HP",
+    "verification": "sha256 is \"sha256:\" + hex(SHA-256(canonical JSON of snapshot)), where canonical JSON sorts object keys and has no whitespace.",
+    "checkpoint": {
+     "number": 1,
+     "version": 4,
+     "label": "A stops here",
+     "note": "",
+     "created_by": {
+      "session_id": "session-a"
+     },
+     "created_at": "2026-09-26T02:25:26.351Z",
+     "sha256": "sha256:35f45b958c7f9bfaffe8d9c5373848054ee910df0664dbf8005368612a8873d4",
+     "snapshot": {
+      "handoffs": [],
+      "protocol": "ACSP/0.2",
+      "resource": {
+       "id": "4MYVCWJV96HP",
+       "focus": "B continues from A's persisted state; C reconstructs why.",
+       "owner": {
+        "human": null,
+        "agent_id": "exp-0003-a-start",
+        "session_id": "session-a"
+       },
+       "title": "exp-0003: inter-session operational communication",
+       "parent": null,
+       "version": 4,
+       "lifecycle": "active",
+       "created_at": "2026-09-26T02:25:26.290Z",
+       "description": ""
+      },
+      "knowledge": [
+       {
+        "id": "TOK-001",
+        "refs": [],
+        "task": {
+         "responsible_session_id": "session-a"
+        },
+        "type": "task",
+        "title": "Check the finding and add a counter-observation",
+        "origin": null,
+        "source": {
+         "kind": "agent",
+         "agent_id": "exp-0003-a-start",
+         "session_id": "session-a",
+         "identity_assurance": "capability"
+        },
+        "status": "active",
+        "content": "",
+        "summary": "",
+        "version": 2,
+        "created_at": "2026-09-26T02:25:26.313Z",
+        "supersedes": null,
+        "annotations": [],
+        "proposal_id": null,
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "superseded_by": null,
+        "after_checkpoint": 0,
+        "stated_confidence": "unclassified",
+        "supersession_reason": null
+       },
+       {
+        "id": "TOK-002",
+        "refs": [],
+        "task": null,
+        "type": "finding",
+        "title": "Queue depth predicts p99 latency",
+        "origin": null,
+        "source": {
+         "kind": "agent",
+         "agent_id": "exp-0003-a-start",
+         "session_id": "session-a",
+         "identity_assurance": "capability"
+        },
+        "status": "active",
+        "content": "",
+        "summary": "",
+        "version": 3,
+        "created_at": "2026-09-26T02:25:26.332Z",
+        "supersedes": null,
+        "annotations": [],
+        "proposal_id": null,
+        "recorded_by": {
+         "session_id": "session-a"
+        },
+        "superseded_by": null,
+        "after_checkpoint": 0,
+        "stated_confidence": "medium",
+        "supersession_reason": null
+       }
+      ]
+     }
+    },
+    "diff_since": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?since_checkpoint=1",
+    "links": {
+     "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "html": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "status": "http://127.0.0.1:39931/r/4MYVCWJV96HP?action=status",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "checkpoints": "http://127.0.0.1:39931/r/4MYVCWJV96HP/checkpoints",
+     "diff": "http://127.0.0.1:39931/r/4MYVCWJV96HP/diff?from=1",
+     "explorer": "http://127.0.0.1:39931/r/4MYVCWJV96HP/explorer",
+     "execute": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "protocol": "http://127.0.0.1:39931/protocol",
+     "protocol_json": "http://127.0.0.1:39931/protocol.json"
+    }
+   },
+   "secret_in_response": false
+  },
+  {
+   "method": "POST",
+   "url": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+   "authorization": "Bearer [REDACTED CAPABILITY]",
+   "status": 200,
+   "request": {
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "actor": {
+     "session_id": "session-b",
+     "agent_id": "exp-0003-b",
+     "kind": "agent"
+    },
+    "idempotency_key": "session-b-b89e7fab4da20e4e",
+    "payload": {
+     "type": "observation",
+     "title": "Counter-observation under delegated authority",
+     "refs": [
+      {
+       "tok": "TOK-002"
+      }
+     ]
+    },
+    "causation_id": "op-AB8VG4H330SHP3DY",
+    "correlation_id": "op-S9ENP5MCDDE6R60E"
+   },
+   "response": {
+    "ok": true,
+    "protocol": "ACSP/0.2",
+    "operation": "append",
+    "resource_id": "4MYVCWJV96HP",
+    "version": 6,
+    "events": [
+     {
+      "id": "4MYVCWJV96HP@6",
+      "resource_id": "4MYVCWJV96HP",
+      "version": 6,
+      "parent_version": 5,
+      "resulting_version": 6,
+      "operation": "append",
+      "occurred_at": "2026-09-26T02:25:26.855Z",
+      "actor": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b",
+       "kind": "agent"
+      },
+      "identity_assurance": "capability",
+      "capability_id": "cap_J1DEZ5CXM1",
+      "on_behalf_of": null,
+      "proposal_id": null,
+      "summary": "session-b appended observation TOK-003 \"Counter-observation under delegated authority\"",
+      "data": {
+       "tok_id": "TOK-003",
+       "type": "observation",
+       "title": "Counter-observation under delegated authority"
+      },
+      "request_hash": "sha256:3990f7eaa57a4a1a6b740ea49603dda14c66f52a9801e1af968728a318042451",
+      "idempotency_key": "session-b-b89e7fab4da20e4e",
+      "operation_id": "op-4TVZNHR4ND93QN95"
+     }
+    ],
+    "result": {
+     "tok": {
+      "id": "TOK-003",
+      "type": "observation",
+      "title": "Counter-observation under delegated authority",
+      "summary": "",
+      "content": "",
+      "stated_confidence": "unclassified",
+      "status": "active",
+      "supersedes": null,
+      "superseded_by": null,
+      "supersession_reason": null,
+      "refs": [
+       {
+        "tok": "TOK-002"
+       }
+      ],
+      "source": {
+       "session_id": "session-b",
+       "agent_id": "exp-0003-b",
+       "kind": "agent",
+       "identity_assurance": "capability"
+      },
+      "recorded_by": {
+       "session_id": "session-b"
+      },
+      "proposal_id": null,
+      "version": 6,
+      "after_checkpoint": 1,
+      "created_at": "2026-09-26T02:25:26.855Z",
+      "task": null,
+      "origin": null,
+      "annotations": []
+     }
+    },
+    "replayed": false,
+    "operation_id": "op-4TVZNHR4ND93QN95",
+    "previous_version": 5,
+    "operation_record": {
+     "schema": "acsp.operation/0.2",
+     "operation_id": "op-4TVZNHR4ND93QN95",
+     "resource_id": "4MYVCWJV96HP",
+     "sequence": 6,
+     "operation_type": "append",
+     "definition_version": "core@ACSP/0.1",
+     "protocol_version": "ACSP/0.2",
+     "actor": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent"
+     },
+     "identity_assurance": "capability",
+     "authority": {
+      "via": "capability",
+      "capability_id": "cap_J1DEZ5CXM1",
+      "capability_kind": "delegation",
+      "scopes": [
+       "read",
+       "append"
+      ]
+     },
+     "requested_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "executed_by": {
+      "session_id": "session-b",
+      "agent_id": "exp-0003-b",
+      "kind": "agent",
+      "identity_assurance": "capability"
+     },
+     "on_behalf_of": null,
+     "proposal_id": null,
+     "payload": {
+      "type": "observation",
+      "title": "Counter-observation under delegated authority",
+      "refs": [
+       {
+        "tok": "TOK-002"
+       }
+      ]
+     },
+     "expected_version": null,
+     "idempotency_key": "session-b-b89e7fab4da20e4e",
+     "request_hash": "sha256:3990f7eaa57a4a1a6b740ea49603dda14c66f52a9801e1af968728a318042451",
+     "transition": {
+      "from_version": 5,
+      "to_version": 6,
+      "state_before": "sha256:025d6837a5ede279892239a2325745bca44d6526fa6ff7fdfb2cce39c9df30c7",
+      "state_after": "sha256:62a7bc0b2e921cf245af460d1ad19803f11ae3715596092b39344890203870bb",
+      "events": [
+       {
+        "id": "4MYVCWJV96HP@6",
+        "version": 6,
+        "operation": "append"
+       }
+      ]
+     },
+     "lineage": {
+      "parent_operation_id": "op-AB8VG4H330SHP3DY",
+      "causation_id": "op-AB8VG4H330SHP3DY",
+      "causation_source": "actor",
+      "correlation_id": "op-S9ENP5MCDDE6R60E"
+     },
+     "executed": true,
+     "result": {
+      "tok": {
+       "id": "TOK-003",
+       "type": "observation",
+       "title": "Counter-observation under delegated authority",
+       "summary": "",
+       "content": "",
+       "stated_confidence": "unclassified",
+       "status": "active",
+       "supersedes": null,
+       "superseded_by": null,
+       "supersession_reason": null,
+       "refs": [
+        {
+         "tok": "TOK-002"
+        }
+       ],
+       "source": {
+        "session_id": "session-b",
+        "agent_id": "exp-0003-b",
+        "kind": "agent",
+        "identity_assurance": "capability"
+       },
+       "recorded_by": {
+        "session_id": "session-b"
+       },
+       "proposal_id": null,
+       "version": 6,
+       "after_checkpoint": 1,
+       "created_at": "2026-09-26T02:25:26.855Z",
+       "task": null,
+       "origin": null,
+       "annotations": []
+      }
+     },
+     "created_at": "2026-09-26T02:25:26.855Z",
+     "links": {
+      "self": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4TVZNHR4ND93QN95",
+      "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4TVZNHR4ND93QN95.json",
+      "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4TVZNHR4ND93QN95",
+      "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+      "resource_json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+      "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op",
+      "state": "http://127.0.0.1:39931/r/4MYVCWJV96HP/state",
+      "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+      "protocol": "http://127.0.0.1:39931/protocol"
+     }
+    },
+    "continuation": {
+     "schema": "acsp.continuation-reference/0.2",
+     "href": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4TVZNHR4ND93QN95",
+     "resource_id": "4MYVCWJV96HP",
+     "operation_id": "op-4TVZNHR4ND93QN95",
+     "version": 6,
+     "state_sha256": "sha256:62a7bc0b2e921cf245af460d1ad19803f11ae3715596092b39344890203870bb",
+     "correlation_id": "op-S9ENP5MCDDE6R60E"
+    },
+    "links": {
+     "resource": "http://127.0.0.1:39931/r/4MYVCWJV96HP",
+     "json": "http://127.0.0.1:39931/r/4MYVCWJV96HP.json",
+     "events": "http://127.0.0.1:39931/r/4MYVCWJV96HP/events",
+     "operations": "http://127.0.0.1:39931/r/4MYVCWJV96HP/operations",
+     "operation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/op/op-4TVZNHR4ND93QN95",
+     "continue": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4TVZNHR4ND93QN95",
+     "protocol": "http://127.0.0.1:39931/protocol"
+    }
+   },
+   "secret_in_response": false
+  }
+ ]
+}

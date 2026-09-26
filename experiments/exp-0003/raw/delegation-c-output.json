@@ -1,0 +1,150 @@
+{
+ "mode": "c",
+ "argv": [
+  "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-4TVZNHR4ND93QN95"
+ ],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/dc-cbxMH3"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "c",
+  "session": "session-c",
+  "pid": 3353,
+  "received_capability_secret": false,
+  "continuation_schema_valid": true,
+  "verification": {
+   "resource_id": "4MYVCWJV96HP",
+   "operations": 6,
+   "chain_ok": true,
+   "versions_contiguous": true,
+   "state_matches_latest": true,
+   "checkpoints_ok": true,
+   "records_schema_valid": true,
+   "problems": [],
+   "graph": [
+    {
+     "operation_id": "op-6SHT346FTN1H7SHW",
+     "sequence": 1,
+     "operation_type": "create",
+     "actor": "session-a",
+     "identity_assurance": "asserted",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-6SHT346FTN1H7SHW",
+     "from_version": 0,
+     "to_version": 1
+    },
+    {
+     "operation_id": "op-S9ENP5MCDDE6R60E",
+     "sequence": 2,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": null,
+     "causation_source": null,
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 1,
+     "to_version": 2
+    },
+    {
+     "operation_id": "op-5061FHYZ0YVFR7PV",
+     "sequence": 3,
+     "operation_type": "append",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-S9ENP5MCDDE6R60E",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 2,
+     "to_version": 3
+    },
+    {
+     "operation_id": "op-4H3DKC1KPXYJ5J8W",
+     "sequence": 4,
+     "operation_type": "checkpoint",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-5061FHYZ0YVFR7PV",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 3,
+     "to_version": 4
+    },
+    {
+     "operation_id": "op-AB8VG4H330SHP3DY",
+     "sequence": 5,
+     "operation_type": "delegate",
+     "actor": "session-a",
+     "identity_assurance": "capability",
+     "causation_id": "op-4H3DKC1KPXYJ5J8W",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 4,
+     "to_version": 5
+    },
+    {
+     "operation_id": "op-4TVZNHR4ND93QN95",
+     "sequence": 6,
+     "operation_type": "append",
+     "actor": "session-b",
+     "identity_assurance": "capability",
+     "causation_id": "op-AB8VG4H330SHP3DY",
+     "causation_source": "actor",
+     "correlation_id": "op-S9ENP5MCDDE6R60E",
+     "from_version": 5,
+     "to_version": 6
+    }
+   ]
+  },
+  "causation_chain": [
+   {
+    "operation_type": "append",
+    "actor": "session-b",
+    "identity_assurance": "capability",
+    "causation_source": "actor"
+   },
+   {
+    "operation_type": "delegate",
+    "actor": "session-a",
+    "identity_assurance": "capability",
+    "causation_source": "actor"
+   },
+   {
+    "operation_type": "checkpoint",
+    "actor": "session-a",
+    "identity_assurance": "capability",
+    "causation_source": "actor"
+   },
+   {
+    "operation_type": "append",
+    "actor": "session-a",
+    "identity_assurance": "capability",
+    "causation_source": "actor"
+   },
+   {
+    "operation_type": "append",
+    "actor": "session-a",
+    "identity_assurance": "capability",
+    "causation_source": null
+   }
+  ],
+  "chain_ids": [
+   "op-4TVZNHR4ND93QN95",
+   "op-AB8VG4H330SHP3DY",
+   "op-4H3DKC1KPXYJ5J8W",
+   "op-5061FHYZ0YVFR7PV",
+   "op-S9ENP5MCDDE6R60E"
+  ],
+  "correlation_ids": [
+   "op-S9ENP5MCDDE6R60E"
+  ],
+  "owner": "session-a",
+  "replay_without_capability": {
+   "status": 401,
+   "code": "authentication_required",
+   "version_unchanged": true
+  }
+ }
+}

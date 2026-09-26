@@ -1,0 +1,20 @@
+{
+ "mode": "b-retry",
+ "argv": [],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/b-jbgcTT"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "b-retry",
+  "session": "session-b",
+  "pid": 3253,
+  "received_capability_secret": false,
+  "status": 200,
+  "replayed": true,
+  "operation_id": "op-38DAXWHRV4DET1KN",
+  "proposals": 1,
+  "resource_id": "SYTRZXTDDAVH"
+ }
+}

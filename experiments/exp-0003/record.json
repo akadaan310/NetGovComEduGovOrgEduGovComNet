@@ -1,0 +1,847 @@
+{
+ "schema": "acsp.experiment-record/0.1",
+ "experiment_id": "exp-0003",
+ "title": "Inter-session operational communication through ACSP state transitions",
+ "question": "Can two independent sessions communicate through ACSP state transitions rather than through conversation messages?",
+ "claim_under_test": "Independent sessions can use ACSP operations against a shared externally persisted resource, with explicit authority, provenance and state-transition semantics, and can continue work through operation/state references passed between sessions.",
+ "run": {
+  "timestamp": "2026-09-26T02:25:27.454Z"
+ },
+ "repository": {
+  "url": "https://github.com/akadaan310/NetGovComEduGovOrgEduGovComNet",
+  "commit": "bd3915b14a0fc936519c4f1679a9caedc091b68b",
+  "branch": "claude/acsp-purl-composition-adsbn6",
+  "dirty_worktree": true
+ },
+ "environment": {
+  "node": "v22.22.2",
+  "platform": "linux",
+  "arch": "x64",
+  "database": "PGlite (in-memory) via harness/serve.ts"
+ },
+ "protocol_versions": {
+  "server": "ACSP/0.2",
+  "envelopes": "ACSP/0.2"
+ },
+ "definition": {
+  "file": "experiments/exp-0003/definition.json",
+  "sha256": "sha256:2c3cb84fd258b0bd20bd844dc08fb9295461ea851c427b808bb1985820c1f8a0",
+  "preregistered_in_commit": "6c04020"
+ },
+ "operational_definitions": {
+  "communication through state transitions": "Each session's only input from the previous session is a URL identifying persisted state; each session's only output to the next is a URL returned by an ACSP operation; everything else a session learns comes from GET requests to the service.",
+  "independent": "Separate OS process, separate private directory, no shared memory, no transcript of any other session, no credential it was not explicitly given.",
+  "verify": "Recompute: the operation chain (state_before = previous state_after, from_version = previous to_version, parent pointers), the current operational-state digest from GET /state, and every checkpoint hash from its snapshot; validate records against the published schemas.",
+  "leak": "Any occurrence of the substring acsp_cap_ in what the orchestrator passes to B or C (argv, environment, stdin), or in any response body B or C receives."
+ },
+ "observations": {
+  "category": "observation",
+  "normalised": {
+   "proposal_run": {
+    "a_start": {
+     "statuses": [
+      201,
+      200,
+      200,
+      200
+     ]
+    },
+    "b": {
+     "continuation_schema_valid": true,
+     "verification": {
+      "operations": 4,
+      "chain_ok": true,
+      "versions_contiguous": true,
+      "state_matches_latest": true,
+      "checkpoints_ok": true,
+      "records_schema_valid": true,
+      "problems": 0,
+      "graph": [
+       [
+        "create",
+        "session-a",
+        "asserted",
+        null,
+        0,
+        1
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        null,
+        1,
+        2
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        "actor",
+        2,
+        3
+       ],
+       [
+        "checkpoint",
+        "session-a",
+        "capability",
+        "actor",
+        3,
+        4
+       ]
+      ]
+     },
+     "authority": {
+      "authenticated": false,
+      "session_id": null,
+      "scopes": [],
+      "permitted": [
+       "fork",
+       "propose"
+      ]
+     },
+     "append_without_capability": {
+      "status": 401,
+      "code": "authentication_required"
+     },
+     "propose": {
+      "status": 200,
+      "identity_assurance": "asserted"
+     },
+     "resolve_without_capability": {
+      "status": 401,
+      "code": "authentication_required"
+     },
+     "received_capability_secret": false
+    },
+    "b_retry": {
+     "status": 200,
+     "replayed": true,
+     "proposals": 1
+    },
+    "a_review": {
+     "viewer_is_owner": true,
+     "verification": {
+      "operations": 5,
+      "chain_ok": true,
+      "versions_contiguous": true,
+      "state_matches_latest": true,
+      "checkpoints_ok": true,
+      "records_schema_valid": true,
+      "problems": 0,
+      "graph": [
+       [
+        "create",
+        "session-a",
+        "asserted",
+        null,
+        0,
+        1
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        null,
+        1,
+        2
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        "actor",
+        2,
+        3
+       ],
+       [
+        "checkpoint",
+        "session-a",
+        "capability",
+        "actor",
+        3,
+        4
+       ],
+       [
+        "propose",
+        "session-b",
+        "asserted",
+        "actor",
+        4,
+        5
+       ]
+      ]
+     },
+     "proposal_payload_hash_ok": true,
+     "accept": {
+      "status": 200,
+      "causation_source": "derived",
+      "events": 2,
+      "on_behalf_of": "session-b"
+     }
+    },
+    "c": {
+     "continuation_schema_valid": true,
+     "verification": {
+      "operations": 6,
+      "chain_ok": true,
+      "versions_contiguous": true,
+      "state_matches_latest": true,
+      "checkpoints_ok": true,
+      "records_schema_valid": true,
+      "problems": 0,
+      "graph": [
+       [
+        "create",
+        "session-a",
+        "asserted",
+        null,
+        0,
+        1
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        null,
+        1,
+        2
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        "actor",
+        2,
+        3
+       ],
+       [
+        "checkpoint",
+        "session-a",
+        "capability",
+        "actor",
+        3,
+        4
+       ],
+       [
+        "propose",
+        "session-b",
+        "asserted",
+        "actor",
+        4,
+        5
+       ],
+       [
+        "resolve_proposal",
+        "session-a",
+        "capability",
+        "derived",
+        5,
+        7
+       ]
+      ]
+     },
+     "causation_chain": [
+      {
+       "operation_type": "resolve_proposal",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "derived"
+      },
+      {
+       "operation_type": "propose",
+       "actor": "session-b",
+       "identity_assurance": "asserted",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "checkpoint",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": null
+      }
+     ],
+     "correlation_ids": 1,
+     "owner": "session-a",
+     "replay_without_capability": {
+      "status": 401,
+      "code": "authentication_required",
+      "version_unchanged": true
+     },
+     "received_capability_secret": false
+    },
+    "leaks": {
+     "into_b": false,
+     "into_c": false,
+     "b_received_secret": false,
+     "c_received_secret": false,
+     "b_dir_has_a_secret": false
+    },
+    "exits": {
+     "a1": 0,
+     "b": 0,
+     "bRetry": 0,
+     "a2": 0,
+     "c": 0
+    },
+    "separate_processes": true
+   },
+   "delegation_run": {
+    "b": {
+     "verification": {
+      "operations": 5,
+      "chain_ok": true,
+      "versions_contiguous": true,
+      "state_matches_latest": true,
+      "checkpoints_ok": true,
+      "records_schema_valid": true,
+      "problems": 0,
+      "graph": [
+       [
+        "create",
+        "session-a",
+        "asserted",
+        null,
+        0,
+        1
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        null,
+        1,
+        2
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        "actor",
+        2,
+        3
+       ],
+       [
+        "checkpoint",
+        "session-a",
+        "capability",
+        "actor",
+        3,
+        4
+       ],
+       [
+        "delegate",
+        "session-a",
+        "capability",
+        "actor",
+        4,
+        5
+       ]
+      ]
+     },
+     "authority": {
+      "authenticated": true,
+      "session_id": "session-b",
+      "scopes": [
+       "read",
+       "append"
+      ],
+      "permitted": [
+       "append",
+       "fork",
+       "propose"
+      ]
+     },
+     "append": {
+      "status": 200,
+      "identity_assurance": "capability",
+      "capability_kind": "delegation"
+     }
+    },
+    "c": {
+     "verification": {
+      "operations": 6,
+      "chain_ok": true,
+      "versions_contiguous": true,
+      "state_matches_latest": true,
+      "checkpoints_ok": true,
+      "records_schema_valid": true,
+      "problems": 0,
+      "graph": [
+       [
+        "create",
+        "session-a",
+        "asserted",
+        null,
+        0,
+        1
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        null,
+        1,
+        2
+       ],
+       [
+        "append",
+        "session-a",
+        "capability",
+        "actor",
+        2,
+        3
+       ],
+       [
+        "checkpoint",
+        "session-a",
+        "capability",
+        "actor",
+        3,
+        4
+       ],
+       [
+        "delegate",
+        "session-a",
+        "capability",
+        "actor",
+        4,
+        5
+       ],
+       [
+        "append",
+        "session-b",
+        "capability",
+        "actor",
+        5,
+        6
+       ]
+      ]
+     },
+     "causation_chain": [
+      {
+       "operation_type": "append",
+       "actor": "session-b",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "delegate",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "checkpoint",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": "actor"
+      },
+      {
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_source": null
+      }
+     ],
+     "replay_without_capability": {
+      "status": 401,
+      "code": "authentication_required",
+      "version_unchanged": true
+     }
+    },
+    "leaks": {
+     "owner_token_given_to_b": false,
+     "into_c": false,
+     "c_received_secret": false
+    },
+    "exits": {
+     "a1": 0,
+     "b": 0,
+     "c": 0
+    }
+   },
+   "hypotheses": [
+    {
+     "id": "H1",
+     "status": "supported"
+    },
+    {
+     "id": "H2",
+     "status": "supported"
+    },
+    {
+     "id": "H3",
+     "status": "supported"
+    },
+    {
+     "id": "H4",
+     "status": "supported"
+    },
+    {
+     "id": "H5",
+     "status": "supported"
+    },
+    {
+     "id": "H6",
+     "status": "supported"
+    },
+    {
+     "id": "H7",
+     "status": "supported"
+    },
+    {
+     "id": "H8",
+     "status": "supported"
+    },
+    {
+     "id": "H9",
+     "status": "supported"
+    }
+   ]
+  },
+  "separate_process_ids": {
+   "a1": 3213,
+   "b": 3233,
+   "bRetry": 3253,
+   "a2": 3273,
+   "c": 3293
+  }
+ },
+ "hypotheses": [
+  {
+   "category": "hypothesis",
+   "id": "H1",
+   "status": "supported",
+   "evidence": {
+    "schema": true,
+    "verification": {
+     "resource_id": "SYTRZXTDDAVH",
+     "operations": 4,
+     "chain_ok": true,
+     "versions_contiguous": true,
+     "state_matches_latest": true,
+     "checkpoints_ok": true,
+     "records_schema_valid": true,
+     "problems": [],
+     "graph": [
+      {
+       "operation_id": "op-TG6D80QZNNVDJBXC",
+       "sequence": 1,
+       "operation_type": "create",
+       "actor": "session-a",
+       "identity_assurance": "asserted",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-TG6D80QZNNVDJBXC",
+       "from_version": 0,
+       "to_version": 1
+      },
+      {
+       "operation_id": "op-J3CQA38CE4G8JAJZ",
+       "sequence": 2,
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_id": null,
+       "causation_source": null,
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "from_version": 1,
+       "to_version": 2
+      },
+      {
+       "operation_id": "op-9KFQYC751RGDV3TZ",
+       "sequence": 3,
+       "operation_type": "append",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_id": "op-J3CQA38CE4G8JAJZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "from_version": 2,
+       "to_version": 3
+      },
+      {
+       "operation_id": "op-0QB097WVR3H0ECF8",
+       "sequence": 4,
+       "operation_type": "checkpoint",
+       "actor": "session-a",
+       "identity_assurance": "capability",
+       "causation_id": "op-9KFQYC751RGDV3TZ",
+       "causation_source": "actor",
+       "correlation_id": "op-J3CQA38CE4G8JAJZ",
+       "from_version": 3,
+       "to_version": 4
+      }
+     ]
+    }
+   },
+   "statement": "B, given only A's continuation URL, resolves the resource and verifies its history.",
+   "criterion": "B's report: continuation schema valid, chain_ok, versions_contiguous, state_matches_latest, checkpoints_ok, records_schema_valid all true."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H2",
+   "status": "supported",
+   "evidence": {
+    "authority": {
+     "authenticated": false,
+     "session_id": null,
+     "scopes": [],
+     "permitted": [
+      "fork",
+      "propose"
+     ]
+    },
+    "append": {
+     "status": 401,
+     "code": "authentication_required"
+    }
+   },
+   "statement": "B determines its own authority from the persisted state, and holding the URL grants it nothing.",
+   "criterion": "B's report: viewer.authenticated false, append not in permitted operations, propose in permitted operations, and B's append attempt returns 401 authentication_required."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H3",
+   "status": "supported",
+   "evidence": {
+    "status": 200,
+    "operation_id": "op-38DAXWHRV4DET1KN",
+    "identity_assurance": "asserted",
+    "causation_id": "op-0QB097WVR3H0ECF8",
+    "proposal_id": "P-001"
+   },
+   "statement": "B's contribution is persisted as an attributed, cited state transition.",
+   "criterion": "B's propose returns 200 with operation_record.lineage.causation_id equal to A's operation id and identity_assurance asserted."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H4",
+   "status": "supported",
+   "evidence": {
+    "status": 200,
+    "operation_id": "op-J79HQ7J7Y3PCF3KM",
+    "causation_id": "op-38DAXWHRV4DET1KN",
+    "causation_source": "derived",
+    "events": 2,
+    "on_behalf_of": "session-b"
+   },
+   "statement": "A, in a new process with only its own capability and B's URL, continues the work.",
+   "criterion": "A's accept returns 200; the record has causation_source derived, causation_id equal to B's operation id, two events, on_behalf_of session-b."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H5",
+   "status": "supported",
+   "evidence": {
+    "chain": [
+     {
+      "operation_type": "resolve_proposal",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "derived"
+     },
+     {
+      "operation_type": "propose",
+      "actor": "session-b",
+      "identity_assurance": "asserted",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "checkpoint",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "append",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "append",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": null
+     }
+    ],
+    "correlation_ids": [
+     "op-J3CQA38CE4G8JAJZ"
+    ]
+   },
+   "statement": "A third session with no credentials reconstructs why the final state exists.",
+   "criterion": "C's report: all verification flags true; the causation chain from the final operation reaches A's first cited operation through B's proposal; one correlation id throughout."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H6",
+   "status": "supported",
+   "evidence": {
+    "proposal_run": {
+     "into_b": false,
+     "into_c": false,
+     "b_received_secret": false,
+     "c_received_secret": false,
+     "b_dir_has_a_secret": false
+    },
+    "delegation_run": {
+     "owner_token_given_to_b": false,
+     "into_c": false,
+     "c_received_secret": false
+    }
+   },
+   "statement": "No capability secret crosses between sessions.",
+   "criterion": "No leak (operational definition) in the proposal run; in the delegation run the only token handed to B is the delegated one, and none reaches C."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H7",
+   "status": "supported",
+   "evidence": {
+    "c_replay": {
+     "status": 401,
+     "code": "authentication_required",
+     "version_unchanged": true
+    },
+    "b_resolve": {
+     "status": 401,
+     "code": "authentication_required"
+    }
+   },
+   "statement": "An operation reference does not confer the authority to repeat or resolve.",
+   "criterion": "C's re-submission of A's recorded accept without a capability returns 401; B's attempt to resolve the proposal returns 401; nothing is executed (versions unchanged)."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H8",
+   "status": "supported",
+   "evidence": {
+    "mode": "b-retry",
+    "session": "session-b",
+    "pid": 3253,
+    "received_capability_secret": false,
+    "status": 200,
+    "replayed": true,
+    "operation_id": "op-38DAXWHRV4DET1KN",
+    "proposals": 1,
+    "resource_id": "SYTRZXTDDAVH"
+   },
+   "statement": "A retried request from a restarted process replays instead of re-executing.",
+   "criterion": "B's second process re-sending its propose envelope with the same idempotency key gets replayed true and the same operation id; the resource has one proposal."
+  },
+  {
+   "category": "hypothesis",
+   "id": "H9",
+   "status": "supported",
+   "evidence": {
+    "b": {
+     "status": 200,
+     "operation_id": "op-4TVZNHR4ND93QN95",
+     "identity_assurance": "capability",
+     "capability_kind": "delegation",
+     "causation_id": "op-AB8VG4H330SHP3DY"
+    },
+    "chain": [
+     {
+      "operation_type": "append",
+      "actor": "session-b",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "delegate",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "checkpoint",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "append",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": "actor"
+     },
+     {
+      "operation_type": "append",
+      "actor": "session-a",
+      "identity_assurance": "capability",
+      "causation_source": null
+     }
+    ]
+   },
+   "statement": "Explicit delegation is the only way B gains authority, and it is visible.",
+   "criterion": "Delegation run: B appends directly (200) with identity_assurance capability and capability_kind delegation; C sees the delegate operation by session-a before it in the lineage."
+  }
+ ],
+ "interpretation": {
+  "category": "interpretation",
+  "entries": []
+ },
+ "uncertainty": {
+  "category": "uncertainty",
+  "notes": [
+   "The agents are deterministic programs written with knowledge of the protocol. They show what the service permits, refuses and records; they do not show that a language-model session would discover and follow the same procedure. That is tested separately (llm_sessions).",
+   "All processes run on one machine and reach the service over loopback HTTP. Isolation is by process, environment and private directory, not by machine.",
+   "State digests are computed and served by the service; verification shows internal consistency of the served history, not that the service is honest."
+  ]
+ },
+ "conclusions": {
+  "category": "conclusion",
+  "entries": []
+ },
+ "llm_sessions": {
+  "category": "observation",
+  "status": "pending",
+  "file": "experiments/exp-0003/llm-sessions.md"
+ },
+ "raw": {
+  "proposal-a1-output.json": "sha256:f125794a5be0c7fe2f76abc1d1a2685484cfcd97a9cbda4215d0c4f91b2b2fb7",
+  "proposal-b-output.json": "sha256:2797ece5edc194dfed75d10962f90163b7f13f7a6c42b3f66fa7058fe8f71c04",
+  "proposal-bRetry-output.json": "sha256:0fb89364e21edc2ee45f4b496dbd36c9ab357bf0291b3d256a93a69bd08398f8",
+  "proposal-a2-output.json": "sha256:91f6505e95618f116f02a650acca896a541006402e03c739a6f46bebfd0005c3",
+  "proposal-c-output.json": "sha256:5140d2003c88e9c0cfeb261cc27ef31e1285f9651334dddf107de3cb5d2fd522",
+  "proposal-a-transcript-a-review.json": "sha256:9f6b082fe5810d6df2ded9df4c4de9356f42d5b7d679192611e29417938270e5",
+  "proposal-a-transcript-a-start.json": "sha256:0d7589564c81eab336fea0f828f9102ea909b1616d272c2179872381f5a6d1fc",
+  "proposal-b-transcript-b-retry.json": "sha256:fa0346302fba869585a4366247d4a3f0006f78bb84ad78db2d68fd8bd4a785ee",
+  "proposal-b-transcript-b.json": "sha256:afdc750d4b858cdfdce85969ed6683e09b9e959ed19223dbb32e875821ce6fc2",
+  "proposal-c-transcript-c.json": "sha256:bb19e70eb26aef4f508245d91ea202b11455b0ffd3bb47690647603d0c169b70",
+  "proposal-passed-between-sessions.json": "sha256:7047ffe6295d538c3a986c3f06651d1eff8b572d59a748588a3287f296f84b40",
+  "delegation-a1-output.json": "sha256:c9613f3fe07388dfb22dc6b3258627210fe1fde1fdf388813cfbf7fbd5c821fb",
+  "delegation-b-output.json": "sha256:84c21d2748773fb9148a50a9898b89c0a954fdd367b995822cde77ae164ffb85",
+  "delegation-c-output.json": "sha256:07b31bd8dce74b3f19f4bb644c6e0088715a614b481c865a6ee22afb6f349568",
+  "delegation-a-transcript-a-start.json": "sha256:7259f6c2a4357ef30c961d31f2d8476d18929eaffbc318c5cd67928f0c51ad8f",
+  "delegation-b-transcript-b.json": "sha256:efb9c6efb675d5d7b87bea3cfc0d2ba1c8e80c071f6e86a2f4a1992cdab0ee87",
+  "delegation-c-transcript-c.json": "sha256:270cc36f49e98e28243dc1f1d21e899931546cc1c359d9e0e3a6fe1ab8c5efe5",
+  "delegation-passed-between-sessions.json": "sha256:be9fb2d95f7e3fd085b7540292789487a91f5313a6b1c98c0157ebc534dd165e"
+ },
+ "reproducibility": {
+  "output_hash": "sha256:46ef1115c5d2a53de54fa0c6bc76c22e0bb684577bf6d4443de079b07ee1a0bb",
+  "hashed": "observations.normalised (no ids, digests, times, ports, pids)",
+  "command": "npm run exp:0003 -- --verify"
+ }
+}

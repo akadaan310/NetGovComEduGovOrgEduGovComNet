@@ -1,0 +1,37 @@
+{
+ "mode": "a-start",
+ "argv": [
+  "http://127.0.0.1:39931",
+  "--delegate",
+  "session-b"
+ ],
+ "env": {
+  "PATH": "[inherited PATH]",
+  "PRIVATE_DIR": "/tmp/acsp-exp-0003-1UZwRT/da-CGFizP"
+ },
+ "exit": 0,
+ "output": {
+  "mode": "a-start",
+  "session": "session-a",
+  "pid": 3313,
+  "received_capability_secret": true,
+  "statuses": [
+   201,
+   200,
+   200,
+   200,
+   200
+  ],
+  "resource_id": "4MYVCWJV96HP",
+  "first_cited_operation": "op-S9ENP5MCDDE6R60E",
+  "operation_ids": [
+   "op-6SHT346FTN1H7SHW",
+   "op-S9ENP5MCDDE6R60E",
+   "op-5061FHYZ0YVFR7PV",
+   "op-4H3DKC1KPXYJ5J8W",
+   "op-AB8VG4H330SHP3DY"
+  ],
+  "delegated": true,
+  "continuation": "http://127.0.0.1:39931/r/4MYVCWJV96HP/continue/op-AB8VG4H330SHP3DY"
+ }
+}
