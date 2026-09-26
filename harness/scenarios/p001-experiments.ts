@@ -87,12 +87,14 @@ export const p001ExpA: Scenario = {
 
     // Session B: a fresh actor. It is given the identity URL (and, out of band, its OWN capability).
     const b = w.actor('session-b', { session: 'session-b', agent: 'agent-runtime-b' });
-    const before = w.client.requests;
+    let before = 0;
+    let after = 0;
     let doc: any;
     let snapshot: any;
     await t.step('CREATE SESSION B', async () => {
       await authorize(t, { rid, principal: principal! }, b);
       t.check(b.token(rid) !== undefined && b.session_id !== a.session_id, 'B holds its own session-bound capability; nothing of A');
+      before = w.client.requests; // B's own requests start here
     });
 
     await t.step('RECOVER IDENTITY', async () => {
@@ -143,6 +145,7 @@ export const p001ExpA: Scenario = {
     await t.step('CHECKPOINT', async () => {
       checkpointB = (await b.checkpoint(rid, { label: 'session B: continued' })).body.result.checkpoint;
       t.eq(checkpointB.number, 2, 'checkpoint 2');
+      after = w.client.requests;
     });
 
     await t.step('falsification criteria and measurements', async () => {
@@ -169,7 +172,7 @@ export const p001ExpA: Scenario = {
       t.measure('provenance_preserved', ex.map((x: any) => ({ id: x.execution_id, session: x.session.session_id, embodiment: x.embodiment_id, model: x.model?.model_id })));
       t.measure('session_changed', { from: 'session-a', to: 'session-b', model_from: 'model-a', model_to: 'model-b' });
       t.measure('observations_on_recovery', embB.observations);
-      t.measure('session_b_requests', w.client.requests - before);
+      t.measure('session_b_requests', after - before);
       t.measure('checkpoints', { a: checkpointA.sha256, b: checkpointB.sha256 });
     });
 

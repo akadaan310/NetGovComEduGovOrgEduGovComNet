@@ -4,7 +4,7 @@
   "extensions": [
     "program-001"
   ],
-  "commit": "7af5618585088fd5cc59cddf3e3330fdf52c1485 (+uncommitted changes)",
+  "commit": "6e6c13f032b8ebd07358308e97a836d77b27de63 (+uncommitted changes)",
   "environment": {
     "node": "v22.22.2",
     "database": "pglite (in-process)",
@@ -159,7 +159,7 @@
           "MODEL_CHANGED",
           "RECOVERY"
         ],
-        "session_b_requests": 14,
+        "session_b_requests": 8,
         "checkpoints": {
           "a": "sha256:5b801bde9a9469580147df75f44a372f01a849029e1a69fd5f916460c2ec1eac",
           "b": "sha256:fcd2d71c0913bfcdefa2de2c02be759c6478f2f23bb84c9ceb105815626876e5"
@@ -359,5 +359,5 @@
       "artifacts": []
     }
   ],
-  "deterministic_sha256": "sha256:cb90c12f32ed9893dd8cd5e1cd4d935c603791953ee56ac7a159894b1cf46108"
+  "deterministic_sha256": "sha256:84cacef65fb989b2777147a85ab2ffcd4b9c81a6dce9be3bed22360cec780713"
 }
