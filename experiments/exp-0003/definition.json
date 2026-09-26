@@ -1,0 +1,33 @@
+{
+  "id": "exp-0003",
+  "title": "Inter-session operational communication through ACSP state transitions",
+  "question": "Can two independent sessions communicate through ACSP state transitions rather than through conversation messages?",
+  "claim_under_test": "Independent sessions can use ACSP operations against a shared externally persisted resource, with explicit authority, provenance and state-transition semantics, and can continue work through operation/state references passed between sessions.",
+  "preregistered": "Written and committed before the experiment scripts exist and before the first run. Criteria are not edited after the first run.",
+  "setup": {
+    "service": "harness/serve.ts: the real ACSP handler over HTTP on 127.0.0.1, in-memory PGlite, its own OS process",
+    "sessions": "Agent A, Agent B and Agent C are separate OS processes started one after another by an orchestrator that plays the human. Each process gets its own private directory. The orchestrator passes between processes ONLY the continuation URL printed by the previous process.",
+    "a_capability": "Agent A stores its owner capability in A's private directory. No other process is given that directory or the token.",
+    "runs": {
+      "proposal": "B has no capability and can only propose; A (a new process) accepts; C verifies.",
+      "delegation": "A additionally delegates [append] to session-b; the human hands B that capability explicitly (the one authority transfer, and it is an ACSP operation); B appends directly; C verifies."
+    }
+  },
+  "operational_definitions": {
+    "communication through state transitions": "Each session's only input from the previous session is a URL identifying persisted state; each session's only output to the next is a URL returned by an ACSP operation; everything else a session learns comes from GET requests to the service.",
+    "independent": "Separate OS process, separate private directory, no shared memory, no transcript of any other session, no credential it was not explicitly given.",
+    "verify": "Recompute: the operation chain (state_before = previous state_after, from_version = previous to_version, parent pointers), the current operational-state digest from GET /state, and every checkpoint hash from its snapshot; validate records against the published schemas.",
+    "leak": "Any occurrence of the substring acsp_cap_ in what the orchestrator passes to B or C (argv, environment, stdin), or in any response body B or C receives."
+  },
+  "hypotheses": [
+    { "id": "H1", "statement": "B, given only A's continuation URL, resolves the resource and verifies its history.", "criterion": "B's report: continuation schema valid, chain_ok, versions_contiguous, state_matches_latest, checkpoints_ok, records_schema_valid all true." },
+    { "id": "H2", "statement": "B determines its own authority from the persisted state, and holding the URL grants it nothing.", "criterion": "B's report: viewer.authenticated false, append not in permitted operations, propose in permitted operations, and B's append attempt returns 401 authentication_required." },
+    { "id": "H3", "statement": "B's contribution is persisted as an attributed, cited state transition.", "criterion": "B's propose returns 200 with operation_record.lineage.causation_id equal to A's operation id and identity_assurance asserted." },
+    { "id": "H4", "statement": "A, in a new process with only its own capability and B's URL, continues the work.", "criterion": "A's accept returns 200; the record has causation_source derived, causation_id equal to B's operation id, two events, on_behalf_of session-b." },
+    { "id": "H5", "statement": "A third session with no credentials reconstructs why the final state exists.", "criterion": "C's report: all verification flags true; the causation chain from the final operation reaches A's first cited operation through B's proposal; one correlation id throughout." },
+    { "id": "H6", "statement": "No capability secret crosses between sessions.", "criterion": "No leak (operational definition) in the proposal run; in the delegation run the only token handed to B is the delegated one, and none reaches C." },
+    { "id": "H7", "statement": "An operation reference does not confer the authority to repeat or resolve.", "criterion": "C's re-submission of A's recorded accept without a capability returns 401; B's attempt to resolve the proposal returns 401; nothing is executed (versions unchanged)." },
+    { "id": "H8", "statement": "A retried request from a restarted process replays instead of re-executing.", "criterion": "B's second process re-sending its propose envelope with the same idempotency key gets replayed true and the same operation id; the resource has one proposal." },
+    { "id": "H9", "statement": "Explicit delegation is the only way B gains authority, and it is visible.", "criterion": "Delegation run: B appends directly (200) with identity_assurance capability and capability_kind delegation; C sees the delegate operation by session-a before it in the lineage." }
+  ]
+}
