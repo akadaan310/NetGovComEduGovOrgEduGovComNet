@@ -169,6 +169,9 @@ function git() {
 async function main() {
   const verify = process.argv.includes('--verify');
   const def = JSON.parse(readFileSync(join(EXP, 'definition.json'), 'utf8'));
+  // Repository state is captured BEFORE the run writes anything (the first recorded run computed it
+  // after writing raw/, which made a clean tree read as dirty).
+  const repo = git();
   const work = mkdtempSync(join(tmpdir(), 'acsp-exp-0003-'));
   const service = await startService();
   let p, d;
@@ -226,7 +229,7 @@ async function main() {
     question: def.question,
     claim_under_test: def.claim_under_test,
     run: { timestamp: new Date().toISOString() },
-    repository: { url: 'https://github.com/akadaan310/NetGovComEduGovOrgEduGovComNet', ...git() },
+    repository: { url: 'https://github.com/akadaan310/NetGovComEduGovOrgEduGovComNet', ...repo },
     environment: { node: process.version, platform: process.platform, arch: process.arch, database: 'PGlite (in-memory) via harness/serve.ts' },
     protocol_versions: { server: 'ACSP/0.2', envelopes: 'ACSP/0.2' },
     definition: { file: 'experiments/exp-0003/definition.json', sha256: 'sha256:' + createHash('sha256').update(readFileSync(join(EXP, 'definition.json'))).digest('hex'), preregistered_in_commit: '6c04020' },

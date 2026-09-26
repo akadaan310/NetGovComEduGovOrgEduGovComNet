@@ -4,6 +4,8 @@ import { bootstrapDocument, bootstrapText, NOTICE } from './bootstrap';
 import {
   DELEGABLE_SCOPES,
   INVARIANTS,
+  INVARIANTS_V02,
+  SUPPORTED_PROTOCOLS,
   PROTOCOL_NAME,
   PROTOCOL_TITLE,
   PROTOCOL_VERSION,
@@ -11,7 +13,8 @@ import {
   SCOPE_MEANINGS,
   VISIBILITY_MEANINGS,
 } from './constants';
-import { OPERATIONS, payloadJsonSchema } from './operations';
+import { OPERATIONS, payloadJsonSchema, semanticsOf } from './operations';
+import { PUBLISHED_SCHEMAS } from './schemas';
 import { ERROR_STATUS } from './errors';
 
 export function protocolDocument(base: string) {
@@ -21,6 +24,13 @@ export function protocolDocument(base: string) {
     type: 'protocol',
     notice: NOTICE,
     invariants: [...INVARIANTS],
+    invariants_v02: [...INVARIANTS_V02],
+    accepted_envelope_versions: [...SUPPORTED_PROTOCOLS],
+    communication_model: {
+      acsp: 'Actor → operation → state transition → persisted result → reference → independent actor → next operation.',
+      not: 'Actor A → message → Actor B. ACSP carries no messages between sessions: sessions read and change persisted state, and pass references to it.',
+      reference: 'A continuation reference (/r/{id}/continue/{operation_id}) identifies a persisted state. It carries no capability, no identity and no memory.',
+    },
     summary:
       'ACSP is an HTTPS continuity substrate. A continuity resource at /r/{id} holds explicitly published research state (TOKs) ' +
       'with provenance. GET is always safe. Mutations are operations POSTed as a JSON envelope, authorised by capabilities.',
@@ -37,6 +47,10 @@ export function protocolDocument(base: string) {
       version: 'Increases by exactly 1 per event. A new resource is at version 1.',
       checkpoint: 'A numbered, hashed snapshot at one version. Checkpoint 0 is created with the resource. Distinct from version.',
       operation_intent: 'A described operation someone wants performed: prepared (GET ?action=prepare_<op>, never stored) or proposed (propose, stored).',
+      operation: 'ACSP/0.2: one accepted mutation request, with a server-generated id (op-…). It produces one or more events and has an immutable record at /r/{id}/op/{operation_id}.',
+      operational_state: 'ACSP/0.2: everything an operation can change (metadata, knowledge, handoffs, proposals, capability public fields, checkpoints). GET /r/{id}/state serves it with its SHA-256; each operation record carries the digest before and after.',
+      lineage: 'ACSP/0.2: parent_operation_id (order, server), causation_id (the operation this one responds to: cited by the actor, or derived for resolve_proposal and acknowledge), correlation_id (workflow: supplied, inherited from causation, or the operation\'s own id).',
+      extension: 'ACSP/0.2: a declarative operation registered by the service, composed only of core content operations; executable only in an executable status, only where the owner enabled it, only with authority covering every effect.',
     },
     scopes: SCOPE_MEANINGS,
     delegable_scopes: [...DELEGABLE_SCOPES],
@@ -61,7 +75,11 @@ export function protocolDocument(base: string) {
         idempotency_key: 'Required. 8-128 chars [A-Za-z0-9._:-]. Same key + same request = replay of the original response.',
         payload: 'Operation-specific; see operations[].payload_schema.',
         create_key: 'create only, when the operator requires it.',
+        causation_id: 'ACSP/0.2, optional: an operation id of this resource (for fork: of the parent) that this operation responds to. Validated; grants nothing.',
+        correlation_id: 'ACSP/0.2, optional: workflow id; inherited from causation_id when omitted.',
+        operation_version: 'ACSP/0.2, optional: pin an extension definition version.',
       },
+      response_v02: 'Adds operation_id, previous_version, operation_record (acsp.operation/0.2), continuation (acsp.continuation-reference/0.2), links.operation, links.continue and, when a secret was minted, secrets.paths. Every ACSP/0.1 field is unchanged.',
     },
     reading: {
       formats: 'Every GET is HTML by default; JSON via a .json suffix, ?format=json, or Accept: application/json.',
@@ -78,6 +96,14 @@ export function protocolDocument(base: string) {
         '/r/{id}/checkpoints/{n}': 'one checkpoint with snapshot',
         '/r/{id}/diff?from=V&to=W | ?since_checkpoint=N': 'diff',
         '/r/{id}/explorer': 'protocol explorer (HTML, for developers)',
+        '/r/{id}/op?after=S&limit=M&correlation_id=C': 'ACSP/0.2 operation records in sequence (poll with after=<sequence>)',
+        '/r/{id}/op/{operation_id}': 'ACSP/0.2 one operation record with its lineage',
+        '/r/{id}/continue[/{operation_id}]': 'ACSP/0.2 continuation reference, evaluated for YOUR authority',
+        '/r/{id}/state': 'ACSP/0.2 current operational state and its SHA-256',
+        '/r/{id}/proposals/{proposalId}': 'ACSP/0.2 a proposal as a protocol object (payload hash binding)',
+        '/extensions[/{name}]': 'ACSP/0.2 extension operation registry',
+        '/extensions/validate?definition=JSON': 'ACSP/0.2 validate a definition (never registers or executes it)',
+        '/schemas[/{name}]': 'ACSP/0.2 JSON Schemas of the 0.2 documents',
       },
     },
     operations: OPERATIONS.map((o) => ({
@@ -97,13 +123,15 @@ export function protocolDocument(base: string) {
       provenance: o.provenance,
       failures: o.failures,
       payload_schema: payloadJsonSchema(o),
+      semantics: semanticsOf(o.name),
       doc_href: u(`/protocol#op-${o.name}`),
     })),
     errors: ERROR_STATUS,
     limits: RESOURCE_LIMITS,
     bootstrap: bootstrapDocument(),
     bootstrap_text: bootstrapText(),
-    links: { home: u('/'), new_resource: u('/new'), discovery: u('/.well-known/acsp') },
+    schemas: Object.keys(PUBLISHED_SCHEMAS).map((n) => ({ name: n, href: u(`/schemas/${n}`) })),
+    links: { home: u('/'), new_resource: u('/new'), discovery: u('/.well-known/acsp'), extensions: u('/extensions'), schemas: u('/schemas') },
   };
 }
 export type ProtocolDocument = ReturnType<typeof protocolDocument>;

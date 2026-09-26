@@ -127,6 +127,18 @@ export const operationalSecurity: Scenario = {
       t.check(ops.every((o: any, i: number) => i === 0 || (o.from_version === ops[i - 1].to_version && o.state_before === ops[i - 1].state_after)), 'the operation chain stays contiguous');
     });
 
+    await t.step('secrets are flagged where they are minted; /state refuses historical queries', async () => {
+      const c = await owner.create({ title: 'flags' });
+      t.eq(c.body.secrets?.paths, ['result.owner_capability.token', 'result.owner_capability_url'], 'create lists the fields that carry the secret');
+      const dd = await owner.delegate(rid, { to: { session_id: 'session-f' }, scopes: ['read'] });
+      t.eq(dd.body.secrets?.paths, ['result.capability.token', 'result.capability_url'], 'delegate lists them too');
+      const ap = await owner.append(rid, { type: 'finding', title: 'no secrets here' });
+      t.eq(ap.body.secrets, undefined, 'responses without secrets carry no flag');
+      const replay = await owner.op(null, 'create', null, { raw: owner.envelope('create', { title: 'flags' }, {}, c.body.operation_record.idempotency_key) });
+      t.eq([replay.body.replayed, replay.body.secrets], [true, undefined], 'a replay (token redacted) flags nothing');
+      t.status(await owner.getJson(`/r/${rid}/state?version=2`), 400, '/state?version= is refused, not silently answered with the current state', 'malformed_request');
+    });
+
     await t.step('restricted resources: references reveal nothing without a capability', async () => {
       const rr = await owner.create({ title: 'Restricted', visibility: 'restricted' });
       const rrid = rr.body.resource_id;

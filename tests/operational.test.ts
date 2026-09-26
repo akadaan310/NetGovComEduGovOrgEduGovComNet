@@ -124,3 +124,21 @@ describe('extension atomicity', () => {
     }
   });
 });
+
+describe('PROTOCOL.md stays in sync with ACSP/0.2', () => {
+  const md = readFileSync('PROTOCOL.md', 'utf8');
+  it('lists every invariant, schema and 0.2 route', () => {
+    for (const inv of INVARIANTS_V02) expect(md, inv).toContain(inv.replace(/\.$/, ''));
+    for (const name of Object.keys(PUBLISHED_SCHEMAS)) expect(md, name).toContain(name);
+    for (const route of ['/r/{id}/op/{operation_id}', '/r/{id}/continue', '/r/{id}/state', '/r/{id}/proposals/{proposalId}', '/extensions', '/schemas']) expect(md, route).toContain(route);
+  });
+  it('the repeat-semantics table matches the registry', () => {
+    const row = md.split('\n').map((l) => l.trim()).find((l) => l.startsWith('| create, append'))!;
+    const [newEffect, refused] = row.split('|').slice(1, 3);
+    for (const [name, s] of Object.entries(SEMANTICS)) {
+      if (!s.idempotency) continue;
+      const cell = s.idempotency.repeat === 'new_effect' ? newEffect : refused;
+      expect(cell, `${name} is ${s.idempotency.repeat}`).toMatch(new RegExp(`\\b${name}\\b`));
+    }
+  });
+});

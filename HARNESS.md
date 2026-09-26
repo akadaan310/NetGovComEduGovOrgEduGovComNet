@@ -88,6 +88,11 @@ This is how the harness models session isolation.
 | `checkpoint-resume` | resume from checkpoint N: the snapshot hash verifies, and the diff since N contains exactly the later changes. |
 | `human-form-path` | A GET-only agent composes an intent URL. The human submits the no-JS form. Double submission is an idempotent replay. |
 | `rate-limits` | unauthenticated writes are limited per client, reads never are, and the window resets. |
+| `inter-session-operation-handoff` | **0.2.** A creates, publishes and checkpoints, then stops. B receives only the continuation URL, verifies the history (operation chain, state digest, checkpoints, schemas), finds from `viewer` that it may only propose, is refused `append`, and proposes citing A's operation. A (a new actor with only its saved capability) accepts; causation is derived. C (no capability) rebuilds the causation chain from the final URL. Variant: explicit delegation. |
+| `idempotency-semantics` | **0.2.** Same request twice, after a week, concurrently, across two sessions, with a stale version, with a reused key; then every mutating operation repeated under a new key, checked against the registry's declared repeat semantics. |
+| `extension-operations` | **0.2.** Registry and schemas; enable rules; draft/retired/unknown/version refusals; union-of-effects authority before any effect; replay; template injection; TOK-published and submitted definitions never run; no proposing; forks do not inherit. |
+| `operational-security` | **0.2.** Leakage, record replay, forged/cross-resource references, spoofing, confused deputy, escalation, malicious text, URL injection, CSRF, races, secret flags, restricted references. |
+| `protocol-compatibility` | **0.2.** Verbatim ACSP/0.1 envelopes still execute with all 0.1 response fields; unknown versions refused; `core:` names. |
 | `computation-envelope` | the ACSP half of the ACSP × PURL composition bridge: a task whose refs are PURL URLs moves owner → A → B → owner. Refs stay verbatim and are never fetched (they use the `.invalid` TLD), checkpoint hashes recompute from served snapshots, B needs its own delegated capability to accept, and every contribution stays attributed to its own session. |
 
 ## Running
@@ -107,6 +112,23 @@ about 60 unauthenticated writes, so raise `ACSP_RATE_LIMIT_ANON_PER_HOUR` on
 the deployment while smoke-testing, or run `core-demonstration` alone.
 Idempotency keys are prefixed with a per-run ID so that repeated runs never
 replay each other.
+
+### Two-process (and more) experiment: exp-0003
+
+The in-process scenarios model session isolation with separate `Actor`
+objects. `experiments/exp-0003` removes that shortcut: `npm run exp:0003`
+starts `harness/serve.ts` as its own process and runs every session turn —
+A, B, B's restart, A's review, C — as a **separate OS process**
+(`scripts/exp-0003/agent.ts`) with a minimal environment and its own
+private directory. The orchestrator plays the human and passes between
+processes only the continuation URL the previous process printed (plus, in
+the delegation run, the one capability the owner delegated). It records
+every process's HTTP transcript (secrets redacted), output and exactly what
+crossed between sessions, evaluates the pre-registered criteria, and
+writes `record.json`. `npm run exp:0003 -- --verify` re-runs everything and
+compares the normalised outcome hash with the committed record. The same
+flow was then run with four independent language-model sessions
+(`experiments/exp-0003/llm-sessions.md`).
 
 ### A local HTTP server for multi-process experiments
 

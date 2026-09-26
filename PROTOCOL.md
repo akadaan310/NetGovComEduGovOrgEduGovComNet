@@ -1,6 +1,10 @@
-# ACSP/0.1 — Agent Continuity & Session Protocol
+# ACSP/0.2 — Agent Continuity & Session Protocol
 
-Status: **prototype, normative for this implementation.**
+Status: **prototype, normative for this implementation.** ACSP/0.2 extends
+ACSP/0.1 for **operational communication between independent sessions**
+(§13–§15). Everything specified for 0.1 in §0–§12 still holds; envelopes
+declaring `ACSP/0.1` are accepted unchanged. Where §0–§12 say "ACSP/0.1",
+read "since ACSP/0.1".
 The machine-readable version of this document is served at `GET /protocol.json`.
 It is generated from `src/protocol/operations.ts`, and tests keep the two in sync.
 
@@ -26,6 +30,8 @@ In protocol terms:
 | Awareness ≠ authority | Knowing a resource URL gives read access at most (`unlisted`). Mutation requires a capability with the right scope. |
 | Handoff ≠ merger | `handoff` moves responsibility for one task TOK, and only once the recipient acknowledges it. Sessions, identities and ownership stay separate. |
 
+ACSP/0.2 adds thirteen invariants for operational communication (§13.2).
+
 ACSP only transports explicit data. It does not merge conversations, transfer
 model state, infer identity from writing style, or decide whether a claim is
 true.
@@ -47,6 +53,10 @@ true.
 | **Checkpoint** | A numbered, hashed snapshot of the resource's persisted state at one version. Checkpoint 0 is created with the resource. |
 | **Capability** | A bearer secret (`acsp_cap_…_…`) bound to one resource and one session, carrying scopes. |
 | **Operation intent** | A description of an operation that someone wants performed. It can be *prepared* (a GET document, never stored) or *proposed* (stored with `propose`). |
+| **Operation** (0.2) | One accepted mutation request: a server-generated id (`op-…`), one or more events, and an immutable record at `/r/{id}/op/{operation_id}` (§13.3). |
+| **Operational state** (0.2) | Everything an operation can change, served with its SHA-256 at `/r/{id}/state` (§13.5). |
+| **Continuation reference** (0.2) | A URL (`/r/{id}/continue/{operation_id}`) identifying a persisted state another session may continue from. No identity, no authority, no memory (§13.7). |
+| **Extension** (0.2) | A declarative operation registered by the service, composed of core operations (§14). |
 
 ### 1.1 Identity assurance
 
@@ -122,8 +132,15 @@ suffix, `?format=json`, or `Accept: application/json`.
 | GET | `/r/{id}/diff?from=V[&to=W]` or `?since_checkpoint=N` | **Diff**: events and knowledge changes in `(from, to]` |
 | GET | `/r/{id}/explorer` | Developer/operator protocol explorer (HTML) |
 | POST | `/r/{id}/operations` | Execute any mutating operation other than `create` |
+| GET | `/r/{id}/op?after=S&limit=M&correlation_id=C` | **0.2** Operation records in sequence (§13.3) |
+| GET | `/r/{id}/op/{operation_id}` | **0.2** One operation record with its lineage |
+| GET | `/r/{id}/continue[/{operation_id}]` | **0.2** Continuation reference, evaluated for the reader (§13.7) |
+| GET | `/r/{id}/state` | **0.2** Current operational state and its SHA-256 (§13.5) |
+| GET | `/r/{id}/proposals/{proposalId}` | **0.2** A proposal as a protocol object (§13.8) |
+| GET | `/extensions`, `/extensions/{name}`, `/extensions/validate?definition=` | **0.2** Extension registry (§14) |
+| GET | `/schemas`, `/schemas/{name}` | **0.2** JSON Schemas: operation-envelope, operation, operation-result, continuation-reference, continuation, operation-definition, extension-registration |
 
-The action shortcuts `?action=inspect|operations|events|checkpoints|diff|retrieve`
+The action shortcuts `?action=inspect|operations|events|checkpoints|diff|retrieve` (0.2: also `op`, `continue`, `state`, `proposal`)
 map to the path forms above, so an agent that can only edit query strings
 can still reach everything.
 
@@ -247,7 +264,7 @@ POST `/r/{id}/operations` (or POST `/r` for `create`), `Content-Type: applicatio
 
 | Field | Rules |
 |---|---|
-| `protocol` | MUST be `ACSP/0.1` |
+| `protocol` | `ACSP/0.2` or `ACSP/0.1` (both accepted) |
 | `operation` | a registered mutating operation |
 | `actor.session_id` | required. With a capability it MUST equal the capability's session, or be omitted, in which case the capability's session is used. |
 | `expected_version` | the version the client last saw. **Required** for `update`, `supersede`, `resolve_proposal` and `close`, optional otherwise. On a mismatch the server returns `409 stale_version`. |
@@ -255,6 +272,28 @@ POST `/r/{id}/operations` (or POST `/r` for `create`), `Content-Type: applicatio
 | `payload` | operation-specific (§8) |
 | `capability` | optional alternative to the `Authorization` header |
 | `create_key` | `create` only, when the operator has set `ACSP_CREATE_KEY` |
+| `causation_id` | **0.2**, optional: the operation this one responds to (§13.6). Must be an operation of this resource (for `fork`, of the parent), else `422 invalid_reference`. Grants nothing. |
+| `correlation_id` | **0.2**, optional: workflow id, 1–128 chars `[A-Za-z0-9._:@-]`; inherited from `causation_id` when omitted |
+| `operation_version` | **0.2**, optional: pin an extension definition version |
+
+#### 6.1.1 Field classes (0.2)
+
+| Field | Required | Supplied by | Security-sensitive | In the operation record |
+|---|---|---|---|---|
+| `protocol` | yes | actor | no | `protocol_version` (immutable) |
+| `operation` | yes | actor | yes (selects authority) | `operation_type` |
+| `operation_version` | no | actor | no | `definition_version` |
+| `actor` | without a capability | actor; fixed by the capability when present | **yes** (spoofing: `session_mismatch`) | `actor`, `identity_assurance` |
+| `expected_version` | for update, supersede, resolve_proposal, close | actor | yes (stale writes) | `expected_version` |
+| `idempotency_key` | yes | actor | yes (replay scope) | `idempotency_key` |
+| `causation_id`, `correlation_id` | no | actor | no (validated, grant nothing) | `lineage` |
+| `payload` | per operation | actor | per operation | `payload` |
+| `capability` / `Authorization` | for scoped operations | actor | **secret** — never stored or echoed | only `authority.capability_id` |
+| `operation_id`, `sequence`, `transition`, `parent_operation_id`, `authority`, `request_hash`, `created_at` | — | **server-generated** | — | yes |
+
+Every field of an operation record is immutable once written (the table
+is append-only). Nothing about an executed operation is mutable; later
+changes are later operations.
 
 HTML form POSTs use `application/x-www-form-urlencoded` with a `request`
 field containing the JSON envelope and an optional `capability` field. They
@@ -286,7 +325,7 @@ get an HTML response.
 | HTTP | code | When |
 |---|---|---|
 | 400 | `malformed_request` | body is not JSON, or the envelope is invalid |
-| 400 | `unsupported_protocol` | `protocol` ≠ `ACSP/0.1` |
+| 400 | `unsupported_protocol` | `protocol` is neither `ACSP/0.1` nor `ACSP/0.2` |
 | 400 | `unknown_operation` | the operation is not in the registry |
 | 400 | `missing_expected_version` | the operation requires `expected_version` |
 | 401 | `invalid_capability` | the token is unknown or has a bad secret |
@@ -308,22 +347,58 @@ get an HTML response.
 | 422 | `idempotency_key_reuse` | same key, different request |
 | 422 | `limit_exceeded` | a per-resource limit was reached |
 | 429 | `rate_limited` | too many writes from this client |
+| 403 | `extension_not_enabled` | **0.2** the extension is not enabled on this resource |
+| 422 | `operation_not_executable` | **0.2** the extension is draft or retired, the pinned version is not registered, or a non-enableable extension was enabled |
+| 422 | `invalid_reference` | **0.2** `causation_id` is not an operation of this resource |
 
 ### 6.4 Idempotency
 
-Idempotency records are scoped to (resource or `new`, credential identity,
-key).
+ACSP distinguishes three properties and does not assume they coincide
+(0.2):
 
-* Same key with the same request (compared by a canonical SHA-256 of
-  operation, actor, payload and expected_version) returns the **original
-  response** with `"replayed": true`. No new event is created.
-* Same key with a different request returns `422 idempotency_key_reuse`.
+* **Request idempotency.** The same `idempotency_key` with the same request
+  (compared by a canonical SHA-256 of operation, actor, payload,
+  expected_version and, when sent, the 0.2 lineage fields), within the same
+  **credential scope** (resource or `new`, plus the capability id, or
+  `asserted:<session_id>` without one), returns the **original response**
+  with `"replayed": true` and the **same `operation_id`**. Nothing is
+  executed again and no event or operation record is added. This holds
+  after any delay (records do not expire in 0.2), for concurrent identical
+  requests (exactly one executes), and even when the request's
+  `expected_version` has since gone stale (the original result is
+  returned, not `stale_version`).
+* **Repeat semantics.** The same operation performed again under a **new**
+  key either has a **new effect** (a second, distinct TOK, annotation,
+  checkpoint, proposal, capability, resource or fork) or is **refused** by
+  a precondition (no event is appended). The registry declares which, per
+  operation (`semantics.idempotency.repeat` in `/protocol.json`); the
+  harness checks every declaration against the implementation:
+
+  | new effect | refused (and why) |
+  |---|---|
+  | create, append, annotate, checkpoint, fork, delegate, propose | update (changes nothing / stale), supersede (already superseded), revoke (already revoked), handoff (already pending), acknowledge (not pending), resolve_proposal (not pending), close (closed) |
+
+* **Event idempotency.** A replay appends no event; a refused repeat
+  appends no event; a repeat with a new effect appends exactly the events
+  of a new operation. Every core handler emits an event only together with
+  a change to some record other than the version counter (`update` refuses
+  a no-op); this is established by reading the handlers, not by a test.
+  (Contrast PURL's `link`, which exp-0002 found appending events that
+  changed nothing but the version.)
+
+Consequences:
+
+* Same key, different request → `422 idempotency_key_reuse`; nothing runs.
+* The **same** request from two sessions (two credentials) is two
+  operations: idempotency is per credential scope, not semantic.
+* A restarted session must not reuse its key sequence under the same
+  capability: a colliding key with a different request is refused (found
+  by the harness). Use random keys, or persist the counter.
 * Failed requests are not recorded, so a failure may be retried with the
   same key.
 * Secrets (capability tokens) appear **only in the original response**.
-  Replays return `"token": null, "token_redacted": true`.
-
----
+  Replays return `"token": null, "token_redacted": true`, and operation
+  records store the result redacted.
 
 ## 7. Operation intents for browser-only agents
 
@@ -364,7 +439,11 @@ authority can use `propose` instead (§8.12).
 
 Every operation is documented with: purpose, required authority, input,
 output, side effects, provenance behaviour, and failure behaviour. The
-registry at `/protocol.json` adds the JSON Schema of every payload.
+registry at `/protocol.json` adds the JSON Schema of every payload and, in
+0.2, each operation's `semantics`: qualified name (`core:<name>`),
+`introduced_in`, preconditions, the state transition `S_n → S_n+1`, the
+events it emits, and its idempotency (§6.4). All eighteen core operations
+were introduced in ACSP/0.1 and are unchanged.
 
 ### Read operations (GET, no side effects, no events)
 
@@ -540,9 +619,14 @@ Every mutating operation:
   "summary": "session-b appended finding TOK-003 \"Cache miss rate\"",
   "data": { "tok_id": "TOK-003", "type": "finding", "title": "Cache miss rate" },
   "request_hash": "sha256:…",
-  "idempotency_key": "session-b-append-0001"
+  "idempotency_key": "session-b-append-0001",
+  "operation_id": "op-J79HQ7J7Y3PCF3KM"
 }
 ```
+
+`operation_id` (0.2) names the operation that emitted the event (null for
+events written before migration 0003). Events emitted by an extension also
+carry `data.extension { name, version }`.
 
 Events are never updated or deleted. The database enforces this with a trigger.
 
@@ -600,6 +684,297 @@ If you can only open URLs (no POST): open a prepare link (?action=prepare_<opera
 | GET-based commands for browser agents | GET is always safe. `?action=prepare_*` returns operation intents, and `propose` stores them. | Prefetchers, crawlers and link unfurlers must not mutate state. |
 | checkpoint ≈ version | Separate counters. | Checkpoints are deliberate boundaries, while versions count every event. |
 | TOK `checkpoint` field | `after_checkpoint` + `version` | Removes ambiguity. |
-| Tables: sessions, agents, actors, operations, branches | Not created | These are identifiers in capabilities and events. The event log is the operation log, and branches are resources with a parent. |
+| Tables: sessions, agents, actors, operations, branches | Sessions, agents, actors and branches: not created. **Operations: created in 0.2.** | Session and agent ids are identifiers in capabilities and events, and branches are resources with a parent. ACSP/0.1 treated the event log as the operation log; that cannot give a two-event request (`resolve_proposal`) one identity or one reference, so 0.2 adds an append-only `operations` table and links each event to its operation. |
 | handoff (unspecified) | Task-scoped, two-phase (handoff → acknowledge), grants no authority | Handoff ≠ merger, and awareness ≠ authority. |
 | operation intents | Two forms: prepared (not stored) and proposed (stored, owner-resolved) | Serves both GET-only and POST-capable agents that lack authority. |
+
+---
+
+## 13. Operational communication (ACSP/0.2)
+
+ACSP/0.2 lets independent sessions **continue each other's work through
+persisted state transitions**. It adds no message channel. Everything in
+this section is additive: every ACSP/0.1 request, response field and
+behaviour above is unchanged, and envelopes declaring `ACSP/0.1` are still
+accepted.
+
+### 13.1 The communication model
+
+```
+Actor ─► operation ─► state transition ─► persisted result ─► reference ─► independent actor ─► next operation
+```
+
+It is **not**
+
+```
+Actor A ─► message ─► Actor B
+```
+
+A session never sends anything to another session. It changes a resource
+(an operation, authorized by its own capability or by none), receives the
+result, and hands a **reference** to the resulting state to whoever
+continues: today a human pasting a URL, later any transport (§13.9). The
+next session reads the state, decides its **own** authority, and performs
+its **own** operation. Two sessions that never share a transcript can work
+this way indefinitely.
+
+| Term | In ACSP | Persisted? |
+|---|---|---|
+| conversation | the private context of one session; ACSP never sees or stores it | no |
+| message | text addressed from one party to another; ACSP has none | — |
+| operation | one accepted mutation request (§13.3) | yes, as an operation record |
+| operation result | the response to that request, including its record and a continuation reference | yes (the record); the response is replayable |
+| state | the operational state of a resource at a version (§13.5) | yes |
+| state transition | S_n → S_n+k caused by one operation (k = number of events) | yes (events + digests) |
+| observation | reading state (GET) | no — reads are never recorded |
+| proposal | an operation someone asked to have performed, stored unexecuted (§13.7) | yes |
+| handoff | an offer of responsibility for one task TOK, effective on acknowledgement | yes |
+| checkpoint | a numbered, hashed snapshot boundary | yes |
+| capability | an explicit bearer credential bound to one resource and one session | only its hash |
+| provenance | who did what, under which authority, in response to what (§13.6) | yes |
+
+### 13.2 Invariants (0.2)
+
+The four 0.1 invariants (§0) hold, and 0.2 adds:
+
+| Invariant | Mechanism |
+|---|---|
+| Access does not imply control. | Reading (URL or `["read"]` capability) never enables a mutation. |
+| Observation does not imply interpretation. | GETs are not recorded; a TOK's `stated_confidence` is its author's claim. |
+| Interpretation does not imply conclusion. | `validation` annotations are the annotator's claim; ACSP never marks anything true. |
+| Delegation does not erase provenance. | Operations under a delegated capability record `capability_id`, `capability_kind: delegation` and the actor. |
+| Forking does not destroy lineage. | The child records `parent`, `parent_version`, `parent_checkpoint`; the parent is unmodified. |
+| Supersession does not require deletion. | `supersede` retains the target with `superseded_by`. |
+| Preparation does not imply execution. | Prepare URLs and `prepared_operation` objects are computed on GET and never stored or executed. |
+| Operation reference does not imply operation authority. | Operation and continuation URLs carry no capability; re-submitting a recorded operation needs the original credential and then only replays it. |
+| Capability is explicit. | Authority exists only as a presented capability; there are no cookies or ambient sessions. |
+| Authority is scoped. | Scopes per capability; owner-only operations; extensions need every effect's scope. |
+| State transitions are attributable. | Every operation record names the actor, identity assurance and authority. |
+| **Replay does not imply re-execution.** *(new)* | Same key + same request returns the original operation; nothing runs twice. |
+| **Definition does not imply execution.** *(new)* | A published, proposed or submitted operation definition never runs (§14). |
+
+### 13.3 Operation records
+
+Every accepted mutation request becomes **one operation** with a
+server-generated id `op-` + 16 Crockford base32 characters, a per-resource
+`sequence`, and an immutable record (append-only in the database, like
+events):
+
+`GET /r/{id}/op/{operation_id}` → `{ type: "operation", operation: <record>, lineage, event_refs, links }`
+
+The record (schema `acsp.operation/0.2`, `GET /schemas/operation`):
+
+| Field | Meaning | Source |
+|---|---|---|
+| `operation_id`, `sequence` | identity and order | server |
+| `operation_type`, `definition_version` | e.g. `append` / `core@ACSP/0.1`, or `ext:ns:name` / `1` | server (from the envelope) |
+| `protocol_version` | what the envelope declared (`ACSP/0.1` or `ACSP/0.2`) | actor |
+| `actor`, `identity_assurance` | who, and whether a capability proved it | actor + server |
+| `authority` | `{ via: capability\|none, capability_id, capability_kind, scopes }` — never the secret | server |
+| `requested_by`, `executed_by` | participants; they differ from the actor only via `on_behalf_of` for accepted proposals | server |
+| `on_behalf_of`, `proposal_id` | set when an accepted proposal was executed | server |
+| `payload`, `expected_version`, `idempotency_key`, `request_hash` | the request as received | actor (hash: server) |
+| `transition` | `{ from_version, to_version, state_before, state_after, events[] }` | server |
+| `lineage` | `{ parent_operation_id, causation_id, causation_source, correlation_id }` (§13.6) | server / actor |
+| `result` | the operation's output, with minted secrets redacted | server |
+| `executed` | always `true`: only executed operations get records | server |
+
+`create` and `fork` operations are recorded on the new resource with
+`from_version: 0` and `state_before: null`. Resources created before
+migration 0003 have events without operation records; `/r/{id}/op` reports
+their number as `legacy_events_without_operation`.
+
+### 13.4 The operation result
+
+A successful POST returns every 0.1 field (§6.2) plus:
+
+```jsonc
+{
+  "operation_id": "op-J79HQ7J7Y3PCF3KM",
+  "previous_version": 5,
+  "operation_record": { /* acsp.operation/0.2 */ },
+  "continuation": {
+    "schema": "acsp.continuation-reference/0.2",
+    "href": "https://host/r/SYTRZXTDDAVH/continue/op-J79HQ7J7Y3PCF3KM",
+    "resource_id": "SYTRZXTDDAVH", "operation_id": "op-J79HQ7J7Y3PCF3KM",
+    "version": 7, "state_sha256": "sha256:…", "correlation_id": "op-…"
+  },
+  "links": { …, "operation": "…/op/op-…", "continue": "…/continue/op-…" },
+  "secrets": { "paths": ["result.owner_capability.token", "result.owner_capability_url"], "notice": "…" }  // only when a secret was minted
+}
+```
+
+The whole response validates against `acsp.operation-result/0.2`. The HTML
+result page (form submissions) shows **OPERATION COMPLETE**, the resource,
+previous and new version, operation, actor, authority, operation id,
+resulting state digest, lineage, and **CONTINUE FROM** with the
+continuation URL.
+
+### 13.5 Operational state and the digest chain
+
+The **operational state** is everything an operation can change: resource
+metadata (including `visibility`, `accepts_proposals`,
+`enabled_extensions`), knowledge with annotations, handoffs, proposals,
+the public fields of capabilities (id, kind, session, scopes, expiry,
+revocation — never secrets), and checkpoint boundaries. It contains no
+time-dependent computed values.
+
+`GET /r/{id}/state` → `{ version, sha256, state, latest_operation }`, where
+`sha256 = "sha256:" + hex(SHA-256(canonical JSON of state))` (keys sorted,
+no whitespace). Only the **current** state is served (`?at`, `?version`,
+`?from` and `?to` are refused with `400`); past digests are in the
+operation records and full past snapshots in checkpoints.
+
+Each record carries `state_before` and `state_after`. For consecutive
+operations `state_before(n) = state_after(n−1)`, `from_version(n) =
+to_version(n−1)` and `parent_operation_id(n) = operation_id(n−1)`, and the
+latest `state_after` equals the digest of `/state`. A reader can check all
+of this with GETs (`harness/verify.ts` does). **Trust:** the digests are
+computed and served by the service. They show that the history it serves
+is internally consistent; they are not signatures and do not show that
+the service is honest.
+
+### 13.6 Lineage
+
+| Field | Answers | Set by |
+|---|---|---|
+| `parent_operation_id` | what happened immediately before, on this resource | server |
+| `causation_id` | why this operation exists: the operation it responds to | the actor (envelope), validated to be an operation of the same resource (for `fork`: of the parent); or **derived** for `resolve_proposal` (the proposal's operation) and `acknowledge` (the handoff's operation) |
+| `causation_source` | `actor`, `derived` or `null` | server |
+| `correlation_id` | which workflow it belongs to | the actor; else inherited from the causation; else the operation's own id |
+
+`GET /r/{id}/op/{operation_id}` returns the causation chain back to its
+root, the operations that respond to it (`consequences`), and its
+neighbours. `GET /r/{id}/op?correlation_id=…` lists a workflow. The graph
+is **protocol provenance** — why the state exists — not conversation
+history. Citations are claims by the citing actor: a causation link proves
+that the cited operation existed, not that the citing session read it.
+
+### 13.7 Continuation references
+
+`GET /r/{id}/continue/{operation_id}` (or `/r/{id}/continue` for the latest
+operation) returns the **continuation document** (`acsp.continuation/0.2`):
+
+* `reference`: `{ href, resource_id, operation_id, version, state_sha256, correlation_id }` — the state to continue from;
+* `produced_by`: the operation, its actor and authority — **attributed to its producer, never to the reader**;
+* `resource`: identity, owner, lifecycle, visibility, and the checkpoint at or before the reference;
+* `current`: the current version, whether the resource moved since the reference, the operations since, and links to `diff` and `state`;
+* `viewer`: the **reader's** authority, evaluated for the credential the reader presents (none, by default);
+* `how_to_continue`: what the reader may do, the citation to use (`causation_id`, `correlation_id`), the current `expected_version`, prepare links with the citation prefilled, and an envelope template;
+* `verification`: the steps of §13.5 and the trust statement.
+
+A continuation reference preserves resource identity, version, provenance,
+ownership, operation lineage and checkpoint information. It transfers **no
+identity, no authority and no memory**: it carries no capability, links in
+it never carry `?cap=` (even if the reader arrived with one), and the same
+URL shows each reader only its own authority. Restricted resources require
+a capability to read it.
+
+### 13.8 Proposals as protocol objects
+
+`GET /r/{id}/proposals/{P-nnn}` returns the proposal with its
+`proposed_operation` (`acsp.proposed-operation/0.2`): the operation,
+payload, `payload_sha256` (bound at proposal time), `requested_by`,
+`base_version`, and the operation that created it. On acceptance exactly
+the stored payload is executed; the engine re-checks the binding hash
+first. Acceptance executes against the **current** state (not
+`base_version`); the operation record shows both. A prepare URL
+(`?action=prepare_<op>`) now also returns a `prepared_operation` object
+(`persisted: false, executed: false`); to persist an operation without
+authority to execute it, submit it with `propose`.
+
+### 13.9 Following changes, and future forwarding
+
+ACSP/0.2 has **no push mechanism**, deliberately. Polling
+`GET /r/{id}/op?after=<sequence>` (cursor = sequence) returns new
+operations, including new proposals (`operation_type: propose`) and
+accepted operations (`resolve_proposal` with `on_behalf_of`);
+`/r/{id}/diff?since_checkpoint=N` returns everything since a checkpoint.
+Everything a router needs to forward work later — without changing the
+state model — is already in each result: the continuation `href`, the
+resource, the resulting version and digest, the correlation id, and the
+actor. A webhook, queue, subscription or orchestrator can carry the
+`continuation` object; the receiving session's authority is still
+evaluated only from the credential it presents.
+
+## 14. Extension operations (ACSP/0.2)
+
+### 14.1 Names
+
+`core:<name>` is the qualified name of a protocol operation (`core:append`
+= `append`; both are accepted). `ext:<namespace>:<name>` names an
+extension, where the namespace is lowercase and dot-separated
+(`ext:acsp.review:record_decision`). A definition has a separate
+`version`; an envelope may pin it with `operation_version`.
+
+### 14.2 Definition, implementation, authority — kept apart
+
+* **Definition** (`acsp.operation-definition/0.2`, `GET /extensions/{name}`):
+  description, input schema, output, the **state transition as a list of
+  core effects** (only `append`, `annotate`, `checkpoint`, `supersede`),
+  derived authority, idempotency, security notes, status. Effects are
+  templates whose only non-literal values are `{ "$input": field }` and
+  `{ "$step": i, "path": "a.b" }` — no expressions, conditionals or loops.
+* **Implementation**: a single interpreter in the service. It substitutes
+  values **once** (substituted data is never re-interpreted), validates each
+  effect's payload with the core operation's own schema, and runs the core
+  handler. All effects run in one transaction; a failure anywhere leaves no
+  trace. Every event records `extension { name, version }`; the whole
+  invocation is one operation record.
+* **Authority**: the invoker must present a capability whose scopes satisfy
+  **every** effect's core requirement (the union), checked before any effect
+  runs; and the resource owner must have enabled the extension
+  (`update { enabled_extensions: [...] }`, owner-only; forks do not inherit
+  it). Extensions cannot be proposed.
+
+Only definitions compiled into the service's reviewed registry
+(`src/protocol/extensions.ts`) are ever executable. A definition published
+in a TOK, submitted to `GET /extensions/validate?definition=…` (which only
+validates), or placed in a URL or payload is data and never runs.
+
+### 14.3 Lifecycle and promotion
+
+```
+draft → experimental → validated → promoted → deprecated → retired
+```
+
+| Status | Executable | Can be newly enabled |
+|---|---|---|
+| draft | no | no |
+| experimental | yes, where enabled | yes |
+| validated | yes, where enabled | yes |
+| promoted | yes, where enabled | yes |
+| deprecated | yes, where already enabled | no |
+| retired | no | no |
+
+Requirements to reach each status are published at `/extensions`
+(`promotion_requirements`): schema, effects and idempotency for
+`experimental`; harness evidence (success, authorization failure, schema
+failure, replay, no partial effects, scope escalation, disabled resource,
+template injection), determinism and provenance for `validated`; stability
+over a protocol minor version, a recorded security review, a fixed identity
+and a compatibility rule for `promoted`. A promoted extension that later
+enters the core registry keeps its `ext:` name as an alias and records
+`promoted_from`; it is never presented as having always been core. Each
+registration carries its status `history` with evidence. In ACSP/0.2 no
+extension is promoted; `ext:acsp.review:record_decision` is `validated`.
+
+### 14.4 Why not arbitrary operations
+
+ACSP is a protocol for governed state transitions, not a programming
+language. An extension can only compose operations an authorized session
+could already have performed one by one; it adds atomicity, a name and a
+single operation record, never new authority.
+
+## 15. What ACSP/0.2 claims, and what it does not
+
+**Claimed and tested** (HARNESS.md, `experiments/exp-0003`): independent
+sessions can use ACSP operations against a shared, externally persisted
+resource, with explicit authority, provenance and state-transition
+semantics, and can continue work through operation/state references passed
+between sessions.
+
+**Not claimed:** shared consciousness, shared model state, memory transfer,
+identity transfer, autonomous communication (the human still carries
+references), semantic understanding, intelligence transfer, general
+distributed computation, or that the service is honest (§13.5).

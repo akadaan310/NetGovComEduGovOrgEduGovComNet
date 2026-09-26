@@ -300,6 +300,12 @@ async function dispatchSub(
     }
     case 'state':
       if (arg) break;
+      for (const k of ['at', 'version', 'from', 'to']) {
+        if (q.has(k)) {
+          // Found by exp-0003 session C: silently serving the current state for ?version=N misleads.
+          throw new AcspError('malformed_request', `/state serves only the CURRENT operational state; "${k}" is not supported. The digest of every past state is in the operation records (/r/{id}/op: state_before/state_after); checkpoints (/r/{id}/checkpoints/{n}) keep full past snapshots.`);
+        }
+      }
       return respond(await stateDocument(env.db, resource, new Links(links.base)));
     case 'proposals':
       if (!arg) break;
@@ -345,6 +351,9 @@ async function handlePost(env: Env, req: Request, url: URL, path: string, format
     const enriched = {
       ...response,
       result: withCapabilityUrls(response.result, links, rid),
+      ...(secretPaths(response.result).length
+        ? { secrets: { paths: secretPaths(response.result), notice: 'These fields are secrets, shown once. Never pass them on, log them or put them in a URL you share; pass continuation.href instead.' } }
+        : {}),
       operation_record: { ...response.operation_record, links: opLinks(links, rid, response.operation_id) },
       continuation: {
         schema: 'acsp.continuation-reference/0.2' as const,
@@ -385,4 +394,18 @@ function withCapabilityUrls(result: Record<string, unknown>, links: Links, rid: 
     }
   }
   return out;
+}
+
+/**
+ * ACSP/0.2: JSON paths of every field in this response that carries a secret,
+ * so an agent can redact before logging or passing anything on (exp-0003:
+ * session A's own redaction missed owner_capability_url).
+ */
+function secretPaths(result: Record<string, unknown>): string[] {
+  const paths: string[] = [];
+  for (const key of ['owner_capability', 'capability']) {
+    const c = result[key] as { token?: string | null } | undefined;
+    if (c && typeof c.token === 'string') paths.push(`result.${key}.token`, `result.${key}_url`);
+  }
+  return paths;
 }

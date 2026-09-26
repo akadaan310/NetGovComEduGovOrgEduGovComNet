@@ -1,6 +1,6 @@
 # ACSP Architecture
 
-ACSP (Agent Continuity & Session Protocol, `ACSP/0.1`) is a small HTTPS substrate.
+ACSP (Agent Continuity & Session Protocol, `ACSP/0.2`; 0.1 envelopes still accepted) is a small HTTPS substrate.
 Independent AI sessions (and humans) use it to publish, inspect and extend
 explicitly persisted research state. Every change carries provenance, and
 ownership, access, authority and task responsibility are kept distinct.
@@ -200,7 +200,16 @@ handoffs      (resource_id, id) — tok_id, from/to session, status
 proposals     (resource_id, id) — operation, payload, proposer_*, status
 idempotency   (scope, key) — request_hash, redacted response
 rate_limits   (bucket, window_start) — count
+operations    (resource_id, id) — ACSP/0.2: seq, operation, actor, authority,
+              requested_by, on_behalf_of, proposal_id, from/to_version,
+              state_before/after (sha256), parent_operation_id, causation_id,
+              causation_source, correlation_id, request_hash, idempotency_key,
+              payload, result (redacted). Append-only (trigger).
 ```
+
+ACSP/0.2 also adds `events.operation_id`, `proposals.operation_id /
+payload_sha256 / base_version` and `resources.enabled_extensions`
+(migration `0003_operation_records.sql`).
 
 ### Versioning and concurrency
 
@@ -267,6 +276,10 @@ Request ─► transport/handler.ts   route, negotiate, read credential (Bearer 
 
 ## 9. Designed-for, not built (future extensions)
 
+(ACSP/0.2 built part of this list: operation records, a cursor feed and
+continuation references are the substrate for event streaming and
+forwarding; see §10.)
+
 The architecture leaves room for the following without redesign. None is
 implemented in v0.1:
 
@@ -286,6 +299,83 @@ implemented in v0.1:
   (already representable as `validation` annotations).
 * **JSON-LD**: an `@context` mapping for the canonical document.
 
-## 10. Known limitations
+## 10. ACSP/0.2: operational communication
+
+### 10.1 The model
+
+```
+ Session A            ACSP service                               Session B
+   │ POST append ────► op-1: S3 → S4 (record, events, digests)
+   │ ◄── result + continuation.href (/r/ID/continue/op-1)
+   │ stops
+   │ ········· a human passes the URL ···········································►
+   │                    │ ◄──── GET continue/op-1 (B's own credential, or none)
+   │                    │ ───── reference, producer, current state, B's authority ─►
+   │                    │ ◄──── GET op, state, checkpoints (verify)
+   │                    │ ◄──── POST propose {causation_id: op-1}
+   │                    │ op-2: S4 → S5
+   │                    │ ───── result + continuation.href (/continue/op-2) ──────►
+```
+
+Sessions never address each other. What moves between them is a reference
+to persisted state; what each can do is decided afresh, per request, from
+the credential it presents. The human carrying URLs is today's transport;
+nothing in the state model depends on it (PROTOCOL.md §13.9).
+
+### 10.2 What was added, and where
+
+| Concern | Where |
+|---|---|
+| Operation identity, lineage, digests, record | `src/continuity/engine.ts` (steps 6–9 of the pipeline below) |
+| Operational state (what the digest covers) | `src/continuity/state.ts` `buildOperationalState` |
+| Operation / feed / continuation / state / proposal / registry documents | `src/continuity/operational.ts` |
+| Routes, POST enrichment (`continuation`, `secrets`) | `src/transport/handler.ts` |
+| Result page, continuation page | `src/transport/html.ts` |
+| Core semantics (preconditions, transition, idempotency) | `src/protocol/operations.ts` `SEMANTICS` |
+| Extension definitions and lifecycle | `src/protocol/extensions.ts` |
+| Extension interpreter (the only implementation) | `src/continuity/extensions.ts` |
+| Published schemas | `src/protocol/schemas.ts` → `schemas/*.schema.json` |
+| Independent verifier (HTTP only) | `harness/verify.ts` |
+
+Request lifecycle for a mutation in 0.2 (additions in bold):
+
+```
+parse envelope (0.1 or 0.2) → resolve operation (core | registered executable extension)
+→ payload schema → tx { verify capability → resolve actor → lock resource → idempotency
+→ authorize → lifecycle → expected_version
+→ **operation id; validate causation_id; parent = latest operation; digest(state before)**
+→ handler (or extension interpreter: authorize every effect, then run core handlers)
+→ flush → **derive causation (resolve_proposal, acknowledge); correlation;
+   digest(state after); insert operation record (result redacted)**
+→ store idempotency record → commit }
+```
+
+### 10.3 Decisions and alternatives rejected
+
+* **An operations table, not "the event log is the operation log".** One
+  request can emit two events; it needs one identity, one URL and one
+  replay target. Kept append-only like events.
+* **Digests of the operational state, not an event hash chain.** Chaining
+  event hashes would prove the event sequence but not what state readers
+  see; hashing the served state lets a reader check the thing it acts on
+  (`/state`). Cost: two state builds per mutation (bounded by resource
+  limits). Limitation: past states are digests only.
+* **Continuation as a GET document evaluated per reader, not a token.** A
+  token would be something to protect; a URL that grants nothing can be
+  pasted anywhere. The reader's authority comes only from its own
+  credential.
+* **`/op` and `/continue`, not `/operations/{id}`.** `/r/{id}/operations`
+  already means the operation *types* (with the viewer's permission) and
+  the POST endpoint; overloading it for executed operations would conflate
+  type and instance.
+* **Pull, not push.** `/op?after=<sequence>` is a cursor feed; a push
+  system (webhooks) would make the service dereference client URLs (SSRF)
+  and add delivery state. Not justified for 0.2.
+* **Extensions as declarative compositions, not plug-in code.** Any
+  executable extension would otherwise be a way around authority, schema
+  validation and provenance. Composing core operations keeps every existing
+  guarantee and needs one small interpreter.
+
+## 11. Known limitations
 
 See README § Known limitations.

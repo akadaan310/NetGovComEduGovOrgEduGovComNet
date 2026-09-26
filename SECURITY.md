@@ -186,7 +186,106 @@ requires a matching `create_key`.
 * No secrets are committed. Capability secrets exist only in the response
   that minted them.
 
-## 10. Not protected in v0.1 (known gaps)
+## 10. ACSP/0.2: operational communication
+
+Every item below is exercised by the `operational-security`,
+`idempotency-semantics`, `extension-operations` and
+`inter-session-operation-handoff` harness scenarios (HARNESS.md) unless it
+says otherwise.
+
+### 10.1 References are never authority
+
+* Operation (`/r/{id}/op/{op}`) and continuation (`/r/{id}/continue/{op}`)
+  URLs carry no capability. Links built in 0.2 documents are "plain": they
+  never include `?cap=`, even when the reader arrived with a capability URL.
+  The same continuation URL shows each reader **only its own** authority.
+* GET on any reference, with any query string, changes nothing; POST to an
+  operation URL is `405`.
+* **Operation replay.** Re-submitting a recorded operation (its envelope is
+  fully readable in the record) without the original credential is refused
+  like any unauthorized request; with the original credential it hits the
+  idempotency record and **replays** — same `operation_id`, nothing executed.
+  With a *different* credential it is a new operation under that
+  credential's own authority, which that credential could have performed
+  anyway. A reference therefore never lets anyone repeat an operation they
+  could not have performed themselves.
+* **Forged / cross-resource references.** Operation ids are looked up
+  within the resource in the path (404 otherwise). `causation_id` must name
+  an operation of the same resource (fork: the parent) or is refused with
+  `invalid_reference`, so it cannot be used as an oracle for other
+  resources. A capability presented at another resource fails with
+  `capability_resource_mismatch`.
+* **Restricted resources.** Continuations, operation records, the
+  operation feed and `/state` of a restricted resource require a capability
+  to read.
+
+### 10.2 Secrets
+
+* Operation records store the operation's result with minted tokens
+  redacted (`token: null, token_redacted: true`); `authority` records only
+  `capability_id`, kind and scopes. `/state` includes the public fields of
+  capabilities only (no secret, no secret hash).
+* A response that mints a secret (create, fork, delegate) lists the JSON
+  paths holding it in `secrets.paths`. In exp-0003 a language-model session
+  redacted `owner_capability.token` but missed the second copy in
+  `owner_capability_url` (a 0.1 field kept for compatibility); the list
+  exists so agents can redact mechanically.
+* Handing work to another session means passing `continuation.href`, never a
+  capability. The bootstrap says so.
+
+### 10.3 Actor spoofing and confused deputies
+
+* With a capability, the actor's session is fixed by it
+  (`session_mismatch` otherwise). Without one, a session id is asserted and
+  every operation record says `identity_assurance: asserted`,
+  `authority.via: none` — distinguishable from the real session's
+  capability-backed operations even when the claimed id is the same.
+* Proposals: only `append`, `annotate`, `supersede` and `checkpoint` can be
+  proposed (not owner operations, not extensions). Acceptance executes
+  exactly the stored payload (hash-bound at proposal time and re-checked);
+  the proposer stays the (possibly asserted) `source`. Only the owner
+  resolves: a fully scoped delegate and the proposer are refused.
+* Citing an operation (`causation_id`) grants nothing.
+
+### 10.4 Custom (extension) operations
+
+* **No code from outside the service runs.** Extension definitions are
+  compiled into the service's reviewed registry. A definition in a TOK, a
+  URL, a payload or `GET /extensions/validate` is data. Unknown names are
+  `unknown_operation`; draft and retired ones `operation_not_executable`.
+* **No new authority.** An extension's effects are limited to the
+  non-owner content operations (append, annotate, checkpoint, supersede). The
+  invoker must hold every effect's scope; this is checked before any effect
+  runs (an append-only capability cannot run append+checkpoint). The owner
+  must enable the extension per resource (delegates cannot); forks do not
+  inherit it.
+* **No bypass of validation.** Each effect's payload is validated with the
+  core operation's own schema and executed by the core handler.
+* **No template injection.** Values are substituted into the trusted
+  template once and never re-scanned; input shaped like `{"$input": …}` is
+  stored as text (or rejected by the input schema).
+* **Atomicity.** All effects run in one transaction; a failure in a later
+  effect leaves no trace of earlier ones (`tests/operational.test.ts`).
+
+### 10.5 Idempotency and races
+
+* Duplicate execution: identical concurrent requests with one key execute
+  once (the other replays). Different keys against the same
+  `expected_version`: one succeeds, the other gets `stale_version`, and the
+  operation chain stays contiguous.
+* Idempotency records never expire in 0.2 (storage grows with writes; an
+  expiry policy would have to keep replay semantics for at least the
+  retry horizon of clients).
+
+### 10.6 What the digests do not protect
+
+The `state_before`/`state_after` chain and `/state` digest let any reader
+check that the history a service serves is internally consistent. They are
+computed by the service and unsigned: a dishonest or compromised service
+can serve a different, internally consistent history. Detecting that needs
+signatures or external anchoring (not in 0.2).
+
+## 11. Not protected in v0.1/0.2 (known gaps)
 
 * **Identity beyond capabilities.** There is no cryptographic agent
   identity. An `asserted` session ID is a claim, and `agent_id` is always a
@@ -199,10 +298,14 @@ requires a matching `create_key`.
   content as externally authored.
 * **Denial of service** beyond the per-IP limits relies on the hosting
   platform.
+* **Service honesty** (0.2): see §10.6.
+* **Past operational states** are available only as digests and checkpoint
+  snapshots; a reader cannot recompute the digest of an arbitrary past
+  version.
 * **Unlisted resource IDs** have about 60 bits of entropy. They are not
   enumerable in practice, but they are not secrets either. Use `restricted`
   for sensitive material.
 
-## 11. Reporting
+## 12. Reporting
 
 This is a prototype. Report issues through the repository's issue tracker.
