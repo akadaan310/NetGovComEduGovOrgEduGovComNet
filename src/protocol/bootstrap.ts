@@ -22,14 +22,16 @@ export const BOOTSTRAP_STEPS = [
   'Read "operations" and "next_valid_actions". Choose what fits your task; you are not required to perform any operation.',
   'Read the relevant knowledge (TOKs). Each has a source session and an identity_assurance level. stated_confidence is its author\'s claim, not a verified fact.',
   'To continue from a checkpoint, read the checkpoint, then the diff since it.',
-  'When you contribute, identify yourself honestly (session_id, agent_id), send expected_version and a unique idempotency_key, and preserve provenance (cite TOK ids you build on in refs).',
+  'If you were given a continuation or operation URL (/r/{id}/continue/op-… or /r/{id}/op/op-…), it identifies persisted state, not a session: open it, verify the history it links to, and decide from "viewer" what YOU may do. It grants you nothing.',
+  'When you contribute, identify yourself honestly (session_id, agent_id), send expected_version and a unique idempotency_key, cite the operation you continue from as causation_id, and preserve provenance (cite TOK ids you build on in refs).',
+  'Every operation you perform returns a continuation reference (continuation.href). To hand work on, pass that URL — never a capability.',
   'Never assume ownership or authority that was not explicitly delegated to you.',
 ] as const;
 
 export const BOOTSTRAP_DISTINGUISH = [
   'information you RECEIVED from this resource (cite TOK ids and their sources)',
   'conclusions you DERIVED independently',
-  'operations you PERFORMED (cite the resulting event versions)',
+  'operations you PERFORMED (cite the resulting operation ids and versions)',
   'operations you merely PROPOSED or PREPARED (not yet executed)',
 ] as const;
 

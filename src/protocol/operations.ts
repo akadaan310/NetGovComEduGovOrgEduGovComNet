@@ -1,5 +1,5 @@
 /**
- * The ACSP/0.1 operation registry — the protocol as code.
+ * The ACSP operation registry (core operations) — the protocol as code.
  *
  * The engine (authority, validation), the resource document (operation
  * discovery), the HTML surface and GET /protocol all read this registry, so
@@ -48,6 +48,27 @@ export interface OperationSpec {
   failures: string[];
 }
 
+/** Idempotency, stated three ways (PROTOCOL.md §6.4). Each claim is exercised by the harness. */
+export interface IdempotencySemantics {
+  /** Same idempotency_key + same request, same credential scope. */
+  request: 'replay';
+  /** The same operation performed again under a NEW key, once the first has executed. */
+  repeat: 'new_effect' | 'refused';
+  /** Why, in one sentence. */
+  note: string;
+}
+
+/** What an operation means, independently of how it is implemented. */
+export interface OperationSemantics {
+  qualified_name: string;
+  introduced_in: string;
+  status: 'core';
+  preconditions: string[];
+  transition: string;
+  events: string;
+  idempotency: IdempotencySemantics | null;
+}
+
 const ParticipantSchema = z.strictObject({
   session_id: IdentifierSchema,
   agent_id: IdentifierSchema.optional(),
@@ -73,6 +94,8 @@ export const PAYLOADS = {
       description: text(5_000).optional(),
       focus: text(2_000).optional(),
       accepts_proposals: z.boolean().optional(),
+      /** ACSP/0.2: the full set of extension operations enabled on this resource. */
+      enabled_extensions: z.array(z.string().max(200)).max(16).optional(),
     })
     .refine((p) => Object.keys(p).length > 0, 'at least one field must be supplied'),
   supersede: z
@@ -143,9 +166,20 @@ export type OperationName = keyof typeof PAYLOADS;
 export type PayloadOf<N extends OperationName> = z.output<(typeof PAYLOADS)[N]>;
 
 /** The envelope every mutating request uses. */
+/** Operation references: server-generated, `op-` + 16 Crockford base32 characters. */
+export const OperationIdSchema = z.string().regex(/^op-[0-9A-HJKMNP-TV-Z]{16}$/, 'must look like op-XXXXXXXXXXXXXXXX');
+/** Correlation ids are chosen by participants (or inherited); same alphabet as session ids. */
+export const CorrelationIdSchema = IdentifierSchema;
+
 export const EnvelopeSchema = z.strictObject({
   protocol: z.string(),
   operation: z.string(),
+  /** ACSP/0.2: the operation this one responds to (same resource). Validated; never grants anything. */
+  causation_id: OperationIdSchema.optional(),
+  /** ACSP/0.2: a workflow identifier; inherited from causation_id when omitted. */
+  correlation_id: CorrelationIdSchema.optional(),
+  /** ACSP/0.2: pin the definition version of an extension operation. */
+  operation_version: z.string().max(32).optional(),
   actor: z
     .strictObject({
       session_id: IdentifierSchema.optional(),
@@ -498,6 +532,111 @@ export const OPERATIONS: OperationSpec[] = [
     failures: [...COMMON_WRITE_FAILURES, '400 missing_expected_version'],
   },
 ];
+
+
+const REPLAY = 'replay' as const;
+const newEffect = (note: string): IdempotencySemantics => ({ request: REPLAY, repeat: 'new_effect', note });
+const refused = (note: string): IdempotencySemantics => ({ request: REPLAY, repeat: 'refused', note });
+
+/**
+ * Semantics of every core operation, independent of the implementation:
+ * preconditions, the state transition S_n --op--> S_n+1, the events emitted,
+ * and idempotency. All core operations were introduced in ACSP/0.1.
+ */
+export const SEMANTICS: Record<string, Omit<OperationSemantics, 'qualified_name' | 'introduced_in' | 'status'>> = {
+  inspect: { preconditions: ['read access'], transition: 'S_n → S_n (no transition)', events: 'none', idempotency: null },
+  status: { preconditions: ['read access'], transition: 'S_n → S_n (no transition)', events: 'none', idempotency: null },
+  retrieve: { preconditions: ['read access', 'the record exists'], transition: 'S_n → S_n (no transition)', events: 'none', idempotency: null },
+  diff: { preconditions: ['read access', 'valid bounds'], transition: 'S_n → S_n (no transition)', events: 'none', idempotency: null },
+  create: {
+    preconditions: ['create_key when the operator requires one'],
+    transition: '∅ → S_1 of a NEW resource: metadata, owner = actor session, checkpoint 0, owner capability',
+    events: 'exactly 1 (create) on the new resource',
+    idempotency: newEffect('Every execution creates a distinct resource with its own owner capability.'),
+  },
+  append: {
+    preconditions: ['scope append', 'lifecycle active', 'refs cite existing TOKs', 'fewer than 1000 TOKs'],
+    transition: 'S_n → S_n+1: knowledge += one new immutable TOK',
+    events: 'exactly 1 (append)',
+    idempotency: newEffect('TOKs have no natural key: the same content under a new key is a second, distinct TOK.'),
+  },
+  annotate: {
+    preconditions: ['scope annotate', 'lifecycle active', 'the TOK exists'],
+    transition: 'S_n → S_n+1: annotations += one annotation on an existing TOK (the TOK is unchanged)',
+    events: 'exactly 1 (annotate)',
+    idempotency: newEffect('Annotations have no natural key: repeating adds a second annotation.'),
+  },
+  update: {
+    preconditions: ['owner', 'lifecycle active', 'expected_version = n', 'at least one field actually changes'],
+    transition: 'S_n → S_n+1: resource metadata fields replaced; before/after values recorded',
+    events: 'exactly 1 (update)',
+    idempotency: refused('A repeat under a new key either changes nothing (refused: invalid_payload) or carries a stale expected_version (refused: stale_version).'),
+  },
+  supersede: {
+    preconditions: ['scope supersede', 'lifecycle active', 'expected_version = n', 'target active'],
+    transition: 'S_n → S_n+1: target.status = superseded; replacement active with supersedes = target',
+    events: 'exactly 1 (supersede)',
+    idempotency: refused('The target is already superseded after the first execution (invalid_state).'),
+  },
+  checkpoint: {
+    preconditions: ['scope checkpoint', 'lifecycle active'],
+    transition: 'S_n → S_n+1: checkpoints += snapshot of S_n+1 with its SHA-256',
+    events: 'exactly 1 (checkpoint)',
+    idempotency: newEffect('Each checkpoint is a new numbered boundary, even over identical content.'),
+  },
+  fork: {
+    preconditions: ['read access on the parent', 'the checkpoint exists when from_checkpoint is given'],
+    transition: 'parent S_n → S_n (unchanged); ∅ → S_1 of a NEW child resource with copied TOKs and lineage',
+    events: 'exactly 1 (fork) on the child; none on the parent',
+    idempotency: newEffect('Every execution creates a distinct child resource.'),
+  },
+  delegate: {
+    preconditions: ['owner', 'lifecycle active', 'fewer than 100 active delegations'],
+    transition: 'S_n → S_n+1: delegations += one capability bound to the named session',
+    events: 'exactly 1 (delegate)',
+    idempotency: newEffect('Every execution mints a distinct capability with its own secret.'),
+  },
+  revoke: {
+    preconditions: ['owner', 'lifecycle active', 'the capability is an active delegation'],
+    transition: 'S_n → S_n+1: capability.revoked_at set',
+    events: 'exactly 1 (revoke)',
+    idempotency: refused('A revoked capability cannot be revoked again (invalid_state).'),
+  },
+  handoff: {
+    preconditions: ['scope handoff', 'owner or responsible session', 'a task TOK with no pending handoff'],
+    transition: 'S_n → S_n+1: handoffs += one pending handoff (responsibility unchanged)',
+    events: 'exactly 1 (handoff)',
+    idempotency: refused('The task already has a pending handoff (invalid_state).'),
+  },
+  acknowledge: {
+    preconditions: ['capability bound to the addressed session', 'the handoff is pending'],
+    transition: 'S_n → S_n+1: handoff accepted|declined; on accept the task\'s responsible session changes',
+    events: 'exactly 1 (acknowledge)',
+    idempotency: refused('The handoff is no longer pending (invalid_state).'),
+  },
+  propose: {
+    preconditions: ['read access', 'accepts_proposals', 'lifecycle active', 'fewer than 100 pending proposals', 'the inner payload is valid'],
+    transition: 'S_n → S_n+1: proposals += one pending proposal (nothing is executed)',
+    events: 'exactly 1 (propose)',
+    idempotency: newEffect('Proposals have no natural key: repeating files a second proposal.'),
+  },
+  resolve_proposal: {
+    preconditions: ['owner', 'expected_version = n', 'the proposal is pending'],
+    transition: 'reject: S_n → S_n+1 (proposal rejected). accept: S_n → S_n+2 (proposal accepted, then the proposed operation applied with the proposer as source)',
+    events: '1 (resolve_proposal) on reject; 2 (resolve_proposal, then the executed operation) on accept',
+    idempotency: refused('The proposal is no longer pending (invalid_state).'),
+  },
+  close: {
+    preconditions: ['owner', 'expected_version = n', 'lifecycle active'],
+    transition: 'S_n → S_n+1: lifecycle closed; pending handoffs and proposals cancelled',
+    events: 'exactly 1 (close)',
+    idempotency: refused('The resource is closed (resource_closed).'),
+  },
+};
+
+export function semanticsOf(name: string): OperationSemantics {
+  return { qualified_name: `core:${name}`, introduced_in: 'ACSP/0.1', status: 'core', ...SEMANTICS[name] };
+}
 
 export const OPERATIONS_BY_NAME: Record<string, OperationSpec> = Object.fromEntries(OPERATIONS.map((o) => [o.name, o]));
 

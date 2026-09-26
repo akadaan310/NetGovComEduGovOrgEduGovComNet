@@ -23,6 +23,9 @@ export type ErrorCode =
   | 'idempotency_key_reuse'
   | 'limit_exceeded'
   | 'rate_limited'
+  | 'operation_not_executable'
+  | 'extension_not_enabled'
+  | 'invalid_reference'
   | 'method_not_allowed'
   | 'service_unavailable'
   | 'internal_error';
@@ -52,6 +55,9 @@ export const ERROR_STATUS: Record<ErrorCode, number> = {
   idempotency_key_reuse: 422,
   limit_exceeded: 422,
   rate_limited: 429,
+  operation_not_executable: 422,
+  extension_not_enabled: 403,
+  invalid_reference: 422,
   internal_error: 500,
   service_unavailable: 503,
 };

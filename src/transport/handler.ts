@@ -22,8 +22,20 @@ import {
   type Viewer,
 } from '../continuity/representation';
 import { loadCheckpoints, loadEvents, loadResource } from '../continuity/state';
+import { opLinks } from '../continuity/operational';
 import { eventRecord } from '../continuity/records';
 import { NOTICE, bootstrapDocument } from '../protocol/bootstrap';
+import {
+  continuationDocument,
+  extensionDocument,
+  extensionsDocument,
+  operationDocument,
+  operationListDocument,
+  proposalDocument,
+  stateDocument,
+  validateDefinitionDocument,
+} from '../continuity/operational';
+import { jsonSchemaOf, PUBLISHED_SCHEMAS, type SchemaName } from '../protocol/schemas';
 import { INVARIANTS, PROTOCOL_VERSION, RESOURCE_LIMITS } from '../protocol/constants';
 import { protocolDocument } from '../protocol/document';
 import { AcspError } from '../protocol/errors';
@@ -36,6 +48,7 @@ import {
   renderProtocolPage,
   renderResourcePage,
   renderResultPage,
+  renderContinuationPage,
 } from './html';
 import { bearer, clientKey, htmlResponse, jsonResponse, negotiate, readBody, securityHeaders, type Format } from './http';
 import { intentDocument } from './intents';
@@ -44,7 +57,9 @@ import { consumeRateLimit } from './ratelimit';
 const RESOURCE_ID = '([0-9A-HJKMNP-TV-Z]{12})';
 const ROUTES = {
   resource: new RegExp(`^/r/${RESOURCE_ID}$`),
-  sub: new RegExp(`^/r/${RESOURCE_ID}/(operations|events|checkpoints|diff|explorer|knowledge)(?:/([A-Za-z0-9-]+))?$`),
+  sub: new RegExp(`^/r/${RESOURCE_ID}/(operations|events|checkpoints|diff|explorer|knowledge|op|continue|state|proposals)(?:/([A-Za-z0-9-]+))?$`),
+  extension: /^\/extensions\/([a-z0-9:._-]{1,200})$/,
+  schema: /^\/schemas\/([a-z-]{1,64})$/,
 };
 
 export type Handler = (req: Request) => Promise<Response>;
@@ -127,6 +142,13 @@ function discoveryDocument(base: string) {
       resource: u('/r/{id}'),
       create: { method: 'POST', href: u('/r'), prepare: u('/new') },
       operations: { method: 'POST', href: u('/r/{id}/operations') },
+      operation_record: u('/r/{id}/op/{operation_id}'),
+      operation_feed: u('/r/{id}/op?after={sequence}'),
+      continuation: u('/r/{id}/continue/{operation_id}'),
+      operational_state: u('/r/{id}/state'),
+      proposal: u('/r/{id}/proposals/{proposal_id}'),
+      extensions: u('/extensions'),
+      schemas: u('/schemas'),
     },
     links: { home: u('/'), protocol: u('/protocol'), protocol_json: u('/protocol.json'), new_resource: u('/new'), discovery: u('/.well-known/acsp') },
   };
@@ -148,6 +170,26 @@ async function handleGet(env: Env, req: Request, url: URL, path: string, format:
   if (path === '/health') {
     await env.db.query('select 1');
     return jsonResponse({ ok: true, protocol: PROTOCOL_VERSION, database: env.db.kind }, 200, headers);
+  }
+  if (path === '/extensions') return respond(extensionsDocument(new Links(base)), () => renderDocumentPage(extensionsDocument(new Links(base)), jsonUrl(url, path)));
+  if (path === '/extensions/validate') {
+    const doc = validateDefinitionDocument(new Links(base), url.searchParams.get('definition'));
+    return respond(doc, () => renderDocumentPage(doc, withQuery(jsonUrl(url, path), url)));
+  }
+  let em = ROUTES.extension.exec(path);
+  if (em) {
+    const doc = extensionDocument(new Links(base), decodeURIComponent(em[1]));
+    return respond(doc, () => renderDocumentPage(doc, jsonUrl(url, path)));
+  }
+  if (path === '/schemas') {
+    const l = new Links(base);
+    const doc = { protocol: { version: PROTOCOL_VERSION }, type: 'schema_list', notice: NOTICE, schemas: Object.keys(PUBLISHED_SCHEMAS).map((n) => ({ name: n, id: `urn:acsp:schema:${n}`, href: l.plain(`/schemas/${n}`) })), links: { protocol: l.plain('/protocol') } };
+    return respond(doc, () => renderDocumentPage(doc, jsonUrl(url, path)));
+  }
+  em = ROUTES.schema.exec(path);
+  if (em) {
+    if (!(em[1] in PUBLISHED_SCHEMAS)) throw new AcspError('not_found', `No schema "${em[1]}". See /schemas.`);
+    return jsonResponse(jsonSchemaOf(em[1] as SchemaName), 200, headers);
   }
   if (path === '/new') {
     const doc = intentDocument({ op: 'create', query: url.searchParams, links: new Links(base), random: env.random });
@@ -185,11 +227,11 @@ async function handleGet(env: Env, req: Request, url: URL, path: string, format:
       return respond(doc, () => renderIntentPage(doc, withQuery(self, url)));
     }
     // Query-string aliases for agents that can only edit query parameters.
-    const alias: Record<string, string> = { operations: 'operations', events: 'events', checkpoints: 'checkpoints', diff: 'diff', retrieve: 'knowledge', explorer: 'explorer' };
+    const alias: Record<string, string> = { operations: 'operations', events: 'events', checkpoints: 'checkpoints', diff: 'diff', retrieve: 'knowledge', explorer: 'explorer', op: 'op', continue: 'continue', state: 'state', proposal: 'proposals' };
     if (alias[action]) {
-      return dispatchSub(env, url, format, alias[action], url.searchParams.get('tok') ?? url.searchParams.get('id') ?? undefined, resource, links, viewer, headers, self, fullDocument);
+      return dispatchSub(env, url, format, alias[action], url.searchParams.get('tok') ?? url.searchParams.get('id') ?? url.searchParams.get('operation_id') ?? undefined, resource, links, viewer, headers, self, fullDocument);
     }
-    throw new AcspError('malformed_request', `Unknown action "${action}". Use inspect, status, operations, events, checkpoints, diff, retrieve, or prepare_<operation>.`);
+    throw new AcspError('malformed_request', `Unknown action "${action}". Use inspect, status, operations, events, checkpoints, diff, retrieve, op, continue, state, proposal, or prepare_<operation>.`);
   }
   return dispatchSub(env, url, format, sub![2], sub![3], resource, links, viewer, headers, self, fullDocument);
 }
@@ -245,6 +287,23 @@ async function dispatchSub(
           sinceCheckpoint: int(q.get('since_checkpoint'), 'since_checkpoint'),
         }),
       );
+    case 'op': {
+      const plain = new Links(links.base);
+      if (arg) return respond(await operationDocument(env.db, resource, plain, arg));
+      const limit = Math.min(int(q.get('limit'), 'limit') ?? RESOURCE_LIMITS.eventsPageMax, RESOURCE_LIMITS.eventsPageMax);
+      const cid = q.get('correlation_id') ?? undefined;
+      return respond(await operationListDocument(env.db, resource, plain, { after: int(q.get('after'), 'after'), limit, correlationId: cid }));
+    }
+    case 'continue': {
+      const doc = await continuationDocument(env.db, resource, new Links(links.base), arg ?? null, await fullDocument());
+      return format === 'json' ? jsonResponse(doc, 200, headers) : htmlResponse(renderContinuationPage(doc, withQuery(self, url)), 200, headers);
+    }
+    case 'state':
+      if (arg) break;
+      return respond(await stateDocument(env.db, resource, new Links(links.base)));
+    case 'proposals':
+      if (!arg) break;
+      return respond(await proposalDocument(env.db, resource, new Links(links.base), arg));
     case 'explorer': {
       const doc = await fullDocument();
       const events = (await loadEvents(env.db, resource.id)).map(eventRecord);
@@ -286,11 +345,23 @@ async function handlePost(env: Env, req: Request, url: URL, path: string, format
     const enriched = {
       ...response,
       result: withCapabilityUrls(response.result, links, rid),
+      operation_record: { ...response.operation_record, links: opLinks(links, rid, response.operation_id) },
+      continuation: {
+        schema: 'acsp.continuation-reference/0.2' as const,
+        href: links.plain(`/r/${rid}/continue/${response.operation_id}`),
+        resource_id: rid,
+        operation_id: response.operation_id,
+        version: response.operation_record.transition.to_version,
+        state_sha256: response.operation_record.transition.state_after,
+        correlation_id: response.operation_record.lineage.correlation_id,
+      },
       links: {
         resource: links.resource(rid),
         json: links.resource(rid, '.json'),
         events: links.resource(rid, '/events'),
         operations: links.resource(rid, '/operations'),
+        operation: links.plain(`/r/${rid}/op/${response.operation_id}`),
+        continue: links.plain(`/r/${rid}/continue/${response.operation_id}`),
         protocol: links.plain('/protocol'),
       },
     };

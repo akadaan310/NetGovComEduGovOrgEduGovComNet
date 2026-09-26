@@ -10,15 +10,18 @@
  */
 import type { Sql } from '../db/types';
 import { isUniqueViolation } from '../db/types';
-import { PROTOCOL_VERSION, type ActorKind } from '../protocol/constants';
+import { PROTOCOL_VERSION, SUPPORTED_PROTOCOLS, type ActorKind } from '../protocol/constants';
 import { EnvelopeSchema, OPERATIONS_BY_NAME, type OperationSpec } from '../protocol/operations';
-import { authorize, verifyCapability, type VerifiedCapability } from './authority';
+import { EXECUTABLE_STATUSES, EXTENSIONS_BY_NAME, isExtensionName, type ExtensionDefinition } from '../protocol/extensions';
+import { authorize, effectiveScopes, verifyCapability, type VerifiedCapability } from './authority';
 import { canonicalHash } from './canonical';
+import { crockford } from './ids';
+import { runExtension } from './extensions';
 import type { Env } from './env';
 import { AcspError, fail } from '../protocol/errors';
 import { HANDLERS } from './handlers';
-import { eventRecord, type Assurance, type EventRecord, type EventRow, type Participant, type ResourceRow } from './records';
-import { loadResource } from './state';
+import { eventRecord, operationRecord, type Assurance, type EventRecord, type EventRow, type OperationRecord, type OperationRow, type Participant, type ResourceRow } from './records';
+import { buildOperationalState, findOperation, loadLatestOperation, loadResource } from './state';
 import { formatIssue, validatePayload } from './validate';
 
 export interface MutationInput {
@@ -43,6 +46,10 @@ export interface OperationResponse {
   events: EventRecord[];
   result: Record<string, unknown>;
   replayed: boolean;
+  /** ACSP/0.2: the operation this request became (stable across idempotent replays). */
+  operation_id: string;
+  previous_version: number;
+  operation_record: OperationRecord;
 }
 
 export interface Actor {
@@ -55,6 +62,10 @@ export interface Actor {
 export class OpContext {
   readonly emitted: EventRecord[] = [];
   private dirty = false;
+  /** Set while an extension's effects run: recorded on every event they emit. */
+  extension: { name: string; version: string } | null = null;
+  /** Set by resolve_proposal on accept. */
+  proposalExecution: { proposal_id: string; proposer: Participant; operation_id: string | null } | null = null;
 
   constructor(
     readonly sql: Sql,
@@ -66,6 +77,8 @@ export class OpContext {
     readonly now: Date,
     private readonly requestHash: string,
     private readonly idempotencyKey: string,
+    /** ACSP/0.2: the operation this request is; every event it emits carries this id. */
+    readonly operationId: string,
   ) {}
 
   /** The actor as a participant record (for authorship). */
@@ -119,15 +132,16 @@ export class OpContext {
       proposal_id: e.proposal_id ?? null,
       occurred_at: this.now,
       summary: e.summary,
-      data: e.data,
+      data: this.extension ? { ...e.data, extension: this.extension } : e.data,
       request_hash: this.requestHash,
       idempotency_key: this.idempotencyKey,
+      operation_id: this.operationId,
     };
     await this.sql.query(
       `insert into events (resource_id, version, parent_version, operation, actor_session_id, actor_agent_id,
          actor_kind, identity_assurance, capability_id, on_behalf_of, proposal_id, occurred_at, summary, data,
-         request_hash, idempotency_key)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+         request_hash, idempotency_key, operation_id)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
       [
         row.resource_id,
         row.version,
@@ -145,6 +159,7 @@ export class OpContext {
         JSON.stringify(row.data),
         row.request_hash,
         row.idempotency_key,
+        row.operation_id,
       ],
     );
     this.resource.version = version;
@@ -161,7 +176,7 @@ export class OpContext {
     await this.sql.query(
       `update resources set title=$2, description=$3, focus=$4, lifecycle=$5, accepts_proposals=$6, version=$7,
          checkpoint_count=$8, tok_count=$9, annotation_count=$10, handoff_count=$11, proposal_count=$12,
-         updated_at=$13, closed_at=$14
+         updated_at=$13, closed_at=$14, enabled_extensions=$15
        where id=$1`,
       [
         r.id,
@@ -178,9 +193,65 @@ export class OpContext {
         r.proposal_count,
         r.updated_at,
         r.closed_at,
+        r.enabled_extensions ?? [],
       ],
     );
   }
+}
+
+/** An executable operation: a core registry entry, or an extension definition wrapped as a spec. */
+interface Resolved {
+  spec: OperationSpec;
+  extension: ExtensionDefinition | null;
+}
+
+export function extensionSpec(ext: ExtensionDefinition): OperationSpec {
+  return {
+    name: ext.name,
+    family: 'write',
+    mutation: true,
+    purpose: ext.description,
+    // The base check is "can read"; the interpreter then requires a capability that
+    // satisfies every effect's core requirement (union of scopes).
+    authority: { kind: 'read' },
+    authority_text: 'A capability satisfying every effect\'s core authority; the extension must be enabled on the resource.',
+    invocation: { method: 'POST', path: '/r/{id}/operations' },
+    requires_expected_version: false,
+    proposable: false,
+    allowed_when_closed: false,
+    payload: ext.input,
+    input: 'See the extension definition (GET /extensions/{name}).',
+    output: ext.output,
+    side_effects: `Effects: ${ext.effects.map((e) => e.operation).join(' → ')}`,
+    provenance: 'Each effect\'s event records extension { name, version }; one operation record.',
+    failures: [],
+  };
+}
+
+function resolveOperation(name: string, version: string | undefined): Resolved {
+  const coreName = name.startsWith('core:') ? name.slice(5) : name;
+  const core = OPERATIONS_BY_NAME[coreName];
+  if (core) {
+    if (!core.mutation) fail('unknown_operation', `"${name}" is a read operation; use GET.`);
+    return { spec: core, extension: null };
+  }
+  if (isExtensionName(name)) {
+    const ext = EXTENSIONS_BY_NAME[name];
+    if (!ext) fail('unknown_operation', `"${name}" is not registered on this service (GET /extensions).`);
+    if (!EXECUTABLE_STATUSES.includes(ext!.status)) {
+      fail('operation_not_executable', `${name} is ${ext!.status}; only ${EXECUTABLE_STATUSES.join(', ')} extensions execute.`, { status: ext!.status });
+    }
+    if (version !== undefined && version !== ext!.version) {
+      fail('operation_not_executable', `${name} version ${version} is not registered (current: ${ext!.version}).`, { registered_version: ext!.version });
+    }
+    return { spec: extensionSpec(ext!), extension: ext! };
+  }
+  return fail('unknown_operation', `"${name}" is not a mutating ${PROTOCOL_VERSION} operation.`, {
+    mutating_operations: Object.values(OPERATIONS_BY_NAME)
+      .filter((o) => o.mutation)
+      .map((o) => o.name),
+    extensions: '/extensions',
+  });
 }
 
 function parseEnvelope(body: unknown) {
@@ -192,20 +263,12 @@ function parseEnvelope(body: unknown) {
     fail('malformed_request', 'The operation envelope is invalid.', { issues: parsed.error.issues.map(formatIssue) });
   }
   const env = parsed.data!;
-  if (env.protocol !== PROTOCOL_VERSION) {
-    fail('unsupported_protocol', `This server speaks ${PROTOCOL_VERSION}; the request declared "${env.protocol}".`);
+  if (!(SUPPORTED_PROTOCOLS as readonly string[]).includes(env.protocol)) {
+    fail('unsupported_protocol', `This server speaks ${PROTOCOL_VERSION} and accepts envelopes declaring ${SUPPORTED_PROTOCOLS.join(' or ')}; the request declared "${env.protocol}".`);
   }
-  const spec = OPERATIONS_BY_NAME[env.operation];
-  if (!spec || !spec.mutation) {
-    fail('unknown_operation', `"${env.operation}" is not a mutating ${PROTOCOL_VERSION} operation.`, {
-      mutating_operations: Object.values(OPERATIONS_BY_NAME)
-        .filter((o) => o.mutation)
-        .map((o) => o.name),
-    });
-  }
-  return { env, spec: spec! };
+  const { spec, extension } = resolveOperation(env.operation, env.operation_version);
+  return { env, spec, extension };
 }
-
 
 /** Secrets never enter the idempotency store; replays get the response with tokens redacted. */
 function redactSecrets<T>(value: T): T {
@@ -224,7 +287,7 @@ function redactSecrets<T>(value: T): T {
 }
 
 export async function executeMutation(env: Env, input: MutationInput): Promise<MutationResult> {
-  const { env: envelope, spec } = parseEnvelope(input.body);
+  const { env: envelope, spec, extension } = parseEnvelope(input.body);
 
   const isCollectionOp = spec.name === 'create';
   if (isCollectionOp && input.resourceId) {
@@ -247,7 +310,7 @@ export async function executeMutation(env: Env, input: MutationInput): Promise<M
   // violation; retrying lets the idempotency lookup return the stored result.
   for (let attempt = 0; ; attempt++) {
     try {
-      return await env.db.tx((sql) => run(sql, env, spec, envelope, payload, credential, input.resourceId));
+      return await env.db.tx((sql) => run(sql, env, spec, extension, envelope, payload, credential, input.resourceId));
     } catch (err) {
       if (attempt < 2 && isUniqueViolation(err)) continue;
       throw err;
@@ -259,6 +322,7 @@ async function run(
   sql: Sql,
   env: Env,
   spec: OperationSpec,
+  extension: ExtensionDefinition | null,
   envelope: ReturnType<typeof parseEnvelope>['env'],
   payload: Record<string, unknown>,
   credential: string | null,
@@ -302,6 +366,10 @@ async function run(
     actor,
     payload: envelope.payload ?? {},
     expected_version: envelope.expected_version ?? null,
+    // ACSP/0.2 fields are part of the request identity only when sent, so 0.1 request hashes are unchanged.
+    causation_id: envelope.causation_id,
+    correlation_id: envelope.correlation_id,
+    operation_version: envelope.operation_version,
   });
   const scope = `${resourceId ?? 'new'}|${cap ? cap.id : `asserted:${actor.session_id}`}`;
   const prior = (
@@ -330,12 +398,90 @@ async function run(
     });
   }
 
-  // 6. Execute.
-  const ctx = new OpContext(sql, env, resource, actor, assurance, cap, now, requestHash, envelope.idempotency_key);
-  const handler = HANDLERS[spec.name as keyof typeof HANDLERS];
-  if (!handler) throw new AcspError('internal_error', `No handler registered for "${spec.name}".`);
-  const result = await handler(ctx, payload as never);
+  // 6. Operation identity and lineage (ACSP/0.2).
+  const operationId = `op-${crockford(env.random, 16)}`;
+  const fromVersion = resourceId ? resource.version : 0;
+  const lineageResource = resourceId; // for fork this is the PARENT: a fork's causation cites a parent operation
+  let causation: OperationRow | null = null;
+  if (envelope.causation_id) {
+    causation = lineageResource ? await findOperation(sql, lineageResource, envelope.causation_id) : null;
+    if (!causation) {
+      fail('invalid_reference', `causation_id ${envelope.causation_id} is not an operation of ${lineageResource ? `resource ${lineageResource}` : 'any resource (create has none)'}.`);
+    }
+  }
+  const previous = resourceId && spec.name !== 'fork' ? await loadLatestOperation(sql, resourceId) : null;
+  const stateBefore = resourceId && spec.name !== 'fork' ? canonicalHash(await buildOperationalState(sql, resource)) : null;
+
+  // 7. Execute.
+  const ctx = new OpContext(sql, env, resource, actor, assurance, cap, now, requestHash, envelope.idempotency_key, operationId);
+  let result: Record<string, unknown>;
+  if (extension) result = await runExtension(ctx, extension, payload);
+  else {
+    const handler = HANDLERS[spec.name as keyof typeof HANDLERS];
+    if (!handler) throw new AcspError('internal_error', `No handler registered for "${spec.name}".`);
+    result = await handler(ctx, payload as never);
+  }
   await ctx.flush();
+
+  // 8. Derived causation when the actor gave none: accepting a proposal responds to the
+  // proposal; acknowledging a handoff responds to the handoff.
+  let causationId = causation?.id ?? null;
+  let causationSource: 'actor' | 'derived' | null = causation ? 'actor' : null;
+  if (!causationId) {
+    const derived = await derivedCausation(sql, ctx, spec.name, payload);
+    if (derived) {
+      causationId = derived.id;
+      causationSource = 'derived';
+      causation = derived;
+    }
+  }
+  const correlationId = envelope.correlation_id ?? causation?.correlation_id ?? operationId;
+  const stateAfter = canonicalHash(await buildOperationalState(sql, ctx.resource));
+  const redacted = redactSecrets(result);
+  const opRow: OperationRow = {
+    resource_id: ctx.resource.id,
+    id: operationId,
+    seq: (previous?.seq ?? 0) + 1,
+    operation: spec.name,
+    definition_version: extension ? extension.version : 'core@ACSP/0.1',
+    protocol: envelope.protocol,
+    actor: { session_id: actor.session_id, agent_id: actor.agent_id, kind: actor.kind },
+    identity_assurance: assurance,
+    capability_id: cap?.id ?? null,
+    authority: { via: cap ? 'capability' : 'none', capability_id: cap?.id ?? null, capability_kind: cap?.kind ?? null, scopes: effectiveScopes(cap) },
+    requested_by: ctx.participant,
+    on_behalf_of: ctx.proposalExecution?.proposer ?? null,
+    proposal_id: ctx.proposalExecution?.proposal_id ?? null,
+    expected_version: envelope.expected_version ?? null,
+    from_version: spec.name === 'fork' ? 0 : fromVersion,
+    to_version: ctx.resource.version,
+    state_before: stateBefore,
+    state_after: stateAfter,
+    parent_operation_id: previous?.id ?? null,
+    causation_id: causationId,
+    causation_source: causationSource,
+    correlation_id: correlationId,
+    request_hash: requestHash,
+    idempotency_key: envelope.idempotency_key,
+    payload: (envelope.payload ?? {}) as Record<string, unknown>,
+    result: redacted,
+    created_at: now,
+  };
+  await sql.query(
+    `insert into operations (resource_id, id, seq, operation, definition_version, protocol, actor, identity_assurance,
+       capability_id, authority, requested_by, on_behalf_of, proposal_id, expected_version, from_version, to_version,
+       state_before, state_after, parent_operation_id, causation_id, causation_source, correlation_id, request_hash,
+       idempotency_key, payload, result, created_at)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)`,
+    [
+      opRow.resource_id, opRow.id, opRow.seq, opRow.operation, opRow.definition_version, opRow.protocol,
+      JSON.stringify(opRow.actor), opRow.identity_assurance, opRow.capability_id, JSON.stringify(opRow.authority),
+      JSON.stringify(opRow.requested_by), opRow.on_behalf_of ? JSON.stringify(opRow.on_behalf_of) : null, opRow.proposal_id,
+      opRow.expected_version, opRow.from_version, opRow.to_version, opRow.state_before, opRow.state_after,
+      opRow.parent_operation_id, opRow.causation_id, opRow.causation_source, opRow.correlation_id, opRow.request_hash,
+      opRow.idempotency_key, JSON.stringify(opRow.payload), JSON.stringify(opRow.result), opRow.created_at,
+    ],
+  );
 
   const status = spec.name === 'create' || spec.name === 'fork' ? 201 : 200;
   const response: OperationResponse = {
@@ -347,9 +493,12 @@ async function run(
     events: ctx.emitted,
     result,
     replayed: false,
+    operation_id: operationId,
+    previous_version: opRow.from_version,
+    operation_record: operationRecord(opRow, ctx.emitted),
   };
 
-  // 7. Record for idempotent replay — with secrets redacted.
+  // 9. Record for idempotent replay — with secrets redacted.
   await sql.query(
     'insert into idempotency (scope, key, request_hash, status_code, response, created_at) values ($1,$2,$3,$4,$5,$6)',
     [scope, envelope.idempotency_key, requestHash, status, JSON.stringify(redactSecrets(response)), now],
@@ -360,4 +509,22 @@ async function run(
 /** Stand-in target for `create`, replaced by the handler via ctx.adopt(). */
 function placeholderResource(): ResourceRow {
   return { id: '', version: 0 } as ResourceRow;
+}
+
+/** Server-derived causation for operations that respond to an earlier operation by construction. */
+async function derivedCausation(sql: Sql, ctx: OpContext, name: string, payload: Record<string, unknown>): Promise<OperationRow | null> {
+  const rid = ctx.resource.id;
+  if (name === 'resolve_proposal') {
+    const { rows } = await sql.query<{ operation_id: string | null }>('select operation_id from proposals where resource_id = $1 and id = $2', [rid, payload.proposal_id]);
+    return rows[0]?.operation_id ? findOperation(sql, rid, rows[0].operation_id) : null;
+  }
+  if (name === 'acknowledge') {
+    const { rows } = await sql.query<{ operation_id: string | null }>(
+      `select e.operation_id from handoffs h join events e on e.resource_id = h.resource_id and e.version = h.created_version
+        where h.resource_id = $1 and h.id = $2`,
+      [rid, payload.handoff_id],
+    );
+    return rows[0]?.operation_id ? findOperation(sql, rid, rows[0].operation_id) : null;
+  }
+  return null;
 }

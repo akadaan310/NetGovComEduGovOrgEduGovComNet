@@ -12,6 +12,7 @@ import { isOwner } from './authority';
 import { canonicalHash } from './canonical';
 import { AcspError, fail } from '../protocol/errors';
 import { newCapability, newResourceId, pad3 } from './ids';
+import { ENABLEABLE_STATUSES, EXTENSIONS_BY_NAME } from '../protocol/extensions';
 import type { OpContext } from './engine';
 import { validatePayload } from './validate';
 import {
@@ -157,6 +158,7 @@ function newResourceRow(ctx: OpContext, fields: Partial<ResourceRow> & Pick<Reso
     created_at: ctx.now,
     updated_at: ctx.now,
     closed_at: null,
+    enabled_extensions: [], // never inherited by forks: enabling is an explicit act on each resource
     ...fields,
   };
 }
@@ -308,6 +310,19 @@ const update: Handler<'update'> = async (ctx, p) => {
   for (const key of ['title', 'description', 'focus', 'accepts_proposals'] as const) {
     const next = p[key];
     if (next !== undefined && next !== r[key]) changes[key] = { from: r[key], to: next };
+  }
+  if (p.enabled_extensions !== undefined) {
+    const next = [...new Set(p.enabled_extensions)].sort();
+    const prev = [...(r.enabled_extensions ?? [])].sort();
+    for (const name of next) {
+      if (prev.includes(name)) continue; // keeping an already-enabled (e.g. now deprecated) extension is allowed
+      const ext = EXTENSIONS_BY_NAME[name];
+      if (!ext) fail('invalid_payload', `No extension "${name}" is registered on this service (GET /extensions).`);
+      if (!ENABLEABLE_STATUSES.includes(ext!.status)) {
+        fail('operation_not_executable', `${name} is ${ext!.status}; only ${ENABLEABLE_STATUSES.join(', ')} extensions can be enabled.`);
+      }
+    }
+    if (JSON.stringify(next) !== JSON.stringify(prev)) changes.enabled_extensions = { from: prev, to: next };
   }
   if (Object.keys(changes).length === 0) fail('invalid_payload', 'The update changes nothing.');
   for (const [k, c] of Object.entries(changes)) (r as unknown as Record<string, unknown>)[k] = c.to;
@@ -615,6 +630,9 @@ const propose: Handler<'propose'> = async (ctx, p) => {
     id,
     operation: p.operation,
     payload: inner,
+    operation_id: ctx.operationId,
+    payload_sha256: canonicalHash(inner),
+    base_version: version - 1,
     rationale: p.rationale,
     proposer_session_id: ctx.actor.session_id,
     proposer_agent_id: ctx.actor.agent_id,
@@ -629,9 +647,9 @@ const propose: Handler<'propose'> = async (ctx, p) => {
   };
   await ctx.sql.query(
     `insert into proposals (resource_id, id, operation, payload, rationale, proposer_session_id, proposer_agent_id,
-       proposer_kind, proposer_assurance, status, created_version, created_at)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-    [row.resource_id, row.id, row.operation, JSON.stringify(row.payload), row.rationale, row.proposer_session_id, row.proposer_agent_id, row.proposer_kind, row.proposer_assurance, row.status, row.created_version, row.created_at],
+       proposer_kind, proposer_assurance, status, created_version, created_at, operation_id, payload_sha256, base_version)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+    [row.resource_id, row.id, row.operation, JSON.stringify(row.payload), row.rationale, row.proposer_session_id, row.proposer_agent_id, row.proposer_kind, row.proposer_assurance, row.status, row.created_version, row.created_at, row.operation_id, row.payload_sha256, row.base_version],
   );
   return {
     proposal: proposalRecord(row),
@@ -655,6 +673,15 @@ const resolveProposal: Handler<'resolve_proposal'> = async (ctx, p) => {
   });
   let executed: Result | null = null;
   if (status === 'accepted') {
+    // The stored payload is executed exactly as proposed; its hash was bound at proposal time.
+    if (prop.payload_sha256 && canonicalHash(prop.payload) !== prop.payload_sha256) {
+      throw new AcspError('internal_error', `${prop.id}: stored payload no longer matches its bound hash; refusing to execute.`);
+    }
+    ctx.proposalExecution = {
+      proposal_id: prop.id,
+      proposer: { session_id: prop.proposer_session_id, agent_id: prop.proposer_agent_id, kind: prop.proposer_kind, identity_assurance: prop.proposer_assurance },
+      operation_id: prop.operation_id ?? null,
+    };
     const proposer: Participant = {
       session_id: prop.proposer_session_id,
       agent_id: prop.proposer_agent_id,

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 export const PROTOCOL_NAME = 'ACSP';
-export const PROTOCOL_VERSION = 'ACSP/0.1';
+export const PROTOCOL_VERSION = 'ACSP/0.2';
+/** Envelope protocol strings this server accepts. 0.1 envelopes remain valid unchanged. */
+export const SUPPORTED_PROTOCOLS = ['ACSP/0.1', 'ACSP/0.2'] as const;
 export const PROTOCOL_TITLE = 'Agent Continuity & Session Protocol';
 
 export const INVARIANTS = [
@@ -9,6 +11,28 @@ export const INVARIANTS = [
   'Reference does not imply ownership.',
   'Awareness does not imply authority.',
   'Handoff does not imply merger.',
+] as const;
+
+/**
+ * The full invariant set of ACSP/0.2. The first four are the ACSP/0.1
+ * invariants (INVARIANTS, kept for compatibility). Each has a mechanism;
+ * PROTOCOL.md §0 names it and a test exercises it.
+ */
+export const INVARIANTS_V02 = [
+  ...INVARIANTS,
+  'Access does not imply control.',
+  'Observation does not imply interpretation.',
+  'Interpretation does not imply conclusion.',
+  'Delegation does not erase provenance.',
+  'Forking does not destroy lineage.',
+  'Supersession does not require deletion.',
+  'Preparation does not imply execution.',
+  'Operation reference does not imply operation authority.',
+  'Capability is explicit.',
+  'Authority is scoped.',
+  'State transitions are attributable.',
+  'Replay does not imply re-execution.',
+  'Definition does not imply execution.',
 ] as const;
 
 /** Session ids, agent ids and other participant-chosen identifiers. */

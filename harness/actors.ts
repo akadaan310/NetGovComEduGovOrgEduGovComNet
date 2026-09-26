@@ -22,6 +22,8 @@ export interface OpOptions {
   actor?: Record<string, unknown>;
   /** Send this exact body instead of building an envelope. */
   raw?: unknown;
+  /** Extra envelope fields (ACSP/0.2: causation_id, correlation_id, operation_version; or protocol override). */
+  extra?: Record<string, unknown>;
 }
 
 export class Actor {
@@ -67,6 +69,7 @@ export class Actor {
       ...(o.expected_version !== undefined ? { expected_version: o.expected_version } : {}),
       idempotency_key: key,
       payload,
+      ...(o.extra ?? {}),
     };
   }
 

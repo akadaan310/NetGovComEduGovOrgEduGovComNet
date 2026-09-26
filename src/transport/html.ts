@@ -258,6 +258,14 @@ const TITLES: Record<string, string> = {
   diff: 'DIFF',
   operation_list: 'OPERATIONS',
   discovery: 'ACSP SERVICE',
+  operation: 'OPERATION RECORD',
+  operation_record_list: 'OPERATION RECORDS',
+  operational_state: 'OPERATIONAL STATE',
+  proposal: 'PROPOSAL',
+  extension_registry: 'EXTENSION OPERATIONS',
+  extension: 'EXTENSION OPERATION',
+  definition_validation: 'DEFINITION VALIDATION',
+  schema_list: 'SCHEMAS',
 };
 
 export function renderDocumentPage(doc: Record<string, unknown> & { type: string; notice?: string; links?: Record<string, string> }, jsonHref: string): string {
@@ -321,15 +329,63 @@ ${kv([
 
 export function renderResultPage(result: Record<string, unknown>, resourceUrl: string | null): string {
   const tokens = JSON.stringify(result).includes('"token":"acsp_');
+  const rec = result.operation_record as
+    | { operation_id: string; actor: { session_id: string; agent_id: string | null }; identity_assurance: string; authority: { via: string; capability_id: string | null; capability_kind: string | null; scopes: string[] }; transition: { from_version: number; to_version: number; state_after: string }; lineage: { causation_id: string | null; correlation_id: string } }
+    | undefined;
+  const cont = result.continuation as { href: string } | undefined;
   return page({
     title: `ACSP — ${String(result.operation ?? 'result')}`,
     doc: result,
     body: `
-<h1>OPERATION ${result.replayed ? 'REPLAYED' : 'PERFORMED'} — ${upper(String(result.operation ?? ''))}</h1>
-<p class="notice">Resource ${esc(result.resource_id)} is now at version ${esc(result.version)}.${result.replayed ? ' This was an idempotent replay: no new event was created.' : ''}</p>
-${tokens ? '<p class="notice"><strong>This response contains a capability token. It is shown ONCE. Store it as a secret now.</strong></p>' : ''}
-${resourceUrl ? `<p>${a(resourceUrl, 'Open the resource →')}</p>` : ''}
+<h1>OPERATION ${result.replayed ? 'REPLAYED' : 'COMPLETE'} — ${upper(String(result.operation ?? ''))}</h1>
+<p class="notice">${result.replayed ? 'This was an idempotent replay of an operation that had already executed: nothing was executed again.' : 'The operation executed and its state transition is persisted.'}</p>
+${tokens ? '<p class="notice"><strong>This response contains a capability token. It is shown ONCE. Store it as a secret now. Do NOT pass it on with the continuation link below.</strong></p>' : ''}
+${rec ? kv([
+  ['Resource', `${esc(result.resource_id)}${resourceUrl ? ` · ${a(resourceUrl, 'open')}` : ''}`],
+  ['Previous version', esc(rec.transition.from_version)],
+  ['New version', esc(rec.transition.to_version)],
+  ['Operation', esc(result.operation)],
+  ['Actor', `${esc(rec.actor.session_id)}${rec.actor.agent_id ? ` (agent ${esc(rec.actor.agent_id)})` : ''} · identity ${esc(rec.identity_assurance)}`],
+  ['Authority', rec.authority.via === 'capability' ? `${esc(rec.authority.capability_kind)} capability ${esc(rec.authority.capability_id)} [${esc(rec.authority.scopes.join(', '))}]` : 'none (read access only)'],
+  ['Operation ID', `<code>${esc(rec.operation_id)}</code>`],
+  ['Resulting state', `<code>${esc(rec.transition.state_after)}</code>`],
+  ['Lineage', `causation ${esc(rec.lineage.causation_id ?? '—')} · correlation ${esc(rec.lineage.correlation_id)}`],
+]) : ''}
+${cont ? `<h2>CONTINUE FROM</h2>
+<p class="notice">Copy this reference into another session. It identifies the resulting state, not a session: it carries no capability and grants no authority. The receiving session evaluates its own authority when it opens it.</p>
+<p><code id="continue-from">${esc(cont.href)}</code></p>
+<p>${a(cont.href, 'Open the continuation →')}</p>` : ''}
 <pre>${pretty(result)}</pre>`,
+  });
+}
+
+/** The page a receiving session (or its human) opens from a continuation reference. */
+export function renderContinuationPage(d: import('../continuity/operational').ContinuationDocument, jsonHref: string): string {
+  const v = d.viewer as { summary?: string; session_id?: string | null; scopes?: string[] };
+  const permitted = (d.how_to_continue.permitted_operations as string[]) ?? [];
+  const since = d.current.operations_since;
+  return page({
+    title: `ACSP — continue ${d.resource.id}`,
+    doc: d,
+    jsonHref,
+    body: `
+<h1>CONTINUATION REFERENCE</h1>
+<p class="notice">${esc(d.notice)}<br>JSON: ${a(jsonHref, jsonHref)}</p>
+${kv([
+  ['Resource', `${esc(d.resource.id)} — ${esc(d.resource.title)} · ${a(d.resource.url, 'open')}`],
+  ['Owner', esc((d.resource.owner as { session_id: string }).session_id)],
+  ['Reference', `version ${esc(d.reference.version)} · operation <code>${esc(d.reference.operation_id ?? '—')}</code>`],
+  ['State at reference', `<code>${esc(d.reference.state_sha256 ?? '—')}</code>`],
+  ['Produced by', d.produced_by ? `${esc(d.produced_by.operation_type)} by ${esc((d.produced_by.actor as { session_id: string }).session_id)} (${esc(d.produced_by.identity_assurance)})` : '—'],
+  ['Current version', `${esc(d.current.version)}${d.current.moved_since_reference ? ` — <strong>moved</strong>: ${esc(since.length)} operation(s) since the reference` : ' — unchanged since the reference'}`],
+  ['Your authority', esc(v.summary ?? '')],
+  ['You may perform', permitted.length ? esc(permitted.join(', ')) : 'no mutating operation'],
+  ['Cite when acting', d.how_to_continue.cite ? `<code>${esc(JSON.stringify(d.how_to_continue.cite))}</code>` : '—'],
+])}
+<h2>VERIFY</h2>
+<ol>${(d.verification.steps as string[]).map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+<p class="muted">${esc(d.verification.trust as string)}</p>
+<pre>${pretty(d)}</pre>`,
   });
 }
 

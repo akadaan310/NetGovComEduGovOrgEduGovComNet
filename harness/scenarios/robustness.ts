@@ -308,7 +308,9 @@ export const humanFormPath: Scenario = {
       const res = await w.client.postForm(`/r/${rid}/operations`, { request: JSON.stringify(intent.request), capability: token });
       t.status(res, 200, 'form POST');
       t.check((res.headers.get('content-type') ?? '').includes('text/html'), 'HTML result for the human');
-      t.check(res.text.includes('OPERATION PERFORMED'), 'result page confirms execution');
+      t.check(res.text.includes('OPERATION COMPLETE'), 'result page confirms execution');
+      t.check(res.text.includes('CONTINUE FROM') && res.text.includes('/continue/op-'), 'result page offers a continuation reference');
+      t.check(!/continue\/op-[^"<]*cap=/.test(res.text), 'the continuation reference carries no capability');
       const tok = (await a.inspect(rid)).body.knowledge.items[0];
       t.eq([tok.title, tok.source.session_id, tok.source.agent_id], ['Seen from a browser', 'session-g', 'browser-agent'], 'TOK attributed to the agent session that composed it');
       const again = await w.client.postForm(`/r/${rid}/operations`, { request: JSON.stringify(intent.request), capability: token });

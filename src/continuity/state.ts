@@ -5,12 +5,14 @@ import { AcspError } from '../protocol/errors';
 import {
   handoffRecord,
   iso,
+  proposalRecord,
   tokRecord,
   type AnnotationRow,
   type CapabilityRow,
   type CheckpointRow,
   type EventRow,
   type HandoffRow,
+  type OperationRow,
   type ProposalRow,
   type ResourceRow,
   type TokRow,
@@ -125,3 +127,82 @@ export async function buildSnapshot(sql: Sql, resource: ResourceRow) {
   };
 }
 export type Snapshot = Awaited<ReturnType<typeof buildSnapshot>>;
+
+
+// ── ACSP/0.2: operations and the operational state ─────────────────────────
+
+export async function loadOperations(sql: Sql, rid: string, opts: { afterSeq?: number; limit?: number; correlationId?: string } = {}) {
+  const { rows } = await sql.query<OperationRow>(
+    `select * from operations where resource_id = $1 and seq > $2 and ($4::text is null or correlation_id = $4)
+      order by seq limit $3`,
+    [rid, opts.afterSeq ?? 0, opts.limit ?? 10_000, opts.correlationId ?? null],
+  );
+  return rows;
+}
+
+export async function loadOperation(sql: Sql, rid: string, id: string): Promise<OperationRow> {
+  const { rows } = await sql.query<OperationRow>('select * from operations where resource_id = $1 and id = $2', [rid, id]);
+  if (!rows[0]) throw new AcspError('not_found', `Resource ${rid} has no operation ${id}.`);
+  return rows[0];
+}
+
+export async function findOperation(sql: Sql, rid: string, id: string): Promise<OperationRow | null> {
+  const { rows } = await sql.query<OperationRow>('select * from operations where resource_id = $1 and id = $2', [rid, id]);
+  return rows[0] ?? null;
+}
+
+export async function loadLatestOperation(sql: Sql, rid: string): Promise<OperationRow | null> {
+  const { rows } = await sql.query<OperationRow>('select * from operations where resource_id = $1 order by seq desc limit 1', [rid]);
+  return rows[0] ?? null;
+}
+
+/** Operations whose causation_id is `id` (the operations that respond to it). */
+export async function loadConsequences(sql: Sql, rid: string, id: string) {
+  const { rows } = await sql.query<OperationRow>('select * from operations where resource_id = $1 and causation_id = $2 order by seq', [rid, id]);
+  return rows;
+}
+
+export async function loadOperationEvents(sql: Sql, rid: string, opId: string) {
+  const { rows } = await sql.query<EventRow>('select * from events where resource_id = $1 and operation_id = $2 order by version', [rid, opId]);
+  return rows;
+}
+
+/**
+ * The OPERATIONAL STATE of a resource at its current version: everything an
+ * operation can change — metadata, knowledge (with annotations), handoffs,
+ * proposals, capabilities (public fields only) and checkpoint boundaries.
+ * Deterministic and time-independent (no "status as of now"), so anyone who
+ * GETs /r/{id}/state can recompute its SHA-256. Each operation record carries
+ * the digest before and after it.
+ */
+export async function buildOperationalState(sql: Sql, resource: ResourceRow) {
+  const snapshot = await buildSnapshot(sql, resource);
+  const proposals = (await loadProposals(sql, resource.id)).map(proposalRecord);
+  const capabilities = (await loadCapabilities(sql, resource.id)).map((c) => ({
+    id: c.id,
+    kind: c.kind,
+    session_id: c.session_id,
+    agent_id: c.agent_id,
+    scopes: c.scopes,
+    created_version: c.created_version,
+    expires_at: iso(c.expires_at),
+    revoked_at: iso(c.revoked_at),
+    revoked_version: c.revoked_version,
+  }));
+  const checkpoints = (await loadCheckpoints(sql, resource.id)).map((c) => ({ number: c.number, version: c.version, label: c.label, sha256: c.snapshot_sha256 }));
+  return {
+    schema: 'acsp.operational-state/0.2',
+    resource: {
+      ...snapshot.resource,
+      visibility: resource.visibility,
+      accepts_proposals: resource.accepts_proposals,
+      enabled_extensions: [...(resource.enabled_extensions ?? [])].sort(),
+    },
+    knowledge: snapshot.knowledge,
+    handoffs: snapshot.handoffs,
+    proposals,
+    capabilities,
+    checkpoints,
+  };
+}
+export type OperationalState = Awaited<ReturnType<typeof buildOperationalState>>;

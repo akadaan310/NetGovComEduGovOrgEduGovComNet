@@ -31,6 +31,7 @@ export interface ResourceRow {
   created_at: Date;
   updated_at: Date;
   closed_at: Date | null;
+  enabled_extensions: string[];
 }
 
 export interface EventRow {
@@ -50,6 +51,7 @@ export interface EventRow {
   data: Record<string, unknown>;
   request_hash: string | null;
   idempotency_key: string | null;
+  operation_id?: string | null;
 }
 
 export interface TokRow {
@@ -155,6 +157,39 @@ export interface ProposalRow {
   resolution_note: string | null;
   result: Record<string, unknown> | null;
   created_at: Date;
+  operation_id?: string | null;
+  payload_sha256?: string | null;
+  base_version?: number | null;
+}
+
+export interface OperationRow {
+  resource_id: string;
+  id: string;
+  seq: number;
+  operation: string;
+  definition_version: string;
+  protocol: string;
+  actor: { session_id: string; agent_id: string | null; kind: ActorKind };
+  identity_assurance: Assurance;
+  capability_id: string | null;
+  authority: { via: 'capability' | 'none'; capability_id: string | null; capability_kind: 'owner' | 'delegation' | null; scopes: string[] };
+  requested_by: Participant;
+  on_behalf_of: Participant | null;
+  proposal_id: string | null;
+  expected_version: number | null;
+  from_version: number;
+  to_version: number;
+  state_before: string | null;
+  state_after: string;
+  parent_operation_id: string | null;
+  causation_id: string | null;
+  causation_source: 'actor' | 'derived' | null;
+  correlation_id: string;
+  request_hash: string;
+  idempotency_key: string;
+  payload: Record<string, unknown>;
+  result: Record<string, unknown>;
+  created_at: Date;
 }
 
 export interface Participant {
@@ -187,6 +222,7 @@ export function eventRecord(e: EventRow) {
     data: e.data,
     request_hash: e.request_hash,
     idempotency_key: e.idempotency_key,
+    operation_id: e.operation_id ?? null,
   };
 }
 export type EventRecord = ReturnType<typeof eventRecord>;
@@ -316,5 +352,49 @@ export function proposalRecord(p: ProposalRow) {
     resolution_note: p.resolution_note,
     result: p.result,
     created_at: iso(p.created_at),
+    operation_id: p.operation_id ?? null,
+    payload_sha256: p.payload_sha256 ?? null,
+    base_version: p.base_version ?? null,
   };
 }
+
+/** The canonical operation record (schema acsp.operation/0.2), without links. */
+export function operationRecord(o: OperationRow, events: { version: number; operation: string }[] = []) {
+  return {
+    schema: 'acsp.operation/0.2',
+    operation_id: o.id,
+    resource_id: o.resource_id,
+    sequence: o.seq,
+    operation_type: o.operation,
+    definition_version: o.definition_version,
+    protocol_version: o.protocol,
+    actor: o.actor,
+    identity_assurance: o.identity_assurance,
+    authority: o.authority,
+    requested_by: o.requested_by,
+    executed_by: { session_id: o.actor.session_id, agent_id: o.actor.agent_id, kind: o.actor.kind, identity_assurance: o.identity_assurance },
+    on_behalf_of: o.on_behalf_of,
+    proposal_id: o.proposal_id,
+    payload: o.payload,
+    expected_version: o.expected_version,
+    idempotency_key: o.idempotency_key,
+    request_hash: o.request_hash,
+    transition: {
+      from_version: o.from_version,
+      to_version: o.to_version,
+      state_before: o.state_before,
+      state_after: o.state_after,
+      events: events.map((e) => ({ id: eventId(o.resource_id, e.version), version: e.version, operation: e.operation })),
+    },
+    lineage: {
+      parent_operation_id: o.parent_operation_id,
+      causation_id: o.causation_id,
+      causation_source: o.causation_source,
+      correlation_id: o.correlation_id,
+    },
+    executed: true,
+    result: o.result,
+    created_at: iso(o.created_at),
+  };
+}
+export type OperationRecord = ReturnType<typeof operationRecord>;

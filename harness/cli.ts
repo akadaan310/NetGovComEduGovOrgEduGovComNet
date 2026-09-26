@@ -7,6 +7,7 @@
  *   npm run harness -- --base-url https://…      against a running deployment
  *   npm run harness -- --list
  */
+import { PROTOCOL_VERSION } from '../src/protocol/constants';
 import { runScenario, type ScenarioOutcome } from './runner';
 import { SCENARIOS } from './scenarios';
 import type { WorldOptions } from './world';
@@ -37,7 +38,7 @@ if (positional.length && selected.length !== positional.length) {
 }
 
 const target = opts.baseUrl ? `http → ${opts.baseUrl}` : `in-process · ${opts.db}`;
-console.log(`ACSP/0.1 protocol harness — ${selected.length} scenario(s) — ${target}\n`);
+console.log(`${PROTOCOL_VERSION} protocol harness — ${selected.length} scenario(s) — ${target}\n`);
 
 const outcomes: ScenarioOutcome[] = [];
 for (const s of selected) {

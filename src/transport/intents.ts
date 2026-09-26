@@ -14,6 +14,9 @@ import { NOTICE } from '../protocol/bootstrap';
 import { PROTOCOL_VERSION } from '../protocol/constants';
 import { AcspError } from '../protocol/errors';
 import { EnvelopeSchema, OPERATIONS_BY_NAME, type OperationSpec } from '../protocol/operations';
+import { EXECUTABLE_STATUSES, EXTENSIONS_BY_NAME } from '../protocol/extensions';
+import { extensionSpec } from '../continuity/engine';
+import { canonicalHash } from '../continuity/canonical';
 
 const TEMPLATES: Record<string, Record<string, unknown>> = {
   create: { title: '', description: '', focus: '', visibility: 'unlisted', accepts_proposals: true },
@@ -95,7 +98,8 @@ export function intentDocument(opts: {
   random: Random;
   resource?: ResourceDocument;
 }) {
-  const spec = OPERATIONS_BY_NAME[opts.op];
+  const ext = EXTENSIONS_BY_NAME[opts.op];
+  const spec = ext ? extensionSpec(ext) : OPERATIONS_BY_NAME[opts.op];
   if (!spec || !spec.mutation) {
     throw new AcspError('unknown_operation', `"${opts.op}" is not a mutating ${PROTOCOL_VERSION} operation that can be prepared.`);
   }
@@ -111,6 +115,8 @@ export function intentDocument(opts: {
     actor: { session_id: session, ...(agent ? { agent_id: agent } : {}), kind: opts.query.get('actor_kind') ?? 'agent' },
     ...(doc ? { expected_version: doc.state.version } : {}),
     idempotency_key: `intent-${crockford(opts.random, 16)}`,
+    ...(opts.query.get('causation_id') ? { causation_id: opts.query.get('causation_id') } : {}),
+    ...(opts.query.get('correlation_id') ? { correlation_id: opts.query.get('correlation_id') } : {}),
     payload,
   };
   const href = spec.name === 'create' ? opts.links.plain('/r') : opts.links.plain(`/r/${doc!.resource.id}/operations`);
@@ -132,6 +138,23 @@ export function intentDocument(opts: {
     requested_by: { session_id: session, agent_id: agent },
     validation: validationOf(spec, request),
     request,
+    // ACSP/0.2: the prepared operation as a protocol object. It is computed, not stored: to
+    // persist it without authority to execute, submit it as a proposal (operation "propose").
+    prepared_operation: {
+      schema: 'acsp.prepared-operation/0.2',
+      status: 'prepared',
+      operation: spec.name,
+      ...(ext ? { definition: { name: ext.name, version: ext.version, status: ext.status, executable: EXECUTABLE_STATUSES.includes(ext.status) } } : {}),
+      resource_id: doc?.resource.id ?? null,
+      expected_version: doc?.state.version ?? null,
+      payload,
+      payload_sha256: canonicalHash(payload),
+      causation_id: request.causation_id ?? null,
+      correlation_id: request.correlation_id ?? null,
+      requested_by: { session_id: session, agent_id: agent },
+      persisted: false,
+      executed: false,
+    },
     execution: {
       method: 'POST',
       href,

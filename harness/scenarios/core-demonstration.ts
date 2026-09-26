@@ -1,3 +1,4 @@
+import { PROTOCOL_VERSION } from '../../src/protocol/constants';
 /**
  * Section 42 — the core demonstration, end to end over HTTP.
  *
@@ -75,7 +76,7 @@ export const coreDemonstration: Scenario = {
       t.check(text.includes('You are an AI agent accessing an Agent Continuity Resource'), 'page addresses the agent explicitly');
       t.check(text.includes('AGENT BOOTSTRAP'), 'agent bootstrap is present in plain text');
       t.check(text.includes('AGENT ACCESS'), 'agent access section is present in plain text');
-      t.check(text.includes('ACSP/0.1'), 'protocol version visible');
+      t.check(text.includes(PROTOCOL_VERSION), 'protocol version visible');
       t.check(text.includes('p99 spikes coincide with full GC pauses'), 'published knowledge is readable');
       t.check(text.includes('SESSION-A'), 'owner visible');
       return page.text;
@@ -88,7 +89,7 @@ export const coreDemonstration: Scenario = {
       t.status(res, 200, 'GET .json');
       t.check((res.headers.get('content-type') ?? '').includes('application/json'), '.json suffix yields JSON');
       const d = res.body;
-      t.eq(d.protocol.version, 'ACSP/0.1', 'protocol');
+      t.eq(d.protocol.version, PROTOCOL_VERSION, 'protocol');
       t.eq(d.type, 'continuity_resource', 'document type');
       t.check(d.notice.startsWith('You are an AI agent accessing an Agent Continuity Resource'), 'notice');
       t.check(Array.isArray(d.bootstrap.steps) && d.bootstrap.steps.length >= 6, 'bootstrap steps');
