@@ -444,6 +444,12 @@ Tables: `resources`, `events` (the append-only history), `toks`,
      IPv6-only, and Vercel functions need IPv4. It looks like
      `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres`
      (find it under Connect → Transaction pooler).
+   * Append `?sslmode=require&uselibpqcompat=true`. Recent `pg` versions
+     treat a bare `sslmode=require` as full certificate verification, which
+     fails against Supabase's own CA. The libpq-compatible mode keeps the
+     connection encrypted.
+   * Put Vercel functions in the region nearest the database (`regions` in
+     `vercel.json`, e.g. `yul1` for Supabase `ca-central-1`).
    * URL-encode special characters in the password (for example `*` → `%2A`,
      `@` → `%40`).
    * ACSP does not use the Supabase Data API or its publishable/anon key.
