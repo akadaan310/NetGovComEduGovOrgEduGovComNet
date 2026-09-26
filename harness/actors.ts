@@ -124,6 +124,35 @@ export class Actor {
     return this.op(rid, 'close', payload, o);
   }
 
+  // ── Program 001 ──
+  embody(rid: string, payload: Record<string, unknown> = {}, o: OpOptions = {}) {
+    return this.op(rid, 'embody', payload, o);
+  }
+  release(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'release', payload, o);
+  }
+  setSubstrate(rid: string, substrate_id: string | null, o: OpOptions = {}) {
+    return this.op(rid, 'set_substrate', { substrate_id }, o);
+  }
+  announce(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'announce', payload, o);
+  }
+  createScroll(rid: string, scroll: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'create_scroll', { scroll }, o);
+  }
+  versionScroll(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'version_scroll', payload, o);
+  }
+  setAlias(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'set_alias', payload, o);
+  }
+  execute(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'execute', payload, o);
+  }
+  discover(rid: string, payload: Record<string, unknown>, o: OpOptions = {}) {
+    return this.op(rid, 'discover_new_operation', payload, o);
+  }
+
   // ── reads ──
   inspect(rid: string, token: string | null | undefined = this.tokens.get(rid)) {
     return this.client.getJson(`/r/${rid}`, token);

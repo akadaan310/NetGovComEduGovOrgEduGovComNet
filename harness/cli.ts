@@ -5,6 +5,7 @@
  *   npm run harness -- core-demonstration -v     one scenario with its transcript
  *   npm run harness -- --db postgres             against ACSP_TEST_DATABASE_URL / DATABASE_URL
  *   npm run harness -- --base-url https://…      against a running deployment
+ *   npm run harness -- --program 001            only Program 001 scenarios
  *   npm run harness -- --list
  */
 import { runScenario, type ScenarioOutcome } from './runner';
@@ -17,7 +18,8 @@ const value = (name: string) => {
   const i = args.indexOf(name);
   return i >= 0 ? args[i + 1] : undefined;
 };
-const positional = args.filter((a, i) => !a.startsWith('-') && !['--db', '--base-url', '--seed'].includes(args[i - 1] ?? ''));
+const positional = args.filter((a, i) => !a.startsWith('-') && !['--db', '--base-url', '--seed', '--program'].includes(args[i - 1] ?? ''));
+const program = value('--program');
 
 if (flag('--list')) {
   for (const s of SCENARIOS) console.log(`${s.name.padEnd(22)} ${s.description}`);
@@ -30,14 +32,14 @@ const opts: WorldOptions = {
   baseUrl: value('--base-url'),
   seed: value('--seed') ? Number(value('--seed')) : undefined,
 };
-const selected = positional.length ? SCENARIOS.filter((s) => positional.includes(s.name)) : SCENARIOS;
+const selected = (positional.length ? SCENARIOS.filter((s) => positional.includes(s.name)) : SCENARIOS).filter((s) => !program || s.program === program);
 if (positional.length && selected.length !== positional.length) {
   console.error(`Unknown scenario(s): ${positional.filter((p) => !SCENARIOS.some((s) => s.name === p)).join(', ')}`);
   process.exit(2);
 }
 
 const target = opts.baseUrl ? `http → ${opts.baseUrl}` : `in-process · ${opts.db}`;
-console.log(`ACSP/0.1 protocol harness — ${selected.length} scenario(s) — ${target}\n`);
+console.log(`ACSP/0.1 protocol harness — ${selected.length} scenario(s)${program ? ` (program ${program})` : ''} — ${target}\n`);
 
 const outcomes: ScenarioOutcome[] = [];
 for (const s of selected) {

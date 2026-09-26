@@ -3,7 +3,9 @@ import { ANNOTATION_KINDS, CONFIDENCE_LEVELS, TOK_TYPE_MEANINGS, TOK_TYPES, KNOW
 import { bootstrapDocument, bootstrapText, NOTICE } from './bootstrap';
 import {
   DELEGABLE_SCOPES,
+  EXTENSIONS,
   INVARIANTS,
+  RESOURCE_KINDS,
   PROTOCOL_NAME,
   PROTOCOL_TITLE,
   PROTOCOL_VERSION,
@@ -11,8 +13,12 @@ import {
   SCOPE_MEANINGS,
   VISIBILITY_MEANINGS,
 } from './constants';
+import { z } from 'zod';
+import { ANNOUNCEMENT_KINDS, OBSERVATION_VOCABULARY } from '../research/phenotype';
+import { SCROLL_LIMITS, ScrollContentSchema } from '../scrolls/scroll';
 import { OPERATIONS, payloadJsonSchema } from './operations';
 import { ERROR_STATUS } from './errors';
+import { identityBootstrapDocument, identityBootstrapText, INTENT_STATES } from './program001';
 
 export function protocolDocument(base: string) {
   const u = (p: string) => new URL(p, base).toString();
@@ -21,6 +27,8 @@ export function protocolDocument(base: string) {
     type: 'protocol',
     notice: NOTICE,
     invariants: [...INVARIANTS],
+    extensions: [...EXTENSIONS],
+    resource_kinds: [...RESOURCE_KINDS],
     summary:
       'ACSP is an HTTPS continuity substrate. A continuity resource at /r/{id} holds explicitly published research state (TOKs) ' +
       'with provenance. GET is always safe. Mutations are operations POSTed as a JSON envelope, authorised by capabilities.',
@@ -78,7 +86,39 @@ export function protocolDocument(base: string) {
         '/r/{id}/checkpoints/{n}': 'one checkpoint with snapshot',
         '/r/{id}/diff?from=V&to=W | ?since_checkpoint=N': 'diff',
         '/r/{id}/explorer': 'protocol explorer (HTML, for developers)',
+        '/substrates': 'program-001: substrate registry with every manifest',
+        '/substrates/{substrate_id}': 'program-001: one substrate manifest (operation contracts)',
+        '/r/{id}/identity': 'program-001: agent identity and its separate dimensions',
+        '/r/{id}/substrates': 'program-001: substrates available to this identity, and its current one',
+        '/r/{id}/scrolls[/{scroll_id}[?version=n]]': 'program-001: Scrolls and their versions',
+        '/r/{id}/aliases[/{name}]': 'program-001: aliases and their resolution',
+        '/r/{id}/executions[/{execution_id}]': 'program-001: execution history',
+        '/r/{id}/transitions': 'program-001: transition-history export for independent instruments',
       },
+    },
+    program_001: {
+      question:
+        'What computational phenomena emerge when persistent identity and state continuity are decoupled from the transient model substrate that performs each transition?',
+      concepts: {
+        agent_identity:
+          'A continuity resource of kind "agent_identity". Its id is the agent_id. It persists across sessions, models and substrates. Identity is self-asserted and capability-bound, not cryptographic.',
+        human_principal: 'The owner: authorizes the identity, delegates and revokes capabilities, releases embodiments. The principal is not the agent and cannot embody it.',
+        embodiment: 'A session attached to the identity (embody → release), with a self-declared model and application. Only the embodied session acts AS the identity.',
+        computational_substrate: 'Where an operation executes. Discoverable manifests with operation contracts (GET /substrates). Not a model, not an identity.',
+        scroll: 'A persisted, versioned, immutable computational artifact: inputs, symbols, and steps that are substrate operations or calls to earlier Scroll versions.',
+        alias: 'A reusable name bound to an explicit Scroll version; rebinding is recorded and history is kept.',
+        execution: 'An append-only record of one run of one Scroll version: identity, session, embodiment, model, substrates, inputs, step sequence, outputs, status.',
+        checkpoint_recovery:
+          'An agent identity\'s checkpoint snapshot adds its identity, embodiments, Scroll versions with content, aliases with history, executions, authority (no secrets) and substrate context.',
+        intent_states: INTENT_STATES,
+      },
+      scroll_schema: z.toJSONSchema(ScrollContentSchema, { io: 'input', unrepresentable: 'any' }),
+      scroll_limits: SCROLL_LIMITS,
+      announcement_kinds: [...ANNOUNCEMENT_KINDS],
+      observation_vocabulary: OBSERVATION_VOCABULARY,
+      identity_bootstrap: identityBootstrapDocument(),
+      identity_bootstrap_text: identityBootstrapText(),
+      substrates: u('/substrates'),
     },
     operations: OPERATIONS.map((o) => ({
       name: o.name,
@@ -103,7 +143,7 @@ export function protocolDocument(base: string) {
     limits: RESOURCE_LIMITS,
     bootstrap: bootstrapDocument(),
     bootstrap_text: bootstrapText(),
-    links: { home: u('/'), new_resource: u('/new'), discovery: u('/.well-known/acsp') },
+    links: { home: u('/'), new_resource: u('/new'), discovery: u('/.well-known/acsp'), substrates: u('/substrates') },
   };
 }
 export type ProtocolDocument = ReturnType<typeof protocolDocument>;

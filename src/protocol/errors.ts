@@ -23,6 +23,8 @@ export type ErrorCode =
   | 'idempotency_key_reuse'
   | 'limit_exceeded'
   | 'rate_limited'
+  | 'not_embodied'
+  | 'substrate_unavailable'
   | 'method_not_allowed'
   | 'service_unavailable'
   | 'internal_error';
@@ -41,11 +43,13 @@ export const ERROR_STATUS: Record<ErrorCode, number> = {
   insufficient_authority: 403,
   invalid_create_key: 403,
   proposals_closed: 403,
+  not_embodied: 403,
   not_found: 404,
   method_not_allowed: 405,
   stale_version: 409,
   resource_closed: 409,
   invalid_state: 409,
+  substrate_unavailable: 409,
   payload_too_large: 413,
   unsupported_media_type: 415,
   invalid_payload: 422,

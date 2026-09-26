@@ -238,12 +238,51 @@ ${kv([
 ])}
 <p class="muted">This page embeds the identical JSON document in &lt;script type="application/json" id="acsp-document"&gt;.</p>`;
 
+  const identity = renderIdentitySections(d);
   return page({
     title: `ACSP ${r.id} — ${r.title}`,
     doc: d,
     jsonHref: d.links.json,
-    body: [header, agentAccess, bootstrap, what, knowledge, handoffs, proposals, ops, authority, checkpoints, lineage, prov, machine].join('\n'),
+    body: [identity ? header.replace('<h1>AGENT CONTINUITY RESOURCE</h1>', '<h1>AGENT IDENTITY</h1>') : header, agentAccess, bootstrap, identity, what, knowledge, handoffs, proposals, ops, authority, checkpoints, lineage, prov, machine].join('\n'),
   });
+}
+
+/** Program 001: the identity, embodiment, substrate, Scroll, alias and execution sections. */
+function renderIdentitySections(d: ResourceDocument): string {
+  if (!d.identity || !d.substrates || !d.scrolls || !d.aliases || !d.executions) return '';
+  const id = d.identity;
+  const e = id.current_embodiment;
+  const dims = Object.entries(id.dimensions) as [string, { value: unknown; meaning: string }][];
+  const ib = d.identity_bootstrap;
+  return `
+<h2 id="identity">AGENT IDENTITY</h2>
+${kv([
+  ['Agent id', `<strong>${esc(id.agent_id)}</strong>`],
+  ['Display name', esc(id.display_name)],
+  ['Status', `${upper(id.status)} · ${upper(id.embodiment_status)}`],
+  ['Human principal', esc(id.owner_principal ?? '—')],
+  ['Also known as', esc(id.also_known_as.join(', ') || '—')],
+  ['Current embodiment', e ? `${esc(e.id)} — session ${esc(e.session.session_id)}${e.model ? ` · model ${esc(e.model.provider)}/${esc(e.model.model_id)}` : ''}${e.application ? ` · application ${esc(e.application.application_id)}` : ''}` : 'none'],
+  ['Current substrate', esc(id.current_substrate?.substrate_id ?? 'none')],
+  ['Current checkpoint', id.current_checkpoint ? `${esc(id.current_checkpoint.number)} — "${esc(id.current_checkpoint.label)}" ${a(id.current_checkpoint.href, 'snapshot')}` : 'none'],
+  ['Assurance', esc(id.assurance)],
+])}
+<h3>SEPARATE DIMENSIONS</h3>
+<table><tr><th>Dimension</th><th>Value</th><th>Meaning</th></tr>${dims.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(typeof v.value === 'string' ? v.value : JSON.stringify(v.value))}</td><td>${esc(v.meaning)}</td></tr>`).join('')}</table>
+${ib ? `<h3>${esc(ib.title)}</h3><ol>${ib.steps.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>` : ''}
+<h3>EMBODIMENTS (${id.embodiments.length})</h3>
+${id.embodiments.length ? `<table><tr><th>ID</th><th>Session</th><th>Model</th><th>Status</th><th>Versions</th><th>Release reason</th></tr>${id.embodiments.map((x) => `<tr><td>${esc(x.id)}</td><td>${esc(x.session.session_id)}</td><td>${esc(x.model ? `${x.model.provider}/${x.model.model_id}` : '—')}</td><td>${esc(x.status)}</td><td>${esc(x.attached_version)}→${esc(x.released_version ?? '')}</td><td>${esc(x.release_reason ?? '')}</td></tr>`).join('')}</table>` : '<p>Never embodied.</p>'}
+<h2 id="substrates">COMPUTATIONAL SUBSTRATES</h2>
+<p class="muted">${esc(d.substrates.question)} Registry: ${a(d.substrates.registry, d.substrates.registry)}</p>
+<table><tr><th>Substrate</th><th>Kind</th><th>Version</th><th>Status</th><th>Operations</th></tr>${d.substrates.available.map((x) => `<tr><td>${a(x.href, x.substrate_id)}${d.substrates!.current?.substrate_id === x.substrate_id ? ' <strong>(current)</strong>' : ''}</td><td>${esc(x.kind)}</td><td>${esc(x.version)}</td><td>${esc(x.status)}</td><td>${esc(x.capabilities.join(', ') || '—')}</td></tr>`).join('')}</table>
+<h2 id="scrolls">SCROLLS (${d.scrolls.count})</h2>
+<p class="muted">${esc(d.scrolls.semantics)}</p>
+${d.scrolls.items.length ? `<table><tr><th>Scroll</th><th>Purpose</th><th>Lineage</th><th>Aliases</th></tr>${d.scrolls.items.map((x) => `<tr><td>${a(x.href, x.scroll_id)}</td><td>${esc(x.purpose)}</td><td>${x.lineage.map((v) => `${esc(v.ref)} <span class="muted">${esc(v.state)} ${esc(v.content_sha256.slice(0, 15))}…</span>`).join('<br>')}</td><td>${esc(x.lineage.flatMap((v) => v.aliases).join(', ') || '—')}</td></tr>`).join('')}</table>` : '<p>No Scrolls.</p>'}
+<h2 id="aliases">ALIASES (${d.aliases.items.length})</h2>
+${d.aliases.items.length ? `<table><tr><th>Name</th><th>Resolves to</th><th>Binding</th><th>History</th></tr>${d.aliases.items.map((x) => `<tr><td>${a(x.href, x.name)}</td><td>${esc(x.target.ref)}</td><td>${esc(x.binding)}</td><td>${esc(x.history.map((h) => h.target.ref).join(' → '))}</td></tr>`).join('')}</table>` : '<p>No aliases.</p>'}
+<h2 id="executions">EXECUTIONS (${d.executions.count})</h2>
+<p class="muted">${esc(d.executions.semantics)} Full history: ${a(d.executions.href, d.executions.href)}</p>
+${d.executions.recent.length ? `<table><tr><th>ID</th><th>Scroll</th><th>Via</th><th>Status</th><th>Inputs</th><th>Outputs</th><th>Session</th><th>Substrates</th></tr>${d.executions.recent.map((x) => `<tr><td>${a(x.href, x.execution_id)}</td><td>${esc(x.scroll ?? `trial ${x.candidate_sha256?.slice(0, 15)}…`)}</td><td>${esc(x.via_alias?.name ?? '—')}</td><td>${esc(x.status)}</td><td>${esc(JSON.stringify(x.inputs))}</td><td>${esc(JSON.stringify(x.outputs ?? x.error))}</td><td>${esc(x.session_id)}</td><td>${esc(x.substrates.join(', '))}</td></tr>`).join('')}</table>` : '<p>No executions.</p>'}`;
 }
 
 // ── generic document page (events, checkpoints, diff, TOK, status, …) ─────
@@ -258,6 +297,17 @@ const TITLES: Record<string, string> = {
   diff: 'DIFF',
   operation_list: 'OPERATIONS',
   discovery: 'ACSP SERVICE',
+  identity: 'AGENT IDENTITY',
+  substrate_registry: 'COMPUTATIONAL SUBSTRATES',
+  substrate: 'COMPUTATIONAL SUBSTRATE',
+  scroll_list: 'SCROLLS',
+  scroll: 'SCROLL',
+  scroll_version: 'SCROLL VERSION',
+  alias_list: 'ALIASES',
+  alias: 'ALIAS',
+  execution_list: 'EXECUTION HISTORY',
+  execution: 'EXECUTION',
+  transition_history: 'TRANSITION HISTORY (INSTRUMENT EXPORT)',
 };
 
 export function renderDocumentPage(doc: Record<string, unknown> & { type: string; notice?: string; links?: Record<string, string> }, jsonHref: string): string {

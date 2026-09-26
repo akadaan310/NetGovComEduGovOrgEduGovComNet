@@ -8,12 +8,13 @@ export interface ScenarioOutcome {
   failures: { step: string; message: string }[];
   error?: string;
   ms: number;
+  measurements: Record<string, unknown>;
 }
 
 export async function runScenario(s: Scenario, opts: WorldOptions = {}, log?: (line: string) => void): Promise<ScenarioOutcome> {
   const started = Date.now();
   if (opts.baseUrl && (s.needsClock || s.needsDatabase)) {
-    return { name: s.name, status: 'skipped', checks: 0, failures: [], ms: 0 };
+    return { name: s.name, status: 'skipped', checks: 0, failures: [], ms: 0, measurements: {} };
   }
   const world = await createWorld({ ...opts, config: { ...opts.config, ...s.config } });
   const t = new T(s.name, log);
@@ -33,5 +34,6 @@ export async function runScenario(s: Scenario, opts: WorldOptions = {}, log?: (l
     failures,
     error,
     ms: Date.now() - started,
+    measurements: t.measurements,
   };
 }

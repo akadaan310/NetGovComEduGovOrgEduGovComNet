@@ -1,4 +1,5 @@
 import { PROTOCOL_VERSION } from '../../src/protocol/constants';
+import { OPERATIONS } from '../../src/protocol/operations';
 import { alternateJsonHref, embeddedDocument } from '../client';
 import type { Scenario } from '../scenario';
 import { setup } from './lifecycle';
@@ -228,7 +229,7 @@ export const representations: Scenario = {
         t.check(d.protocol?.version === PROTOCOL_VERSION && typeof d.notice === 'string' && d.notice.includes('Agent Continuity Resource'), `${u} is self-describing`);
       }
       const p = (await ro.getJson('/protocol')).body;
-      t.check(p.operations.length === 18 && p.operations.every((o: any) => o.purpose && o.authority_text && o.side_effects && o.provenance && o.failures.length), 'protocol documents every operation completely');
+      t.check(p.operations.length === OPERATIONS.length && p.operations.length >= 18 && p.operations.every((o: any) => o.purpose && o.authority_text && o.side_effects && o.provenance && o.failures.length), 'protocol documents every operation completely');
       t.check(p.operations.filter((o: any) => o.mutation).every((o: any) => o.payload_schema?.type === 'object'), 'every mutation publishes a JSON Schema');
       const disc = await ro.getJson('/.well-known/acsp');
       t.eq(disc.body.type, 'discovery', 'well-known discovery document');

@@ -6,7 +6,7 @@
  * event per state change (ctx.emit) and updates the projections.
  */
 import { PROTOCOL_VERSION, RESOURCE_LIMITS } from '../protocol/constants';
-import { OPERATIONS_BY_NAME, type PAYLOADS, type PayloadOf } from '../protocol/operations';
+import { appliesTo, OPERATIONS_BY_NAME, type PAYLOADS, type PayloadOf } from '../protocol/operations';
 import { formatTokId, type TokInput } from '../research/tok';
 import { isOwner } from './authority';
 import { canonicalHash } from './canonical';
@@ -29,17 +29,18 @@ import {
   type TokRow,
 } from './records';
 import { buildSnapshot, loadAnnotations, loadCheckpoint, loadToks, type Snapshot } from './state';
+import { PROGRAM_001_HANDLERS } from './identity';
 
 /** Who a record is attributed to: the actor directly, or a proposer via an accepted proposal. */
-interface Via {
+export interface Via {
   author: Participant;
   proposal_id: string | null;
   on_behalf_of: Participant | null;
 }
-const direct = (ctx: OpContext): Via => ({ author: ctx.participant, proposal_id: null, on_behalf_of: null });
+export const direct = (ctx: OpContext): Via => ({ author: ctx.participant, proposal_id: null, on_behalf_of: null });
 
-type Result = Record<string, unknown>;
-type Handler<N extends keyof typeof PAYLOADS> = (
+export type Result = Record<string, unknown>;
+export type Handler<N extends keyof typeof PAYLOADS> = (
   ctx: OpContext,
   payload: PayloadOf<N>,
   via?: Via,
@@ -125,11 +126,12 @@ async function insertResource(ctx: OpContext, r: ResourceRow): Promise<void> {
   await ctx.sql.query(
     `insert into resources (id, protocol, title, description, focus, lifecycle, visibility, accepts_proposals,
        owner_session_id, owner_agent_id, owner_human, version, parent_id, parent_version, parent_checkpoint,
-       created_at, updated_at)
-     values ($1,$2,$3,$4,$5,'active',$6,$7,$8,$9,$10,1,$11,$12,$13,$14,$14)`,
+       created_at, updated_at, kind, also_known_as)
+     values ($1,$2,$3,$4,$5,'active',$6,$7,$8,$9,$10,1,$11,$12,$13,$14,$14,$15,$16)`,
     [
       r.id, r.protocol, r.title, r.description, r.focus, r.visibility, r.accepts_proposals, r.owner_session_id,
       r.owner_agent_id, r.owner_human, r.parent_id, r.parent_version, r.parent_checkpoint, r.created_at,
+      r.kind, JSON.stringify(r.also_known_as),
     ],
   );
 }
@@ -157,6 +159,12 @@ function newResourceRow(ctx: OpContext, fields: Partial<ResourceRow> & Pick<Reso
     created_at: ctx.now,
     updated_at: ctx.now,
     closed_at: null,
+    kind: 'continuity_resource',
+    also_known_as: [],
+    current_substrate_id: null,
+    scroll_count: 0,
+    execution_count: 0,
+    embodiment_count: 0,
     ...fields,
   };
 }
@@ -218,7 +226,7 @@ async function writeCheckpoint(ctx: OpContext, number: number, snapshot: Snapsho
   });
 }
 
-const who = (p: { session_id: string }) => p.session_id;
+export const who = (p: { session_id: string }) => p.session_id;
 
 // ── handlers ───────────────────────────────────────────────────────────────
 
@@ -230,17 +238,23 @@ const create: Handler<'create'> = async (ctx, p) => {
     visibility: p.visibility,
     accepts_proposals: p.accepts_proposals,
     owner_human: p.owner_human ?? null,
+    kind: p.kind,
+    also_known_as: p.also_known_as,
   });
   await insertResource(ctx, row);
   ctx.adopt(row);
+  const identity = p.kind === 'agent_identity';
   const version = await ctx.emit({
     operation: 'create',
-    summary: `${who(ctx.actor)} created resource "${p.title}"`,
+    summary: identity
+      ? `${who(ctx.actor)} created agent identity "${p.title}" (principal: ${p.owner_human ?? 'unnamed'})`
+      : `${who(ctx.actor)} created resource "${p.title}"`,
     data: {
       title: p.title,
       visibility: p.visibility,
       accepts_proposals: p.accepts_proposals,
       owner: { session_id: ctx.actor.session_id, agent_id: ctx.actor.agent_id, human: p.owner_human ?? null },
+      ...(identity ? { kind: p.kind, also_known_as: p.also_known_as } : {}),
     },
   });
   const owner_capability = await issueCapability(ctx, {
@@ -252,11 +266,18 @@ const create: Handler<'create'> = async (ctx, p) => {
     version,
   });
   const n = ctx.allocate('checkpoint_count');
-  const genesis = await writeCheckpoint(ctx, n, await buildSnapshot(ctx.sql, ctx.resource), 'genesis', 'Created with the resource.');
+  const genesis = await writeCheckpoint(ctx, n, await buildSnapshot(ctx.sql, ctx.resource, ctx.now), 'genesis', 'Created with the resource.');
   return {
-    resource: { id: row.id, title: row.title, visibility: row.visibility, lifecycle: 'active', version },
+    resource: { id: row.id, kind: row.kind, title: row.title, visibility: row.visibility, lifecycle: 'active', version },
     owner_capability,
     checkpoint: genesis,
+    ...(identity
+      ? {
+          notice:
+            'Agent identity created. The owner capability belongs to the principal session that created it; it cannot embody the identity. ' +
+            'Delegate a capability (scopes embody, substrate, scroll, alias, execute, checkpoint, announce) to the session that will embody it.',
+        }
+      : {}),
   };
 };
 
@@ -305,9 +326,12 @@ const annotate: Handler<'annotate'> = async (ctx, p, via = direct(ctx)) => {
 const update: Handler<'update'> = async (ctx, p) => {
   const r = ctx.resource;
   const changes: Record<string, { from: unknown; to: unknown }> = {};
-  for (const key of ['title', 'description', 'focus', 'accepts_proposals'] as const) {
+  if (p.also_known_as !== undefined && r.kind !== 'agent_identity') {
+    fail('invalid_payload', 'also_known_as applies only to agent identities.');
+  }
+  for (const key of ['title', 'description', 'focus', 'accepts_proposals', 'also_known_as'] as const) {
     const next = p[key];
-    if (next !== undefined && next !== r[key]) changes[key] = { from: r[key], to: next };
+    if (next !== undefined && JSON.stringify(next) !== JSON.stringify(r[key])) changes[key] = { from: r[key], to: next };
   }
   if (Object.keys(changes).length === 0) fail('invalid_payload', 'The update changes nothing.');
   for (const [k, c] of Object.entries(changes)) (r as unknown as Record<string, unknown>)[k] = c.to;
@@ -373,7 +397,7 @@ const supersede: Handler<'supersede'> = async (ctx, p, via = direct(ctx)) => {
 const checkpoint: Handler<'checkpoint'> = async (ctx, p, via = direct(ctx)) => {
   const number = ctx.allocate('checkpoint_count');
   // The checkpoint captures the state as of its own event's version.
-  const snapshot = await buildSnapshot(ctx.sql, { ...ctx.resource, version: ctx.resource.version + 1 });
+  const snapshot = await buildSnapshot(ctx.sql, { ...ctx.resource, version: ctx.resource.version + 1 }, ctx.now);
   await ctx.emit({
     operation: 'checkpoint',
     summary: `${who(via.author)} created checkpoint ${number} "${p.label}"`,
@@ -458,7 +482,7 @@ const fork: Handler<'fork'> = async (ctx, p) => {
     version,
   });
   const n = ctx.allocate('checkpoint_count');
-  const genesis = await writeCheckpoint(ctx, n, await buildSnapshot(ctx.sql, ctx.resource), 'genesis', `Forked from ${parent.id}@${parentVersion}.`);
+  const genesis = await writeCheckpoint(ctx, n, await buildSnapshot(ctx.sql, ctx.resource, ctx.now), 'genesis', `Forked from ${parent.id}@${parentVersion}.`);
   return {
     resource: { id: child.id, title: child.title, visibility: child.visibility, lifecycle: 'active', version },
     lineage,
@@ -592,9 +616,12 @@ const acknowledge: Handler<'acknowledge'> = async (ctx, p) => {
   return { handoff: handoffRecord({ ...h, status, resolved_version: version, resolution_note: p.note }) };
 };
 
-const propose: Handler<'propose'> = async (ctx, p) => {
+export const propose: Handler<'propose'> = async (ctx, p) => {
   if (!ctx.resource.accepts_proposals) {
     fail('proposals_closed', `Resource ${ctx.resource.id} does not accept proposals.`);
+  }
+  if (!appliesTo(OPERATIONS_BY_NAME[p.operation], ctx.resource.kind)) {
+    fail('invalid_payload', `"${p.operation}" cannot be proposed on a resource of kind "${ctx.resource.kind}".`);
   }
   const inner = validatePayload(OPERATIONS_BY_NAME[p.operation], p.payload);
   const { rows } = await ctx.sql.query<{ n: number }>(
@@ -683,13 +710,28 @@ const close: Handler<'close'> = async (ctx, p) => {
     `select id from proposals where resource_id = $1 and status = 'pending'`,
     [ctx.resource.id],
   );
+  const { rows: em } = await ctx.sql.query<{ id: string }>(
+    `select id from embodiments where resource_id = $1 and status = 'active'`,
+    [ctx.resource.id],
+  );
   ctx.resource.lifecycle = 'closed';
   ctx.resource.closed_at = ctx.now;
   const version = await ctx.emit({
     operation: 'close',
     summary: `${who(ctx.actor)} closed the resource: ${p.reason}`,
-    data: { reason: p.reason, final_note: p.final_note, cancelled_handoffs: ho.map((h) => h.id), cancelled_proposals: pr.map((x) => x.id) },
+    data: {
+      reason: p.reason,
+      final_note: p.final_note,
+      cancelled_handoffs: ho.map((h) => h.id),
+      cancelled_proposals: pr.map((x) => x.id),
+      ...(ctx.resource.kind === 'agent_identity' ? { released_embodiments: em.map((e) => e.id) } : {}),
+    },
   });
+  await ctx.sql.query(
+    `update embodiments set status = 'released', released_version = $2, release_reason = 'identity closed',
+       released_by_session_id = $3, released_at = $4 where resource_id = $1 and status = 'active'`,
+    [ctx.resource.id, version, ctx.actor.session_id, ctx.now],
+  );
   await ctx.sql.query(
     `update handoffs set status = 'cancelled', resolved_version = $2, resolution_note = 'resource closed' where resource_id = $1 and status = 'pending'`,
     [ctx.resource.id, version],
@@ -702,6 +744,7 @@ const close: Handler<'close'> = async (ctx, p) => {
 };
 
 export const HANDLERS = {
+  ...PROGRAM_001_HANDLERS,
   create,
   append,
   annotate,

@@ -84,6 +84,7 @@ These are **five separate concepts** and the representation keeps them apart.
 | `supersede` | `supersede` |
 | `handoff` | `handoff` (the actor must *also* be the owner or the task's responsible session) |
 | `owner` | everything above, plus the owner-only operations. Held only by the owner capability. |
+| `embody`, `substrate`, `scroll`, `alias`, `execute`, `announce` | Program 001, agent identities only (§13.3). |
 
 `acknowledge` needs no scope. It needs a capability **bound to the session
 the handoff is addressed to**. Being addressed is the authority.
@@ -298,10 +299,12 @@ get an HTML response.
 | 403 | `insufficient_authority` | the scope or role is missing |
 | 403 | `invalid_create_key` | `create` is locked and the key is wrong |
 | 403 | `proposals_closed` | the resource does not accept proposals |
+| 403 | `not_embodied` | (Program 001) the operation acts as the identity, and the actor is not its current embodiment |
 | 404 | `not_found` | unknown resource, TOK, event, checkpoint, handoff or proposal |
 | 409 | `stale_version` | `expected_version` ≠ the current version |
 | 409 | `resource_closed` | the resource's lifecycle is `closed` |
-| 409 | `invalid_state` | e.g. the target is already superseded, the handoff is not pending, the task already has a pending handoff |
+| 409 | `invalid_state` | e.g. the target is already superseded, the handoff is not pending, the task already has a pending handoff; (Program 001) the operation does not apply to this resource kind |
+| 409 | `substrate_unavailable` | (Program 001) the substrate exists but is not available |
 | 413 | `payload_too_large` | body > 64 KiB |
 | 415 | `unsupported_media_type` | the POST is neither JSON nor a form |
 | 422 | `invalid_payload` | the payload failed its schema |
@@ -601,3 +604,272 @@ If you can only open URLs (no POST): open a prepare link (?action=prepare_<opera
 | Tables: sessions, agents, actors, operations, branches | Not created | These are identifiers in capabilities and events. The event log is the operation log, and branches are resources with a parent. |
 | handoff (unspecified) | Task-scoped, two-phase (handoff → acknowledge), grants no authority | Handoff ≠ merger, and awareness ≠ authority. |
 | operation intents | Two forms: prepared (not stored) and proposed (stored, owner-resolved) | Serves both GET-only and POST-capable agents that lack authority. |
+
+---
+
+## 13. Program 001 extension: agent identity, computational substrate, Scroll
+
+Status: **implemented, additive to ACSP/0.1** (`extensions: ["program-001"]`
+in discovery, `/protocol` and every resource document). Nothing in §0–§12
+changes for existing resources: a resource created without `kind` is a
+`continuity_resource`, its snapshots hash exactly as before, and no Program
+001 operation applies to it.
+
+The research question this extension serves:
+
+> What computational phenomena emerge when persistent identity and state
+> continuity are decoupled from the transient model substrate that performs
+> each transition?
+
+### 13.1 Separate dimensions
+
+```
+Agent identity ≠ model ≠ application ≠ session ≠ resource ownership ≠ capability ≠ substrate
+```
+
+| Dimension | Where it lives | Changes identity? |
+|---|---|---|
+| **Agent identity** | an agent-identity resource; `identity.agent_id` = its resource id | — |
+| **Human principal** | `owner_human`; the owner capability is held by the principal's session | no |
+| **Resource ownership** | `ownership.owner.session_id` (the principal's session) | no |
+| **Session** | the current **embodiment** (`embody` … `release`) | no |
+| **Model**, **application** | self-declared on the embodiment | no |
+| **Computational substrate** | `identity.current_substrate`, set by `set_substrate` | no |
+| **Capability** | bearer token bound to one resource and one session | no — a capability is authority, not identity |
+
+`actor.agent_id` (§1) remains a self-asserted **software label**; it is not
+the agent identity. Identity in Program 001 is self-asserted and
+capability-bound. There is no cryptographic identity.
+
+The principal authorizes; it is not the agent. The owner capability **cannot
+`embody`**. Only the **embodied session** performs operations *as* the
+identity (`requires_embodiment`); anyone else — including a session holding
+the right scope but not embodying — gets `403 not_embodied`. The one
+exception is the owner accepting a proposal: the result records the proposer
+as source, the owner as executor, and no embodiment.
+
+### 13.2 Self / announce / propose / commit
+
+| State | Mechanism |
+|---|---|
+| PRIVATE (self) | anything not sent to ACSP; prepared intents (GET) stay private until submitted |
+| ANNOUNCED | `announce` — grants nothing, commits nothing else |
+| DISCOVERED | reads; never recorded by the server |
+| AUTHORIZED | a capability exists for the session (`delegate`) |
+| PROPOSED | `propose`, or `discover_new_operation` with `propose: true` |
+| ACCEPTED | `resolve_proposal` with `accept` |
+| COMMITTED | the operation's event exists; records carry `state: "committed"` |
+| PERSISTED | a checkpoint at or after the commit covers it (`state: "persisted"`, `persisted_in_checkpoint`) |
+
+A prepared operation is never reported as executed; an intention is never
+reported as a committed fact.
+
+### 13.3 Scopes (agent identities)
+
+| Scope | Allows |
+|---|---|
+| `embody` | `embody` (your own session), `release` (your own embodiment) |
+| `substrate` | `set_substrate` |
+| `scroll` | `create_scroll`, `version_scroll` |
+| `alias` | `set_alias` |
+| `execute` | `execute`, `discover_new_operation` |
+| `announce` | `announce` |
+| `checkpoint` | `checkpoint` (unchanged; covers Program 001 state) |
+
+### 13.4 Computational substrates
+
+`GET /substrates` lists every substrate's manifest; `GET /substrates/{id}`
+returns one; `GET /r/{id}/substrates` adds the identity's current one.
+A manifest has `substrate_id, kind, provider, version, status
+(available|unavailable), execution_mode, value_domain, capabilities,
+operations[], surface, provenance` and a `manifest_sha256`. Each operation
+contract has `name, description, arity, input_schema, output_schema,
+required_authority, side_effects, determinism, failure_modes`.
+
+| Substrate | Status | Semantics |
+|---|---|---|
+| `deterministic-calculator` 1.0 | available | IEEE-754 binary64: `add, subtract, multiply, divide, power` (integer exponent ≤ 1024, square-and-multiply), `modulo` (sign of dividend). Non-finite results fail. |
+| `exact-rational-calculator` 1.0 | available | the same operation names over exact rationals; JSON numbers are read as their shortest decimal; results are reduced `"p/q"` strings; `power` exponent ≤ 64; 4096-bit bound. |
+| `model-session` 0 | unavailable | declared abstraction only; ACSP executes no model. |
+
+No substrate evaluates code, shell commands or expressions.
+
+### 13.5 Scrolls
+
+A Scroll version is immutable once committed (database trigger).
+
+```jsonc
+{
+  "purpose": "square x, then add y",
+  "description": "",
+  "inputs": ["x", "y"],                         // names [a-z_][a-z0-9_]{0,31}
+  "symbols": { "n": 3 },                        // constants: numbers or "p/q"
+  "operations": [
+    { "id": "sq", "scroll": { "scroll_id": "SCR-001", "version": 1 }, "arguments": ["x", "x"] },
+    { "id": "sum", "operation": "add", "arguments": ["sq", "y"] }   // optional "substrate" pins one
+  ],
+  "output": "sum"                               // default: the last step
+}
+```
+
+* Every string argument must name an input, symbol or earlier step. A step
+  calls a substrate operation (arity checked against its contract) or an
+  **explicit** earlier Scroll version (never an alias, never "latest").
+* Stored normalised (step ids filled in, `output` set) with
+  `content_sha256` = SHA-256 of its canonical JSON.
+* Limits: 64 steps, 16 inputs, 16 symbols, 16 KiB canonical JSON; per
+  execution 256 substrate steps and composition depth 8; 1,000 Scroll
+  versions per identity.
+* Records: `scroll_id, version, ref ("SCR-001:v2"), parent_version,
+  content_sha256, content, dependencies, created_by {session, embodiment},
+  recorded_by, proposal_id, event_version, after_checkpoint, aliases, state,
+  persisted_in_checkpoint`.
+
+Scroll definition ≠ Scroll execution ≠ Scroll result.
+
+### 13.6 Checkpoints and recovery
+
+An agent identity's checkpoint snapshot is §10's `{ protocol, resource,
+knowledge, handoffs }` plus `kind, identity, embodiments, scrolls` (every
+version with content), `aliases` (with history), `executions` (every
+record), `authority` (owner and capability records, never secrets) and
+`substrate_context`. To recover, a new session:
+
+1. is given the identity URL and, out of band, a capability bound to **its
+   own** session (the principal delegates it);
+2. reads `identity.current_checkpoint`, verifies its hash, reads the diff since;
+3. `embody`s (after the previous embodiment is released by its session, or
+   by the principal if that session is gone);
+4. resolves aliases and continues.
+
+It never uses the previous session's id or capability.
+
+### 13.7 Agent identity bootstrap
+
+Every agent-identity document includes this text in `identity_bootstrap`,
+in addition to §11. The canonical source is `src/protocol/program001.ts`.
+
+```
+AGENT IDENTITY BOOTSTRAP — ACSP/0.1 + program-001
+
+1. This resource is an AGENT IDENTITY (type "agent_identity"). Its identity is "identity.agent_id". You are not it by reading it.
+2. Read "identity.dimensions": identity, principal, ownership, session, model, application, substrate and capability are separate. Changing any of the last five does not change the identity.
+3. Read "identity.current_embodiment". Only the embodied session acts AS the identity; a capability alone is not enough. If none is active and you hold a capability with scope "embody", you may embody it.
+4. To continue the identity's work: read the latest checkpoint (identity.current_checkpoint), which contains its Scrolls, aliases, execution history, authority and substrate context; then read the diff since it.
+5. Read "substrates" (or GET /substrates) to learn which operations exist, their schemas and their determinism before composing anything.
+6. A Scroll is immutable: to change one, commit a new version. An alias names an explicit version. Executing records an execution; reading never executes.
+7. Without authority, do not claim a commit: prepare (?action=prepare_<op>) or propose instead, and report it as proposed.
+```
+
+### 13.8 URLs
+
+| Method | Path | Meaning |
+|---|---|---|
+| POST | `/r` with `payload.kind = "agent_identity"` | create an agent identity (`title` = display name, `owner_human` = principal, `also_known_as`) |
+| GET | `/substrates`, `/substrates/{id}` | substrate registry and manifests |
+| GET | `/r/{id}/identity` | the identity and its dimensions |
+| GET | `/r/{id}/substrates` | substrates available to the identity, and its current one |
+| GET | `/r/{id}/scrolls`, `/r/{id}/scrolls/{scroll_id}[?version=n]` | Scrolls and versions |
+| GET | `/r/{id}/aliases`, `/r/{id}/aliases/{name}` | aliases and resolution |
+| GET | `/r/{id}/executions[?after=N&limit=M]`, `/r/{id}/executions/{execution_id}` | execution history |
+| GET | `/r/{id}/transitions` | transition-history export (§13.10) |
+
+`?action=identity|substrates|scrolls|aliases|executions|transitions` are
+query-string aliases. `fork` does not apply to agent identities.
+
+### 13.9 Operations
+
+#### identify
+* **Purpose:** read the identity and its separate dimensions. **Authority:** read access.
+* **Output:** `{ identity, substrates, scrolls, aliases, executions, announcements, intent_states }`. **Side effects:** none.
+
+#### discover_substrates
+* **Purpose:** list substrates and their manifests. **Authority:** none (registry) or read access (identity view).
+* **Output:** `{ substrates: [manifest…], current? }`. **Failures:** `404` unknown substrate.
+
+#### read_scrolls
+* **Purpose:** read Scrolls, every version, lineage, hashes, dependencies, aliases and state. Reading never executes.
+* **Authority:** read access. **Failures:** `404`.
+
+#### resolve_alias
+* **Purpose:** resolve an alias to its explicit Scroll version, with its binding history. Not recorded; independent of any session.
+* **Authority:** read access. **Failures:** `404`.
+
+#### read_executions
+* **Purpose:** read the append-only execution history (paginated) or one execution.
+* **Authority:** read access. **Failures:** `404`.
+
+#### export_transitions
+* **Purpose:** the identity's history as a transition sequence for an independent instrument (§13.10).
+* **Authority:** read access.
+
+#### embody
+* **Family:** identity. **Purpose:** attach YOUR session to the identity as its embodiment, with a declared model/application.
+* **Authority:** scope `embody`; not the owner capability. **Payload:** `{ model?: { provider, model_id, version? }, application?: { application_id }, note? }`.
+* **Output:** `{ embodiment }`. **Side effects:** a new active embodiment `EMB-nnn`; at most one is active.
+* **Provenance:** event `embody` with the previous embodiment.
+* **Failures:** `403 insufficient_authority` (owner), `409 invalid_state` (another embodiment active), authority errors.
+
+#### release
+* **Family:** identity. **Purpose:** end an embodiment. Capabilities are not revoked by it.
+* **Authority:** scope `embody` as that embodiment's session, or the owner. **Payload:** `{ embodiment_id, reason }`.
+* **Provenance:** event `release` with `released_by` and `by_owner`. **Failures:** `404`, `409 invalid_state` (not active), `403`.
+
+#### set_substrate
+* **Family:** identity. **Purpose:** attach, change or detach the identity's current substrate.
+* **Authority:** scope `substrate`, embodied. **Payload:** `{ substrate_id | null, reason? }`.
+* **Provenance:** event `set_substrate` `{ from, to, change: attached|changed|detached, manifest_sha256 }`.
+* **Failures:** `403 not_embodied`, `404` unknown, `409 substrate_unavailable`, `409 invalid_state` (already current).
+
+#### announce
+* **Family:** identity. **Purpose:** state that something exists, is available or is intended. Grants and commits nothing else.
+* **Authority:** scope `announce`, embodied. **Payload:** `{ kind: availability|intent|artifact|surface, statement, refs? }`.
+* **Provenance:** event `announce`. **Failures:** `403 not_embodied`, `422` (unknown cited Scroll).
+
+#### create_scroll
+* **Family:** computation. **Purpose:** commit a new Scroll at version 1 (§13.5). Nothing executes.
+* **Authority:** scope `scroll`, embodied (or the owner accepting a proposal). Proposable.
+* **Payload:** `{ scroll }`. **Output:** `{ scroll }`.
+* **Provenance:** event `create_scroll` `{ scroll_id, version, content_sha256, operations, step_count, composition, calls }`.
+* **Failures:** `403 not_embodied`, `422 invalid_payload` (with every issue), `422 limit_exceeded`.
+
+#### version_scroll
+* **Family:** computation. **Purpose:** commit the next version; earlier versions never change.
+* **Authority:** as `create_scroll`. **Payload:** `{ scroll_id, parent_version, scroll, reason? }`. `parent_version` must be the latest.
+* **Failures:** `404`, `409 stale_version` (`details: { scroll_id, expected, current }`), `409 invalid_state` (identical content), `422`.
+
+#### set_alias
+* **Family:** computation. **Purpose:** bind a name to an explicit Scroll version, or rebind it; every binding is kept.
+* **Authority:** scope `alias`, embodied (or owner via proposal). **Requires `expected_version`.** Proposable.
+* **Payload:** `{ name, target: { scroll_id, version }, reason? }`. **Output:** `{ alias: { binding, target, previous } }`.
+* **Failures:** `400 missing_expected_version`, `404`, `409 stale_version`, `409 invalid_state` (same target), `422`.
+
+#### execute
+* **Family:** computation. **Purpose:** run a Scroll version (explicit, or through an alias) on inputs and append the execution record.
+* **Authority:** scope `execute`, embodied (or owner via proposal). Proposable.
+* **Payload:** `{ target: { scroll_id, version } | { alias }, inputs, substrate_id? }` (default: the identity's current substrate).
+* **Output:** `{ execution: { execution_id, status: completed|failed, outputs, operation_sequence, … } }`.
+* **Side effects:** a new immutable execution record. A computational failure is RECORDED (`status: "failed"`); an invalid request records nothing.
+* **Provenance:** event `execute` `{ execution_id, scroll, via_alias, status, inputs_sha256, outputs }`.
+* **Failures:** `403 not_embodied`, `404` (Scroll, version, alias, substrate), `409 invalid_state` (no substrate selected), `409 substrate_unavailable`, `422` (inputs do not match).
+
+#### discover_new_operation
+* **Family:** computation. **Purpose:** test a candidate composition on trial inputs and record the observation; optionally propose it as a Scroll.
+* **Authority:** scope `execute`, embodied. **Payload:** `{ candidate, trials: [{ inputs }] (1–16), substrate_id?, propose?, rationale? }`.
+* **Side effects:** one `trial` execution record per trial; with `propose: true`, a pending `create_scroll` proposal. **No Scroll is created.**
+* **Provenance:** event `discover_new_operation`, then (with propose) `propose`.
+
+### 13.10 Transition export (SubstrateIO bridge)
+
+`GET /r/{id}/transitions` returns `format: "acsp-transition-history/1"`: one
+transition per event, with logical time `t` (= version), actor, assurance,
+embodiment in effect, substrate after the event, Scroll, execution outcome,
+alias, checkpoint in effect, and derived **observation labels** from a fixed
+vocabulary (`vocabulary`). `occurred_at` is wall-clock and excluded from
+`deterministic_sha256`. ACSP does not import any instrument; an instrument
+consumes this document.
+
+The labels (e.g. `SCROLL_CREATED`, `ALIAS_REBOUND`, `REUSE`,
+`OPERATION_REPEATED`, `RETRY`, `COMPOSITION`, `SUBSTRATE_CHANGED`,
+`RECOVERY`) are observations of recorded events, not traits. No personality
+or disposition is defined.

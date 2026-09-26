@@ -7,8 +7,16 @@ import { verifyCapability } from '../continuity/authority';
 import { executeMutation } from '../continuity/engine';
 import type { Env } from '../continuity/env';
 import {
+  aliasesDocument,
   assertCanRead,
+  assertIdentity,
   buildResourceDocument,
+  executionsDocument,
+  identityDocument,
+  scrollsDocument,
+  substrateManifestDocument,
+  substrateRegistryDocument,
+  transitionsDocument,
   checkpointDocument,
   checkpointsDocument,
   diffDocument,
@@ -24,7 +32,7 @@ import {
 import { loadCheckpoints, loadEvents, loadResource } from '../continuity/state';
 import { eventRecord } from '../continuity/records';
 import { NOTICE, bootstrapDocument } from '../protocol/bootstrap';
-import { INVARIANTS, PROTOCOL_VERSION, RESOURCE_LIMITS } from '../protocol/constants';
+import { EXTENSIONS, INVARIANTS, PROTOCOL_VERSION, RESOURCE_KINDS, RESOURCE_LIMITS } from '../protocol/constants';
 import { protocolDocument } from '../protocol/document';
 import { AcspError } from '../protocol/errors';
 import {
@@ -44,7 +52,10 @@ import { consumeRateLimit } from './ratelimit';
 const RESOURCE_ID = '([0-9A-HJKMNP-TV-Z]{12})';
 const ROUTES = {
   resource: new RegExp(`^/r/${RESOURCE_ID}$`),
-  sub: new RegExp(`^/r/${RESOURCE_ID}/(operations|events|checkpoints|diff|explorer|knowledge)(?:/([A-Za-z0-9-]+))?$`),
+  sub: new RegExp(
+    `^/r/${RESOURCE_ID}/(operations|events|checkpoints|diff|explorer|knowledge|identity|substrates|scrolls|aliases|executions|transitions)(?:/([A-Za-z0-9_-]+))?$`,
+  ),
+  substrate: /^\/substrates(?:\/([a-z][a-z0-9-]{0,63}))?$/,
 };
 
 export type Handler = (req: Request) => Promise<Response>;
@@ -123,12 +134,23 @@ function discoveryDocument(base: string) {
       'This service hosts Agent Continuity Resources at /r/{id}. Each resource explains itself (HTML and JSON), ' +
       'lists the operations available and whether you may perform them, and records every change with provenance.',
     bootstrap: bootstrapDocument(),
+    extensions: [...EXTENSIONS],
+    resource_kinds: [...RESOURCE_KINDS],
     endpoints: {
       resource: u('/r/{id}'),
       create: { method: 'POST', href: u('/r'), prepare: u('/new') },
+      create_agent_identity: { method: 'POST', href: u('/r'), prepare: u('/new?kind=agent_identity') },
       operations: { method: 'POST', href: u('/r/{id}/operations') },
+      substrates: u('/substrates'),
     },
-    links: { home: u('/'), protocol: u('/protocol'), protocol_json: u('/protocol.json'), new_resource: u('/new'), discovery: u('/.well-known/acsp') },
+    links: {
+      home: u('/'),
+      protocol: u('/protocol'),
+      protocol_json: u('/protocol.json'),
+      new_resource: u('/new'),
+      discovery: u('/.well-known/acsp'),
+      substrates: u('/substrates'),
+    },
   };
 }
 
@@ -148,6 +170,12 @@ async function handleGet(env: Env, req: Request, url: URL, path: string, format:
   if (path === '/health') {
     await env.db.query('select 1');
     return jsonResponse({ ok: true, protocol: PROTOCOL_VERSION, database: env.db.kind }, 200, headers);
+  }
+  const sm = ROUTES.substrate.exec(path);
+  if (sm) {
+    const links = new Links(base);
+    const doc = sm[1] ? substrateManifestDocument(sm[1], links) : substrateRegistryDocument(links);
+    return respond(doc, () => renderDocumentPage(doc, jsonUrl(url, path)));
   }
   if (path === '/new') {
     const doc = intentDocument({ op: 'create', query: url.searchParams, links: new Links(base), random: env.random });
@@ -185,11 +213,27 @@ async function handleGet(env: Env, req: Request, url: URL, path: string, format:
       return respond(doc, () => renderIntentPage(doc, withQuery(self, url)));
     }
     // Query-string aliases for agents that can only edit query parameters.
-    const alias: Record<string, string> = { operations: 'operations', events: 'events', checkpoints: 'checkpoints', diff: 'diff', retrieve: 'knowledge', explorer: 'explorer' };
+    const alias: Record<string, string> = {
+      operations: 'operations',
+      events: 'events',
+      checkpoints: 'checkpoints',
+      diff: 'diff',
+      retrieve: 'knowledge',
+      explorer: 'explorer',
+      identity: 'identity',
+      substrates: 'substrates',
+      scrolls: 'scrolls',
+      aliases: 'aliases',
+      executions: 'executions',
+      transitions: 'transitions',
+    };
     if (alias[action]) {
       return dispatchSub(env, url, format, alias[action], url.searchParams.get('tok') ?? url.searchParams.get('id') ?? undefined, resource, links, viewer, headers, self, fullDocument);
     }
-    throw new AcspError('malformed_request', `Unknown action "${action}". Use inspect, status, operations, events, checkpoints, diff, retrieve, or prepare_<operation>.`);
+    throw new AcspError(
+      'malformed_request',
+      `Unknown action "${action}". Use inspect, status, operations, events, checkpoints, diff, retrieve, identity, substrates, scrolls, aliases, executions, transitions, or prepare_<operation>.`,
+    );
   }
   return dispatchSub(env, url, format, sub![2], sub![3], resource, links, viewer, headers, self, fullDocument);
 }
@@ -245,6 +289,22 @@ async function dispatchSub(
           sinceCheckpoint: int(q.get('since_checkpoint'), 'since_checkpoint'),
         }),
       );
+    case 'identity':
+      if (arg) break;
+      return respond(await identityDocument(env.db, resource, viewer, links));
+    case 'substrates':
+      if (arg) break;
+      assertIdentity(resource);
+      return respond(substrateRegistryDocument(links, resource));
+    case 'scrolls':
+      return respond(await scrollsDocument(env.db, resource, links, arg, int(q.get('version'), 'version')));
+    case 'aliases':
+      return respond(await aliasesDocument(env.db, resource, links, arg));
+    case 'executions':
+      return respond(await executionsDocument(env.db, resource, links, { id: arg, after: int(q.get('after'), 'after'), limit: int(q.get('limit'), 'limit') }));
+    case 'transitions':
+      if (arg) break;
+      return respond(await transitionsDocument(env.db, resource, links));
     case 'explorer': {
       const doc = await fullDocument();
       const events = (await loadEvents(env.db, resource.id)).map(eventRecord);

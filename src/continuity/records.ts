@@ -3,7 +3,9 @@
  * Row → record mapping lives here so every surface (resource document,
  * retrieve endpoints, checkpoint snapshots) presents records identically.
  */
-import type { ActorKind, Scope, Visibility } from '../protocol/constants';
+import type { ActorKind, ResourceKind, Scope, Visibility } from '../protocol/constants';
+import { dependencies, refString, type ScrollContent, type StepRecord } from '../scrolls/scroll';
+import type { Value } from '../substrates/types';
 
 export type Assurance = 'capability' | 'asserted';
 
@@ -31,6 +33,13 @@ export interface ResourceRow {
   created_at: Date;
   updated_at: Date;
   closed_at: Date | null;
+  // Program 001
+  kind: ResourceKind;
+  also_known_as: string[];
+  current_substrate_id: string | null;
+  scroll_count: number;
+  execution_count: number;
+  embodiment_count: number;
 }
 
 export interface EventRow {
@@ -318,3 +327,208 @@ export function proposalRecord(p: ProposalRow) {
     created_at: iso(p.created_at),
   };
 }
+
+// ── Program 001 ────────────────────────────────────────────────────────────
+
+export interface ModelRef {
+  provider: string;
+  model_id: string;
+  version?: string;
+}
+
+export interface EmbodimentRow {
+  resource_id: string;
+  id: string;
+  session_id: string;
+  agent_label: string | null;
+  capability_id: string | null;
+  model: ModelRef | null;
+  application: { application_id: string } | null;
+  note: string;
+  status: 'active' | 'released';
+  attached_version: number;
+  released_version: number | null;
+  release_reason: string | null;
+  released_by_session_id: string | null;
+  created_at: Date;
+  released_at: Date | null;
+}
+
+export function embodimentRecord(e: EmbodimentRow) {
+  return {
+    id: e.id,
+    status: e.status,
+    session: { session_id: e.session_id, agent_label: e.agent_label, capability_id: e.capability_id },
+    model: e.model,
+    application: e.application,
+    note: e.note,
+    attached_version: e.attached_version,
+    released_version: e.released_version,
+    release_reason: e.release_reason,
+    released_by: e.released_by_session_id ? { session_id: e.released_by_session_id } : null,
+    attached_at: iso(e.created_at),
+    released_at: iso(e.released_at),
+  };
+}
+export type EmbodimentRecord = ReturnType<typeof embodimentRecord>;
+
+export interface ScrollRow {
+  resource_id: string;
+  scroll_id: string;
+  version: number;
+  parent_version: number | null;
+  content: ScrollContent;
+  content_sha256: string;
+  author_session_id: string;
+  author_agent_id: string | null;
+  author_kind: ActorKind;
+  author_assurance: Assurance;
+  recorded_by_session_id: string;
+  embodiment_id: string | null;
+  proposal_id: string | null;
+  event_version: number;
+  after_checkpoint: number;
+  created_at: Date;
+}
+
+/**
+ * Intent state of a committed record (Program 001): "committed" once its
+ * event exists, "persisted" once a checkpoint at or after that event covers it.
+ */
+export const commitState = (eventVersion: number, checkpoints: { number: number; version: number }[]) => {
+  const cp = checkpoints.find((c) => c.version >= eventVersion);
+  return { state: cp ? ('persisted' as const) : ('committed' as const), persisted_in_checkpoint: cp ? cp.number : null };
+};
+
+export function scrollVersionRecord(s: ScrollRow, ctx: { aliases?: string[]; checkpoints?: { number: number; version: number }[] } = {}) {
+  return {
+    scroll_id: s.scroll_id,
+    version: s.version,
+    ref: refString({ scroll_id: s.scroll_id, version: s.version }),
+    parent_version: s.parent_version,
+    content_sha256: s.content_sha256,
+    content: s.content,
+    dependencies: dependencies(s.content),
+    created_by: {
+      session_id: s.author_session_id,
+      agent_id: s.author_agent_id,
+      kind: s.author_kind,
+      identity_assurance: s.author_assurance,
+      embodiment_id: s.embodiment_id,
+    },
+    recorded_by: { session_id: s.recorded_by_session_id },
+    proposal_id: s.proposal_id,
+    event_version: s.event_version,
+    after_checkpoint: s.after_checkpoint,
+    created_at: iso(s.created_at),
+    aliases: ctx.aliases ?? [],
+    ...(ctx.checkpoints ? commitState(s.event_version, ctx.checkpoints) : {}),
+  };
+}
+export type ScrollVersionRecord = ReturnType<typeof scrollVersionRecord>;
+
+export interface AliasBindingRow {
+  resource_id: string;
+  name: string;
+  binding: number;
+  scroll_id: string;
+  scroll_version: number;
+  reason: string;
+  author_session_id: string;
+  author_assurance: Assurance;
+  embodiment_id: string | null;
+  proposal_id: string | null;
+  event_version: number;
+  created_at: Date;
+}
+
+export function aliasBindingRecord(b: AliasBindingRow) {
+  return {
+    name: b.name,
+    binding: b.binding,
+    target: { scroll_id: b.scroll_id, version: b.scroll_version, ref: refString({ scroll_id: b.scroll_id, version: b.scroll_version }) },
+    reason: b.reason,
+    set_by: { session_id: b.author_session_id, identity_assurance: b.author_assurance, embodiment_id: b.embodiment_id },
+    proposal_id: b.proposal_id,
+    event_version: b.event_version,
+    created_at: iso(b.created_at),
+  };
+}
+
+/** Current binding plus full history for one alias; `bindings` must be ordered by binding. */
+export function aliasRecord(bindings: AliasBindingRow[]) {
+  const current = bindings[bindings.length - 1];
+  return {
+    name: current.name,
+    target: aliasBindingRecord(current).target,
+    binding: current.binding,
+    history: bindings.map(aliasBindingRecord),
+    semantics: 'An alias names an explicit Scroll version. Rebinding adds a new binding; earlier bindings and Scroll versions never change.',
+  };
+}
+export type AliasRecord = ReturnType<typeof aliasRecord>;
+
+export interface ExecutionRow {
+  resource_id: string;
+  id: string;
+  number: number;
+  kind: 'scroll' | 'trial';
+  scroll_id: string | null;
+  scroll_version: number | null;
+  scroll_sha256: string | null;
+  via_alias: { name: string; binding: number } | null;
+  inputs: Record<string, Value>;
+  steps: StepRecord[] | { candidate: ScrollContent; steps: StepRecord[] };
+  outputs: Record<string, Value> | null;
+  status: 'completed' | 'failed';
+  error: { code: string; message: string; at: string } | null;
+  default_substrate: { substrate_id: string; version: string; manifest_sha256: string } | null;
+  session_id: string;
+  agent_label: string | null;
+  identity_assurance: Assurance;
+  embodiment_id: string | null;
+  model: ModelRef | null;
+  application: { application_id: string } | null;
+  proposal_id: string | null;
+  on_behalf_of: Participant | null;
+  parent_checkpoint: number;
+  event_version: number;
+  started_at: Date;
+  completed_at: Date;
+}
+
+export function executionRecord(x: ExecutionRow) {
+  const trial = x.kind === 'trial';
+  const steps = Array.isArray(x.steps) ? x.steps : x.steps.steps;
+  return {
+    execution_id: x.id,
+    kind: x.kind,
+    identity: x.resource_id,
+    session: { session_id: x.session_id, agent_label: x.agent_label, identity_assurance: x.identity_assurance },
+    embodiment_id: x.embodiment_id,
+    model: x.model,
+    application: x.application,
+    scroll: trial || !x.scroll_id
+      ? null
+      : { scroll_id: x.scroll_id, version: x.scroll_version, ref: refString({ scroll_id: x.scroll_id, version: x.scroll_version! }), content_sha256: x.scroll_sha256 },
+    candidate: trial && !Array.isArray(x.steps) ? { content: x.steps.candidate, content_sha256: x.scroll_sha256 } : null,
+    via_alias: x.via_alias,
+    default_substrate: x.default_substrate,
+    substrates_used: Array.from(new Map(steps.filter((s) => s.substrate).map((s) => [s.substrate!.substrate_id, s.substrate!])).values()),
+    inputs: x.inputs,
+    operation_sequence: steps,
+    outputs: x.outputs,
+    status: x.status,
+    error: x.error,
+    started_at: iso(x.started_at),
+    completed_at: iso(x.completed_at),
+    parent_checkpoint: x.parent_checkpoint,
+    proposal_id: x.proposal_id,
+    on_behalf_of: x.on_behalf_of,
+    event_version: x.event_version,
+    semantics:
+      'An execution record: one run of one Scroll version (or candidate) on these inputs. The definition is the Scroll; the result is "outputs". ' +
+      'Computed by an ACSP substrate, deterministically; not an observation of any model.',
+  };
+}
+export type ExecutionRecord = ReturnType<typeof executionRecord>;

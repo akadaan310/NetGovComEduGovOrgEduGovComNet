@@ -11,7 +11,7 @@
 import type { Sql } from '../db/types';
 import { isUniqueViolation } from '../db/types';
 import { PROTOCOL_VERSION, type ActorKind } from '../protocol/constants';
-import { EnvelopeSchema, OPERATIONS_BY_NAME, type OperationSpec } from '../protocol/operations';
+import { appliesTo, EnvelopeSchema, OPERATIONS_BY_NAME, type OperationSpec } from '../protocol/operations';
 import { authorize, verifyCapability, type VerifiedCapability } from './authority';
 import { canonicalHash } from './canonical';
 import type { Env } from './env';
@@ -79,7 +79,17 @@ export class OpContext {
   }
 
   /** Allocate the next sequential number for a record family. */
-  allocate(counter: 'tok_count' | 'annotation_count' | 'handoff_count' | 'proposal_count' | 'checkpoint_count'): number {
+  allocate(
+    counter:
+      | 'tok_count'
+      | 'annotation_count'
+      | 'handoff_count'
+      | 'proposal_count'
+      | 'checkpoint_count'
+      | 'scroll_count'
+      | 'execution_count'
+      | 'embodiment_count',
+  ): number {
     this.resource[counter] += 1;
     this.dirty = true;
     // checkpoints are numbered from 0; the others from 1
@@ -161,7 +171,8 @@ export class OpContext {
     await this.sql.query(
       `update resources set title=$2, description=$3, focus=$4, lifecycle=$5, accepts_proposals=$6, version=$7,
          checkpoint_count=$8, tok_count=$9, annotation_count=$10, handoff_count=$11, proposal_count=$12,
-         updated_at=$13, closed_at=$14
+         updated_at=$13, closed_at=$14, also_known_as=$15, current_substrate_id=$16, scroll_count=$17,
+         execution_count=$18, embodiment_count=$19
        where id=$1`,
       [
         r.id,
@@ -178,6 +189,11 @@ export class OpContext {
         r.proposal_count,
         r.updated_at,
         r.closed_at,
+        JSON.stringify(r.also_known_as ?? []),
+        r.current_substrate_id ?? null,
+        r.scroll_count ?? 0,
+        r.execution_count ?? 0,
+        r.embodiment_count ?? 0,
       ],
     );
   }
@@ -317,9 +333,12 @@ async function run(
     return { status: prior.status_code, response: { ...prior.response, replayed: true } };
   }
 
-  // 5. Authorize, then check lifecycle and version.
+  // 5. Authorize, then check resource kind, lifecycle and version.
   const decision = authorize(spec, resourceId ? resource : null, cap);
   if (!decision.ok) throw decision.error;
+  if (resourceId && !appliesTo(spec, resource.kind)) {
+    fail('invalid_state', `"${spec.name}" does not apply to a resource of kind "${resource.kind}" (applies to: ${(spec.applies_to ?? []).join(', ')}).`);
+  }
   if (resourceId && resource.lifecycle === 'closed' && !spec.allowed_when_closed) {
     fail('resource_closed', `Resource ${resource.id} is closed; it can be read and forked but not changed.`);
   }

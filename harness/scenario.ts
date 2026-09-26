@@ -1,4 +1,5 @@
 /** Scenario and assertion primitives. */
+import { canonicalJson } from '../src/continuity/canonical';
 import type { World, WorldOptions } from './world';
 
 export interface Scenario {
@@ -10,6 +11,8 @@ export interface Scenario {
   needsDatabase?: boolean;
   /** Custom world configuration. */
   config?: WorldOptions['config'];
+  /** Research program the scenario belongs to (e.g. "001"); selectable with --program. */
+  program?: string;
   run(world: World, t: T): Promise<void>;
 }
 
@@ -21,6 +24,8 @@ export interface CheckResult {
 
 export class T {
   readonly results: CheckResult[] = [];
+  /** Named measurements an experiment records (reported alongside pass/fail). */
+  readonly measurements: Record<string, unknown> = {};
   private current = '(setup)';
   private stepNo = 0;
   constructor(
@@ -41,8 +46,9 @@ export class T {
     return ok;
   }
 
+  /** Structural equality: object key order is irrelevant (Postgres jsonb does not keep it); array order matters. */
   eq(actual: unknown, expected: unknown, message: string): boolean {
-    const ok = JSON.stringify(actual) === JSON.stringify(expected);
+    const ok = canonicalJson(actual) === canonicalJson(expected);
     return this.check(ok, ok ? message : `${message} — expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   }
 
@@ -52,6 +58,12 @@ export class T {
     const ok = res.status === status && (code === undefined || gotCode === code);
     const detail = ok ? '' : ` — got ${res.status}${gotCode ? ` ${gotCode}` : ''}${res.body?.error?.message ? ` (${res.body.error.message})` : ''}`;
     return this.check(ok, `${message} → ${status}${code ? ` ${code}` : ''}${detail}`);
+  }
+
+  /** Record a measurement. It is data, not an assertion. */
+  measure(key: string, value: unknown): void {
+    this.measurements[key] = value;
+    this.log(`    ≡ ${key} = ${JSON.stringify(value)}`);
   }
 
   get failures(): CheckResult[] {

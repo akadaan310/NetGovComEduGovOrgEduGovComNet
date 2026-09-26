@@ -6,36 +6,55 @@
  */
 import type { Sql } from '../db/types';
 import { bootstrapDocument, NOTICE } from '../protocol/bootstrap';
+import { identityBootstrapDocument, INTENT_STATES } from '../protocol/program001';
 import {
   INVARIANTS,
   PROTOCOL_NAME,
   PROTOCOL_TITLE,
+  EXTENSIONS,
   PROTOCOL_VERSION,
   RESOURCE_LIMITS,
   SCOPE_MEANINGS,
   VISIBILITY_MEANINGS,
 } from '../protocol/constants';
-import { OPERATIONS, type OperationSpec } from '../protocol/operations';
+import { appliesTo, OPERATIONS, type OperationSpec } from '../protocol/operations';
+import { deriveObservations, OBSERVATION_VOCABULARY } from '../research/phenotype';
 import { KNOWLEDGE_SEMANTICS } from '../research/tok';
+import { refString } from '../scrolls/scroll';
+import { getSubstrate, manifestHash, SUBSTRATES, substrateRef } from '../substrates/registry';
+import { canonicalHash } from './canonical';
 import { authorize, describeRequirement, effectiveScopes, isOwner, type VerifiedCapability } from './authority';
 import { AcspError } from '../protocol/errors';
 import {
   capabilityRecord,
   checkpointRecord,
+  commitState,
+  embodimentRecord,
   eventRecord,
+  executionRecord,
   handoffRecord,
   iso,
   proposalRecord,
+  scrollVersionRecord,
   tokRecord,
+  type EmbodimentRow,
+  type EventRow,
+  type ExecutionRow,
   type ResourceRow,
+  type ScrollRow,
 } from './records';
 import {
   loadAnnotations,
   loadCapabilities,
+  groupAliases,
+  loadAliasBindings,
   loadCheckpoint,
   loadCheckpoints,
+  loadEmbodiments,
   loadEvent,
   loadEvents,
+  loadExecutions,
+  loadScrolls,
   loadForks,
   loadHandoffs,
   loadProposals,
@@ -90,6 +109,19 @@ export function resourceLinks(id: string, l: Links) {
   };
 }
 
+/** Program 001 links, present on agent identities only. */
+export function identityLinks(id: string, l: Links) {
+  return {
+    identity: l.resource(id, '/identity'),
+    substrates: l.resource(id, '/substrates'),
+    substrate_registry: l.plain('/substrates'),
+    scrolls: l.resource(id, '/scrolls'),
+    aliases: l.resource(id, '/aliases'),
+    executions: l.resource(id, '/executions'),
+    transitions: l.resource(id, '/transitions'),
+  };
+}
+
 export const protocolHeader = (l: Links) => ({
   name: PROTOCOL_NAME,
   version: PROTOCOL_VERSION,
@@ -97,6 +129,7 @@ export const protocolHeader = (l: Links) => ({
   spec: l.plain('/protocol'),
   spec_json: l.plain('/protocol.json'),
   invariants: [...INVARIANTS],
+  extensions: [...EXTENSIONS],
 });
 
 export async function readableResource(sql: Sql, id: string, viewer: Viewer): Promise<ResourceRow> {
@@ -141,6 +174,8 @@ interface PermissionContext {
   cap: VerifiedCapability | null;
   pendingHandoffsToViewer: number;
   tasksViewerHolds: number;
+  /** Agent identities: the active embodiment, if any. */
+  embodiment: EmbodimentRow | null;
 }
 
 function permission(spec: OperationSpec, c: PermissionContext): { permitted: boolean; reason: string } {
@@ -159,6 +194,23 @@ function permission(spec: OperationSpec, c: PermissionContext): { permitted: boo
   if (spec.name === 'acknowledge' && c.pendingHandoffsToViewer === 0) {
     return { permitted: false, reason: 'No pending handoff is addressed to your session.' };
   }
+  const e = c.embodiment;
+  if (spec.name === 'embody') {
+    if (isOwner(c.cap)) return { permitted: false, reason: 'The owner (principal) authorizes the identity but cannot embody it. Delegate "embody" to a session.' };
+    if (e) return { permitted: false, reason: `Embodied by session "${e.session_id}" (${e.id}); it must be released first.` };
+  }
+  if (spec.name === 'release') {
+    if (!e) return { permitted: false, reason: 'No embodiment is active.' };
+    if (!isOwner(c.cap) && e.session_id !== c.cap?.session_id) return { permitted: false, reason: `${e.id} belongs to session "${e.session_id}".` };
+  }
+  if (spec.requires_embodiment && (!e || e.session_id !== c.cap?.session_id)) {
+    return {
+      permitted: false,
+      reason: e
+        ? `Acts as the identity: only the embodied session "${e.session_id}" may perform it.${spec.proposable ? ' You may propose it.' : ''}`
+        : `Acts as the identity: a session must "embody" it first.${spec.proposable ? ' You may propose it.' : ''}`,
+    };
+  }
   if (spec.name === 'propose' && !c.cap) {
     return { permitted: true, reason: 'Anyone who can read may propose; your identity will be recorded as asserted.' };
   }
@@ -166,13 +218,19 @@ function permission(spec: OperationSpec, c: PermissionContext): { permitted: boo
 }
 
 function operationEntries(id: string, l: Links, c: PermissionContext) {
-  return OPERATIONS.filter((o) => o.name !== 'create').map((spec) => {
+  return OPERATIONS.filter((o) => o.name !== 'create' && appliesTo(o, c.resource.kind)).map((spec) => {
     const p = permission(spec, c);
     const readHref: Record<string, string> = {
       inspect: l.resource(id),
       status: l.resource(id, '', { action: 'status' }),
       retrieve: `${l.plain(`/r/${id}/knowledge/`)}{tokId}`,
       diff: l.resource(id, '/diff', { from: 1 }),
+      identify: l.resource(id, '/identity'),
+      discover_substrates: l.resource(id, '/substrates'),
+      read_scrolls: l.resource(id, '/scrolls'),
+      resolve_alias: `${l.plain(`/r/${id}/aliases/`)}{name}`,
+      read_executions: l.resource(id, '/executions'),
+      export_transitions: l.resource(id, '/transitions'),
     };
     return {
       name: spec.name,
@@ -187,6 +245,7 @@ function operationEntries(id: string, l: Links, c: PermissionContext) {
       authority_text: spec.authority_text,
       requires_expected_version: spec.requires_expected_version,
       proposable: spec.proposable,
+      ...(spec.requires_embodiment ? { requires_embodiment: true } : {}),
       permitted_for_viewer: p.permitted,
       reason: p.reason,
     };
@@ -207,7 +266,153 @@ export async function loadResourceView(sql: Sql, r: ResourceRow) {
   const parent = r.parent_id
     ? (await sql.query<Pick<ResourceRow, 'id' | 'title' | 'owner_session_id'>>('select id, title, owner_session_id from resources where id = $1', [r.parent_id])).rows[0]
     : null;
-  return { resource: r, toks, annotations, handoffs, proposals, capabilities, checkpoints, recent, first, forks, parent };
+  const identity = r.kind === 'agent_identity' ? await loadIdentityView(sql, r) : null;
+  return { resource: r, toks, annotations, handoffs, proposals, capabilities, checkpoints, recent, first, forks, parent, identity };
+}
+
+/** Program 001 state of an agent identity. */
+export async function loadIdentityView(sql: Sql, r: ResourceRow) {
+  const embodiments = await loadEmbodiments(sql, r.id);
+  const scrolls = await loadScrolls(sql, r.id);
+  const aliases = groupAliases(await loadAliasBindings(sql, r.id));
+  const executions = await loadExecutions(sql, r.id, { recent: RESOURCE_LIMITS.recentExecutions });
+  const announcements = (
+    await sql.query<EventRow>(`select * from events where resource_id = $1 and operation = 'announce' order by version desc limit 20`, [r.id])
+  ).rows.reverse();
+  const checkpoints = await loadCheckpoints(sql, r.id);
+  return { embodiments, scrolls, aliases, executions, announcements, checkpoints, active: embodiments.find((e) => e.status === 'active') ?? null };
+}
+export type IdentityView = Awaited<ReturnType<typeof loadIdentityView>>;
+
+
+function scrollSummaries(v: IdentityView, l: Links, rid: string) {
+  const by = new Map<string, ScrollRow[]>();
+  for (const s of v.scrolls) by.set(s.scroll_id, [...(by.get(s.scroll_id) ?? []), s]);
+  return Array.from(by.entries()).map(([scroll_id, versions]) => {
+    const latest = versions[versions.length - 1];
+    const aliasesOf = (s: ScrollRow) => v.aliases.filter((a) => a.target.ref === refString(s)).map((a) => a.name);
+    return {
+      scroll_id,
+      latest_version: latest.version,
+      purpose: latest.content.purpose,
+      href: l.resource(rid, `/scrolls/${scroll_id}`),
+      latest: scrollVersionRecord(latest, { aliases: aliasesOf(latest), checkpoints: v.checkpoints }),
+      lineage: versions.map((s) => ({
+        version: s.version,
+        ref: refString(s),
+        parent_version: s.parent_version,
+        content_sha256: s.content_sha256,
+        event_version: s.event_version,
+        aliases: aliasesOf(s),
+        ...commitState(s.event_version, v.checkpoints),
+      })),
+    };
+  });
+}
+
+const substrateSummary = (l: Links) =>
+  SUBSTRATES.map((s) => ({
+    substrate_id: s.manifest.substrate_id,
+    kind: s.manifest.kind,
+    version: s.manifest.version,
+    status: s.manifest.status,
+    execution_mode: s.manifest.execution_mode,
+    capabilities: s.manifest.capabilities,
+    manifest_sha256: manifestHash(s.manifest),
+    href: l.plain(`/substrates/${s.manifest.substrate_id}`),
+  }));
+
+function compactExecution(x: ExecutionRow, l: Links, rid: string) {
+  const r = executionRecord(x);
+  return {
+    execution_id: r.execution_id,
+    kind: r.kind,
+    scroll: r.scroll?.ref ?? null,
+    candidate_sha256: r.candidate?.content_sha256 ?? null,
+    via_alias: r.via_alias,
+    status: r.status,
+    inputs: r.inputs,
+    outputs: r.outputs,
+    error: r.error,
+    session_id: r.session.session_id,
+    embodiment_id: r.embodiment_id,
+    model: r.model,
+    substrates: r.substrates_used.map((s) => s.substrate_id),
+    event_version: r.event_version,
+    href: l.resource(rid, `/executions/${r.execution_id}`),
+  };
+}
+
+/** The Program 001 sections of an agent identity's document. */
+export function identitySections(r: ResourceRow, v: IdentityView, viewer: Viewer, l: Links) {
+  const e = v.active;
+  const cp = v.checkpoints[v.checkpoints.length - 1];
+  const current = r.current_substrate_id ? getSubstrate(r.current_substrate_id) : undefined;
+  const cap = viewer.cap;
+  return {
+    identity: {
+      agent_id: r.id,
+      kind: 'agent_identity' as const,
+      url: l.resource(r.id),
+      status: r.lifecycle === 'active' ? 'active' : 'retired',
+      embodiment_status: e ? 'embodied' : 'unembodied',
+      display_name: r.title,
+      description: r.description,
+      owner_principal: r.owner_human,
+      also_known_as: r.also_known_as,
+      created_at: iso(r.created_at),
+      current_embodiment: e ? embodimentRecord(e) : null,
+      current_session: e ? { session_id: e.session_id } : null,
+      current_model: e?.model ?? null,
+      current_application: e?.application ?? null,
+      current_substrate: current ? substrateRef(current) : null,
+      current_checkpoint: cp ? { ...checkpointRecord(cp), href: l.resource(r.id, `/checkpoints/${cp.number}`) } : null,
+      assurance:
+        'Self-asserted and capability-bound. agent_id is this resource\'s id. Acting AS the identity requires a capability bound to your session AND being its current embodiment. ' +
+        'There is no cryptographic identity: whoever holds a capability can use it.',
+      dimensions: {
+        agent_identity: { value: r.id, meaning: 'The persistent identity. It survives sessions, model changes and substrate changes.' },
+        human_principal: { value: r.owner_human, meaning: 'The accountable human who authorizes the identity (owner_human). The principal is not the agent.' },
+        resource_ownership: { value: r.owner_session_id, meaning: 'The session holding the owner capability (normally the principal\'s). Ownership is not identity.' },
+        session: { value: e?.session_id ?? null, meaning: 'The session currently embodying the identity. Sessions end; the identity does not.' },
+        model: { value: e?.model ?? null, meaning: 'The model the embodying session declared (self-asserted). A model change is not an identity change.' },
+        application: { value: e?.application ?? null, meaning: 'The application the embodying session declared (self-asserted).' },
+        substrate: { value: r.current_substrate_id, meaning: 'Where the identity\'s operations execute by default. A substrate change is not an identity change.' },
+        capability: {
+          value: cap ? { id: cap.id, session_id: cap.session_id, scopes: cap.scopes } : null,
+          meaning: 'YOUR presented capability: authority for one session on this resource. A capability is not identity.',
+        },
+        software_label: { value: 'actor.agent_id', meaning: 'The ACSP/0.1 actor field agent_id is a self-asserted software/model label, NOT this agent identity.' },
+      },
+      embodiments: v.embodiments.map(embodimentRecord),
+    },
+    substrates: {
+      question: 'What computational substrates are available to this identity, and what can each do?',
+      current: current ? substrateRef(current) : null,
+      available: substrateSummary(l),
+      registry: l.plain('/substrates'),
+    },
+    scrolls: {
+      semantics: 'A Scroll version is an immutable computational artifact. New versions add lineage; nothing is mutated in place. Reading a Scroll never executes it.',
+      count: new Set(v.scrolls.map((s) => s.scroll_id)).size,
+      version_count: v.scrolls.length,
+      items: scrollSummaries(v, l, r.id),
+      href: l.resource(r.id, '/scrolls'),
+    },
+    aliases: {
+      semantics: 'An alias names an explicit Scroll version. Rebinding is recorded; earlier bindings remain in history.',
+      items: v.aliases.map((a) => ({ ...a, href: l.resource(r.id, `/aliases/${a.name}`) })),
+      href: l.resource(r.id, '/aliases'),
+    },
+    executions: {
+      semantics: 'Append-only. Definition (Scroll) ≠ execution (this record) ≠ result (its outputs).',
+      count: r.execution_count,
+      recent: v.executions.map((x) => compactExecution(x, l, r.id)),
+      href: l.resource(r.id, '/executions'),
+    },
+    announcements: v.announcements.map((a) => ({ id: `${a.resource_id}@${a.version}`, version: a.version, by: a.actor_session_id, ...a.data })),
+    intent_states: INTENT_STATES,
+  };
 }
 export type ResourceView = Awaited<ReturnType<typeof loadResourceView>>;
 
@@ -218,11 +423,13 @@ export function buildResourceDocument(v: ResourceView, viewer: Viewer, l: Links,
   const latestCp = v.checkpoints[v.checkpoints.length - 1];
   const pendingToViewer = cap ? v.handoffs.filter((h) => h.status === 'pending' && h.to_session_id === cap.session_id) : [];
   const tasksHeld = cap ? v.toks.filter((t) => t.type === 'task' && t.status === 'active' && t.responsible_session_id === cap.session_id) : [];
+  const embodiment = v.identity?.active ?? null;
   const operations = operationEntries(r.id, l, {
     resource: r,
     cap,
     pendingHandoffsToViewer: pendingToViewer.length,
     tasksViewerHolds: tasksHeld.length,
+    embodiment,
   });
   const permitted = new Set(operations.filter((o) => o.permitted_for_viewer).map((o) => o.name));
   const links = resourceLinks(r.id, l);
@@ -237,8 +444,15 @@ export function buildResourceDocument(v: ResourceView, viewer: Viewer, l: Links,
   if (latestCp && latestCp.number > 0) {
     next.push({ action: 'resume from checkpoint', why: `Checkpoint ${latestCp.number} ("${latestCp.label}") is the latest boundary; read it, then the diff since.`, href: l.resource(r.id, '/diff', { since_checkpoint: latestCp.number }) });
   }
+  if (v.identity) identityNextActions(next, r, v.identity, cap, permitted, l);
   if (r.lifecycle === 'closed') {
-    next.push({ action: 'fork', why: 'The resource is closed. Fork it to continue the research in an independent branch.', href: l.resource(r.id, '', { action: 'prepare_fork' }) });
+    if (permitted.has('fork')) {
+      next.push({ action: 'fork', why: 'The resource is closed. Fork it to continue the research in an independent branch.', href: l.resource(r.id, '', { action: 'prepare_fork' }) });
+    }
+  } else if (v.identity) {
+    if (!cap) {
+      next.push({ action: 'request a capability', why: 'To act as this identity, ask its principal (the owner) to delegate a capability bound to YOUR session, then embody it.', href: links.protocol + '#op-embody' });
+    }
   } else {
     if (permitted.has('append')) {
       next.push({ action: 'append', why: 'You may publish new TOKs.', href: l.resource(r.id, '', { action: 'prepare_append' }) });
@@ -253,9 +467,10 @@ export function buildResourceDocument(v: ResourceView, viewer: Viewer, l: Links,
 
   return {
     protocol: protocolHeader(l),
-    type: 'continuity_resource',
+    type: v.identity ? 'agent_identity' : 'continuity_resource',
     notice: NOTICE,
     bootstrap: bootstrapDocument(),
+    ...(v.identity ? { identity_bootstrap: identityBootstrapDocument() } : {}),
     resource: {
       id: r.id,
       url: links.self,
@@ -325,7 +540,8 @@ export function buildResourceDocument(v: ResourceView, viewer: Viewer, l: Links,
           pending_handoff: v.handoffs.find((h) => h.tok_id === t.id && h.status === 'pending')?.id ?? null,
         })),
     },
-    viewer: viewerSection(r, viewer),
+    viewer: { ...viewerSection(r, viewer), ...(v.identity ? { embodied: !!embodiment && embodiment.session_id === cap?.session_id } : {}) },
+    ...(v.identity ? identitySections(r, v.identity, viewer, l) : {}),
     knowledge: {
       semantics: KNOWLEDGE_SEMANTICS,
       items: knowledge,
@@ -342,10 +558,51 @@ export function buildResourceDocument(v: ResourceView, viewer: Viewer, l: Links,
       recent_events: v.recent.map(eventRecord),
       history: links.events,
     },
-    links,
+    links: v.identity ? { ...links, ...identityLinks(r.id, l) } : links,
   };
 }
 export type ResourceDocument = ReturnType<typeof buildResourceDocument>;
+
+function identityNextActions(
+  next: { action: string; why: string; href: string }[],
+  r: ResourceRow,
+  v: IdentityView,
+  cap: VerifiedCapability | null,
+  permitted: Set<string>,
+  l: Links,
+) {
+  if (r.lifecycle === 'closed') return;
+  const e = v.active;
+  const cp = v.checkpoints[v.checkpoints.length - 1];
+  if (permitted.has('embody')) {
+    next.push({
+      action: 'embody',
+      why: cp && cp.number > 0
+        ? `No session embodies this identity. Read checkpoint ${cp.number} to recover its state, then embody it as your own session.`
+        : 'No session embodies this identity. Embody it as your own session to act as it.',
+      href: l.resource(r.id, '', { action: 'prepare_embody' }),
+    });
+  }
+  if (e && cap && e.session_id === cap.session_id) {
+    if (!r.current_substrate_id && permitted.has('set_substrate')) {
+      next.push({ action: 'set_substrate', why: 'No substrate is selected. Choose one from "substrates".', href: l.resource(r.id, '', { action: 'prepare_set_substrate' }) });
+    }
+    if (v.aliases.length && permitted.has('execute')) {
+      next.push({ action: 'execute', why: `Reuse a named Scroll: ${v.aliases.map((a) => `"${a.name}" → ${a.target.ref}`).join(', ')}.`, href: l.resource(r.id, '', { action: 'prepare_execute', alias: v.aliases[0].name }) });
+    }
+    if (permitted.has('create_scroll')) {
+      next.push({ action: 'create_scroll', why: 'Commit a new Scroll from substrate operations or earlier Scroll versions.', href: l.resource(r.id, '', { action: 'prepare_create_scroll' }) });
+    }
+  } else if (e) {
+    next.push({ action: 'propose', why: `The identity is embodied by session "${e.session_id}". Without being its embodiment you can propose create_scroll, version_scroll, set_alias or execute.`, href: l.resource(r.id, '', { action: 'prepare_propose', proposed_operation: 'execute' }) });
+  } else if (!cap) {
+    next.push({ action: 'propose', why: 'You hold no capability. You may read everything and propose an operation (for example execute) for the principal to accept.', href: l.resource(r.id, '', { action: 'prepare_propose', proposed_operation: 'execute' }) });
+  }
+  if (v.aliases.length) {
+    next.push({ action: 'resolve alias', why: 'Aliases name explicit Scroll versions; resolving is a read and changes nothing.', href: l.resource(r.id, '/aliases') });
+  }
+}
+
 
 export function statusDocument(r: ResourceRow, checkpoints: { number: number; version: number; label: string }[], l: Links) {
   const cp = checkpoints[checkpoints.length - 1];
@@ -495,5 +752,180 @@ export function operationsDocument(doc: ResourceDocument) {
     operations: doc.operations,
     next_valid_actions: doc.next_valid_actions,
     links: doc.links,
+  };
+}
+
+// ── Program 001 read documents ─────────────────────────────────────────────
+
+export function assertIdentity(r: ResourceRow): void {
+  if (r.kind !== 'agent_identity') throw new AcspError('not_found', `Resource ${r.id} is not an agent identity (kind "${r.kind}").`);
+}
+
+const idHeader = (r: ResourceRow, l: Links) => ({
+  protocol: protocolHeader(l),
+  notice: NOTICE,
+  agent_id: r.id,
+  version: r.version,
+  links: { ...resourceLinks(r.id, l), ...identityLinks(r.id, l) },
+});
+
+export async function identityDocument(sql: Sql, r: ResourceRow, viewer: Viewer, l: Links) {
+  assertIdentity(r);
+  const v = await loadIdentityView(sql, r);
+  const s = identitySections(r, v, viewer, l);
+  return { ...idHeader(r, l), type: 'identity', identity_bootstrap: identityBootstrapDocument(), ...s };
+}
+
+export function substrateManifestDocument(id: string, l: Links) {
+  const s = getSubstrate(id);
+  if (!s) throw new AcspError('not_found', `No substrate "${id}". See ${l.plain('/substrates')}.`);
+  return {
+    protocol: protocolHeader(l),
+    type: 'substrate',
+    notice: NOTICE,
+    manifest: s.manifest,
+    manifest_sha256: manifestHash(s.manifest),
+    links: { registry: l.plain('/substrates'), protocol: l.plain('/protocol') },
+  };
+}
+
+export function substrateRegistryDocument(l: Links, r?: ResourceRow) {
+  const cur = r?.current_substrate_id ? getSubstrate(r.current_substrate_id) : undefined;
+  const current = cur ? substrateRef(cur) : null;
+  return {
+    protocol: protocolHeader(l),
+    type: 'substrate_registry',
+    notice: NOTICE,
+    semantics:
+      'A computational substrate is the environment through which an identity performs an operation. It is not a model and not an identity. ' +
+      'Each manifest lists its operations with input/output schemas, determinism, side effects and required authority. GET never executes anything.',
+    ...(r ? { agent_id: r.id, current } : {}),
+    substrates: SUBSTRATES.map((s) => ({ ...s.manifest, manifest_sha256: manifestHash(s.manifest), href: l.plain(`/substrates/${s.manifest.substrate_id}`) })),
+    links: (r ? { ...resourceLinks(r.id, l), ...identityLinks(r.id, l) } : { registry: l.plain('/substrates'), protocol: l.plain('/protocol') }) as Record<string, string>,
+  };
+}
+
+export async function scrollsDocument(sql: Sql, r: ResourceRow, l: Links, scrollId?: string, version?: number) {
+  assertIdentity(r);
+  const v = await loadIdentityView(sql, r);
+  const items = scrollSummaries(v, l, r.id);
+  if (!scrollId) {
+    return { ...idHeader(r, l), type: 'scroll_list', semantics: 'Each Scroll with its lineage. Follow href for every version with content.', scrolls: items };
+  }
+  const versions = v.scrolls.filter((s) => s.scroll_id === scrollId);
+  if (!versions.length) throw new AcspError('not_found', `Agent identity ${r.id} has no Scroll ${scrollId}.`);
+  const aliasesOf = (s: ScrollRow) => v.aliases.filter((a) => a.target.ref === refString(s)).map((a) => a.name);
+  const records = versions.map((s) => scrollVersionRecord(s, { aliases: aliasesOf(s), checkpoints: v.checkpoints }));
+  if (version !== undefined) {
+    const one = records.find((x) => x.version === version);
+    if (!one) throw new AcspError('not_found', `${scrollId} has no version ${version}.`);
+    return { ...idHeader(r, l), type: 'scroll_version', scroll: one };
+  }
+  return {
+    ...idHeader(r, l),
+    type: 'scroll',
+    scroll_id: scrollId,
+    latest_version: versions[versions.length - 1].version,
+    semantics: 'Versions are immutable and ordered; parent_version records lineage; content_sha256 is sha256 of the canonical JSON of content.',
+    versions: records,
+  };
+}
+
+export async function aliasesDocument(sql: Sql, r: ResourceRow, l: Links, name?: string) {
+  assertIdentity(r);
+  const aliases = groupAliases(await loadAliasBindings(sql, r.id));
+  if (!name) return { ...idHeader(r, l), type: 'alias_list', aliases: aliases.map((a) => ({ ...a, href: l.resource(r.id, `/aliases/${a.name}`) })) };
+  const a = aliases.find((x) => x.name === name);
+  if (!a) throw new AcspError('not_found', `Agent identity ${r.id} has no alias "${name}".`);
+  return {
+    ...idHeader(r, l),
+    type: 'alias',
+    alias: a,
+    resolves_to: { ...a.target, href: l.resource(r.id, `/scrolls/${a.target.scroll_id}`, { version: a.target.version }) },
+    notice_resolution: 'Resolving an alias is a read. It is not recorded and does not depend on any session.',
+  };
+}
+
+export async function executionsDocument(sql: Sql, r: ResourceRow, l: Links, q: { id?: string; after?: number; limit?: number }) {
+  assertIdentity(r);
+  if (q.id) {
+    const { rows } = await sql.query<ExecutionRow>('select * from executions where resource_id = $1 and id = $2', [r.id, q.id]);
+    if (!rows[0]) throw new AcspError('not_found', `Agent identity ${r.id} has no execution ${q.id}.`);
+    return { ...idHeader(r, l), type: 'execution', execution: executionRecord(rows[0]) };
+  }
+  const limit = Math.min(q.limit ?? RESOURCE_LIMITS.executionsPageMax, RESOURCE_LIMITS.executionsPageMax);
+  const rows = await loadExecutions(sql, r.id, { after: q.after ?? 0, limit });
+  const last = rows[rows.length - 1];
+  return {
+    ...idHeader(r, l),
+    type: 'execution_list',
+    semantics: 'Append-only execution history, oldest first.',
+    count: r.execution_count,
+    after: q.after ?? 0,
+    executions: rows.map(executionRecord),
+    next: last && last.number < r.execution_count ? l.resource(r.id, '/executions', { after: last.number, limit }) : null,
+  };
+}
+
+/**
+ * The SubstrateIO bridge: the identity's history as a transition sequence.
+ * ACSP is the system under observation; this is a projection an independent
+ * instrument can consume without importing ACSP. Logical time is the event
+ * version; wall-clock time is carried but excluded from the hash.
+ */
+export async function transitionsDocument(sql: Sql, r: ResourceRow, l: Links) {
+  assertIdentity(r);
+  const events = await loadEvents(sql, r.id);
+  const records = events.map(eventRecord);
+  const labels = deriveObservations(records, true);
+  const checkpoints = await loadCheckpoints(sql, r.id);
+  let embodiment: { embodiment_id: string; session_id: string; model: unknown; application: unknown } | null = null;
+  let substrate: string | null = null;
+  const transitions = records.map((e, i) => {
+    const d = e.data as Record<string, any>;
+    if (e.operation === 'embody') embodiment = { embodiment_id: d.embodiment_id, session_id: d.session_id, model: d.model ?? null, application: d.application ?? null };
+    if (e.operation === 'release' || (e.operation === 'close' && d.released_embodiments?.length)) embodiment = null;
+    if (e.operation === 'set_substrate') substrate = d.to ?? null;
+    const cp = [...checkpoints].reverse().find((c) => c.version <= e.version);
+    const scroll = d.scroll?.ref ?? (d.ref as string | undefined) ?? null;
+    return {
+      t: e.version,
+      from_version: e.parent_version,
+      to_version: e.version,
+      event_id: e.id,
+      operation: e.operation,
+      actor: { session_id: e.actor.session_id, software_label: e.actor.agent_id, kind: e.actor.kind },
+      identity_assurance: e.identity_assurance,
+      on_behalf_of: e.on_behalf_of ? { session_id: e.on_behalf_of.session_id } : null,
+      proposal_id: e.proposal_id,
+      embodiment: embodiment ? { ...(embodiment as object) } : null,
+      substrate_after: substrate,
+      scroll,
+      execution: d.execution_id ? { execution_id: d.execution_id, status: d.status, outputs: d.outputs ?? null } : null,
+      trials: e.operation === 'discover_new_operation' ? d.trials : null,
+      alias: e.operation === 'set_alias' ? { name: d.name, binding: d.binding, target: d.target.ref, previous: d.previous } : d.via_alias ?? null,
+      checkpoint_in_effect: cp ? cp.number : null,
+      checkpoint_created: e.operation === 'checkpoint' ? d.number : null,
+      observations: labels[i],
+      occurred_at: e.occurred_at,
+    };
+  });
+  const deterministic = transitions.map(({ occurred_at: _wall, ...rest }) => rest);
+  return {
+    protocol: protocolHeader(l),
+    type: 'transition_history',
+    format: 'acsp-transition-history/1',
+    notice: NOTICE,
+    agent_id: r.id,
+    epistemic_status:
+      'RECORDED protocol events of an ACSP agent identity. Executions are computations by ACSP substrates. Nothing here observes a model\'s internal state; ' +
+      'model fields are self-declared by the embodying session.',
+    logical_time: 't = event version (increases by exactly 1 per transition).',
+    clocks: 'occurred_at is the server wall clock: an observation of the service, excluded from deterministic_sha256.',
+    vocabulary: OBSERVATION_VOCABULARY,
+    transition_count: transitions.length,
+    transitions,
+    deterministic_sha256: canonicalHash(deterministic),
+    links: { ...resourceLinks(r.id, l), ...identityLinks(r.id, l) },
   };
 }

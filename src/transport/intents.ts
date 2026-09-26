@@ -30,6 +30,20 @@ const TEMPLATES: Record<string, Record<string, unknown>> = {
   propose: { operation: 'append', payload: { type: 'finding', title: '', content: '' }, rationale: '' },
   resolve_proposal: { proposal_id: 'P-001', decision: 'accept', note: '' },
   close: { reason: '', final_note: '' },
+  embody: { note: '' },
+  release: { embodiment_id: 'EMB-001', reason: '' },
+  set_substrate: { substrate_id: 'deterministic-calculator', reason: '' },
+  announce: { kind: 'availability', statement: '', refs: [] },
+  create_scroll: { scroll: { purpose: '', inputs: ['a', 'b'], operations: [{ operation: 'multiply', arguments: ['a', 'b'] }] } },
+  version_scroll: { scroll_id: 'SCR-001', parent_version: 1, scroll: { purpose: '', inputs: ['a', 'b'], operations: [{ operation: 'multiply', arguments: ['a', 'b'] }] }, reason: '' },
+  set_alias: { name: '', target: { scroll_id: 'SCR-001', version: 1 }, reason: '' },
+  execute: { target: { alias: '' }, inputs: {} },
+  discover_new_operation: {
+    candidate: { purpose: '', inputs: ['a', 'b'], operations: [{ operation: 'add', arguments: ['a', 'b'] }] },
+    trials: [{ inputs: { a: 1, b: 2 } }],
+    propose: false,
+    rationale: '',
+  },
 };
 
 /**
@@ -40,7 +54,7 @@ const TEMPLATES: Record<string, Record<string, unknown>> = {
 const SIMPLE_FIELDS = [
   'type', 'title', 'summary', 'content', 'stated_confidence', 'tok_id', 'kind', 'label', 'note', 'reason',
   'target', 'by', 'handoff_id', 'proposal_id', 'decision', 'capability_id', 'focus', 'description', 'rationale',
-  'visibility',
+  'visibility', 'substrate_id', 'embodiment_id', 'name', 'statement', 'scroll_id',
 ];
 const TOK_FIELDS = new Set(['type', 'title', 'summary', 'content', 'stated_confidence']);
 const PLACEHOLDER_SESSION = '<your-session-id>';
@@ -63,7 +77,15 @@ function prefill(op: string, q: URLSearchParams): Record<string, unknown> {
     else if (op === 'supersede' && TOK_FIELDS.has(f)) (payload.replacement as Record<string, unknown>)[f] = v;
     else if (f in (TEMPLATES[op] ?? {})) payload[f] = v;
   }
-  if (op === 'propose' && q.get('proposed_operation')) payload.operation = q.get('proposed_operation');
+  if (op === 'propose' && q.get('proposed_operation')) {
+    payload.operation = q.get('proposed_operation');
+    // A proposal for a Program 001 operation starts from that operation's template.
+    if (payload.operation !== 'append' && TEMPLATES[String(payload.operation)] && !raw) payload.payload = structuredClone(TEMPLATES[String(payload.operation)]);
+  }
+  const alias = q.get('alias');
+  if (alias && op === 'execute') payload.target = { alias };
+  if (alias && op === 'propose' && payload.operation === 'execute') (payload.payload as Record<string, unknown>).target = { alias };
+  if (op === 'create' && q.get('kind')) payload.kind = q.get('kind');
   const to = q.get('to_session_id');
   if (to && (op === 'delegate' || op === 'handoff')) payload.to = { session_id: to };
   const scopes = q.get('scopes');
