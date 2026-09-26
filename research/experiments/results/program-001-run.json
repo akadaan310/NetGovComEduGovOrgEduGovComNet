@@ -1,0 +1,363 @@
+{
+  "program": "001",
+  "protocol": "ACSP/0.1",
+  "extensions": [
+    "program-001"
+  ],
+  "commit": "7af5618585088fd5cc59cddf3e3330fdf52c1485 (+uncommitted changes)",
+  "environment": {
+    "node": "v22.22.2",
+    "database": "pglite (in-process)",
+    "clock": "ManualClock",
+    "random": "SeededRandom(42)"
+  },
+  "epistemic_status": "SIMULATED actors (deterministic harness code) exercising the real HTTP handler. No model was run; model fields are declared labels.",
+  "summary": {
+    "scenarios": 13,
+    "passed": 13,
+    "checks": 395,
+    "failures": []
+  },
+  "outcomes": [
+    {
+      "name": "p001-identity",
+      "status": "passed",
+      "checks": 49,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-substrates",
+      "status": "passed",
+      "checks": 39,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-scrolls",
+      "status": "passed",
+      "checks": 44,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-aliases",
+      "status": "passed",
+      "checks": 25,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-executions",
+      "status": "passed",
+      "checks": 41,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-authority",
+      "status": "passed",
+      "checks": 31,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-get-safety",
+      "status": "passed",
+      "checks": 38,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-proposals",
+      "status": "passed",
+      "checks": 16,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-discover",
+      "status": "passed",
+      "checks": 18,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-provenance",
+      "status": "passed",
+      "checks": 18,
+      "failures": [],
+      "measurements": {},
+      "artifacts": []
+    },
+    {
+      "name": "p001-exp-a-kill-recover",
+      "status": "passed",
+      "checks": 42,
+      "failures": [],
+      "measurements": {
+        "identity_recovered": true,
+        "checkpoint_recovered": {
+          "number": 1,
+          "sha256_verified": true
+        },
+        "scroll_recovered": {
+          "ref": "SCR-001:v1",
+          "content_sha256_equal": true
+        },
+        "alias_resolved": {
+          "from_checkpoint": "SCR-001:v1",
+          "live": "SCR-001:v1"
+        },
+        "execution_reproduced": {
+          "a": {
+            "s1": 42
+          },
+          "b": {
+            "s1": 42
+          },
+          "equal": true
+        },
+        "provenance_preserved": [
+          {
+            "id": "EXE-001",
+            "session": "session-a",
+            "embodiment": "EMB-001",
+            "model": "model-a"
+          },
+          {
+            "id": "EXE-002",
+            "session": "session-b",
+            "embodiment": "EMB-002",
+            "model": "model-b"
+          },
+          {
+            "id": "EXE-003",
+            "session": "session-b",
+            "embodiment": "EMB-002",
+            "model": "model-b"
+          }
+        ],
+        "session_changed": {
+          "from": "session-a",
+          "to": "session-b",
+          "model_from": "model-a",
+          "model_to": "model-b"
+        },
+        "observations_on_recovery": [
+          "EMBODIMENT_ATTACHED",
+          "SESSION_CHANGED",
+          "MODEL_CHANGED",
+          "RECOVERY"
+        ],
+        "session_b_requests": 14,
+        "checkpoints": {
+          "a": "sha256:5b801bde9a9469580147df75f44a372f01a849029e1a69fd5f916460c2ec1eac",
+          "b": "sha256:fcd2d71c0913bfcdefa2de2c02be759c6478f2f23bb84c9ceb105815626876e5"
+        },
+        "arm2_ungraceful_recovered": {
+          "s1": 42
+        }
+      },
+      "artifacts": [
+        "transitions"
+      ]
+    },
+    {
+      "name": "p001-exp-b-substrate-switch",
+      "status": "passed",
+      "checks": 19,
+      "failures": [],
+      "measurements": {
+        "preserved": [
+          "agent_id",
+          "Scroll id/version/content_sha256",
+          "alias binding",
+          "execution history of the X era",
+          "principal and ownership"
+        ],
+        "changed": [
+          "session (A → B)",
+          "declared model (model-a → model-b)",
+          "substrate (deterministic-calculator → exact-rational-calculator)",
+          "output representation (JSON number → rational string)"
+        ],
+        "outputs_by_substrate": [
+          {
+            "inputs": {
+              "a": 1,
+              "b": 2,
+              "c": 3
+            },
+            "on_x": 2,
+            "on_y": "2",
+            "y_as_nearest_double": 2,
+            "numerically_equal": true,
+            "representation_changed": true
+          },
+          {
+            "inputs": {
+              "a": 0.1,
+              "b": 0.2,
+              "c": 0.3
+            },
+            "on_x": 0.20000000000000004,
+            "on_y": "1/5",
+            "y_as_nearest_double": 0.2,
+            "numerically_equal": false,
+            "representation_changed": true
+          },
+          {
+            "inputs": {
+              "a": 1,
+              "b": 1,
+              "c": 1
+            },
+            "on_x": 1,
+            "on_y": "1",
+            "y_as_nearest_double": 1,
+            "numerically_equal": true,
+            "representation_changed": true
+          },
+          {
+            "inputs": {
+              "a": 10,
+              "b": 0,
+              "c": 0
+            },
+            "on_x": 3.3333333333333335,
+            "on_y": "10/3",
+            "y_as_nearest_double": 3.3333333333333335,
+            "numerically_equal": true,
+            "representation_changed": true
+          },
+          {
+            "inputs": {
+              "a": 10000000000000000,
+              "b": 1,
+              "c": -10000000000000000
+            },
+            "on_x": 0,
+            "on_y": "1/3",
+            "y_as_nearest_double": 0.3333333333333333,
+            "numerically_equal": false,
+            "representation_changed": true
+          },
+          {
+            "inputs": {
+              "a": 0.5,
+              "b": 0.25,
+              "c": 0.125
+            },
+            "on_x": 0.2916666666666667,
+            "on_y": "7/24",
+            "y_as_nearest_double": 0.2916666666666667,
+            "numerically_equal": true,
+            "representation_changed": true
+          }
+        ],
+        "inputs_where_values_diverge": [
+          {
+            "a": 0.1,
+            "b": 0.2,
+            "c": 0.3
+          },
+          {
+            "a": 10000000000000000,
+            "b": 1,
+            "c": -10000000000000000
+          }
+        ],
+        "substrate_change_observations": [
+          "SUBSTRATE_SELECTED",
+          "SUBSTRATE_DETACHED",
+          "SUBSTRATE_ATTACHED",
+          "SUBSTRATE_CHANGED"
+        ]
+      },
+      "artifacts": [
+        "transitions"
+      ]
+    },
+    {
+      "name": "p001-fresh-session",
+      "status": "passed",
+      "checks": 15,
+      "failures": [],
+      "measurements": {
+        "m0_readonly": {
+          "requests": 10,
+          "failures": 0,
+          "discovered": {
+            "protocol": true,
+            "identity": true,
+            "state": true,
+            "authority": true,
+            "substrates": true,
+            "scrolls": true,
+            "operations": true,
+            "aliases": true
+          },
+          "may": [
+            "inspect",
+            "status",
+            "retrieve",
+            "diff",
+            "propose",
+            "identify",
+            "discover_substrates",
+            "read_scrolls",
+            "resolve_alias",
+            "read_executions",
+            "export_transitions"
+          ],
+          "claims": [
+            "PROPOSED"
+          ]
+        },
+        "m0_delegated": {
+          "requests": 12,
+          "failures": 0,
+          "may": [
+            "inspect",
+            "status",
+            "retrieve",
+            "diff",
+            "checkpoint",
+            "propose",
+            "identify",
+            "discover_substrates",
+            "read_scrolls",
+            "resolve_alias",
+            "read_executions",
+            "export_transitions",
+            "embody"
+          ],
+          "claims": [
+            "PERFORMED",
+            "PERFORMED",
+            "PERFORMED"
+          ],
+          "outputs": {
+            "s1": 15
+          },
+          "checkpoint": {
+            "number": 2,
+            "sha256": "sha256:6b7d242029992179ea36d999614ab543450e8cca1886f54e56381e82f3371e42"
+          }
+        }
+      },
+      "artifacts": []
+    }
+  ],
+  "deterministic_sha256": "sha256:cb90c12f32ed9893dd8cd5e1cd4d935c603791953ee56ac7a159894b1cf46108"
+}

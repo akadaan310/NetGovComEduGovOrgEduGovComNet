@@ -26,6 +26,8 @@ export class T {
   readonly results: CheckResult[] = [];
   /** Named measurements an experiment records (reported alongside pass/fail). */
   readonly measurements: Record<string, unknown> = {};
+  /** Larger outputs (e.g. exports) kept for the caller, not logged. */
+  readonly artifacts: Record<string, unknown> = {};
   private current = '(setup)';
   private stepNo = 0;
   constructor(
@@ -64,6 +66,10 @@ export class T {
   measure(key: string, value: unknown): void {
     this.measurements[key] = value;
     this.log(`    ≡ ${key} = ${JSON.stringify(value)}`);
+  }
+
+  artifact(key: string, value: unknown): void {
+    this.artifacts[key] = value;
   }
 
   get failures(): CheckResult[] {

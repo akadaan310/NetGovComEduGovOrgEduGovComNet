@@ -89,6 +89,37 @@ This is how the harness models session isolation.
 | `human-form-path` | A GET-only agent composes an intent URL. The human submits the no-JS form. Double submission is an idempotent replay. |
 | `rate-limits` | unauthenticated writes are limited per client, reads never are, and the window resets. |
 
+### Program 001 scenarios (`--program 001`)
+
+| Scenario | What it proves |
+|---|---|
+| `p001-identity` | Create, retrieve and retire an identity. Principal ≠ agent: the owner cannot embody. A capability is not embodiment. Session, model and substrate change while `agent_id` does not. Plain resources are unchanged. |
+| `p001-substrates` | `/substrates` manifests and complete operation contracts. Unknown, unavailable and unselected substrates. |
+| `p001-scrolls` | Create, retrieve and hash-verify; versioning and lineage; the DB refuses Scroll mutation; composition; malformed and oversize Scrolls; concurrent creation and versioning. |
+| `p001-aliases` | Explicit-version binding, rebinding with history, stale and concurrent changes, authority. |
+| `p001-executions` | Record contents, determinism, recorded failures, replay versus duplicate, invalid requests, composition, substrate override, pagination. |
+| `p001-authority` | Asserted identity is not authority; forged, cross-identity, wrong-scope, revoked and expired capabilities; no leakage across sessions. |
+| `p001-get-safety` | Every Program 001 GET and prepare intent changes nothing. |
+| `p001-proposals` | Propose ≠ commit; accepted proposals keep the proposer as source; concurrent resolution. |
+| `p001-discover` | `discover_new_operation`: compose from discovered contracts, record trials, propose; the principal decides persistence. |
+| `p001-provenance` | The transition export is contiguous and deterministic; snapshot tampering is detected; history rewrites are refused. |
+| `p001-exp-a-kill-recover` | **Experiment A** ([spec](research/experiments/PROGRAM-001.md)), with measurements. |
+| `p001-exp-b-substrate-switch` | **Experiment B** ([spec](research/experiments/PROGRAM-001-SUBSTRATE-SWITCH.md)), with measurements. |
+| `p001-fresh-session` | **M0**, a deterministic client given only a URL (`harness/clients/m0.ts`). It proposes without authority and performs with it. |
+
+`t.measure(key, value)` records a measurement (data, not an assertion).
+`npm run program-001` runs these scenarios and writes
+`research/experiments/results/program-001-run.json` plus each experiment's
+transition export. Seeded ids and the manual clock make repeated runs
+byte-identical.
+
+**The low-model ladder.** M0 is the deterministic baseline for the same task
+(recover an identity from a URL, resolve an alias, execute or propose) that
+M1–M5 (tiny to frontier models) can later run against the same surface, with
+no hidden context. Its report fields (`discovered.*`, `may`/`may_not`,
+`claims` PERFORMED/PROPOSED, `requests`, `failures`) are the measurement
+dimensions. No model is implemented or called.
+
 ## Running
 
 ```bash

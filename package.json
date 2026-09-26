@@ -2,7 +2,7 @@
   "name": "acsp",
   "version": "0.1.0",
   "private": true,
-  "description": "ACSP — Agent Continuity & Session Protocol: a browser-accessible continuity substrate for independent AI sessions.",
+  "description": "ACSP \u2014 Agent Continuity & Session Protocol: a browser-accessible continuity substrate for independent AI sessions.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -15,7 +15,8 @@
     "test": "vitest run",
     "harness": "tsx harness/cli.ts",
     "db:migrate": "tsx scripts/migrate.ts",
-    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build"
+    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build",
+    "program-001": "tsx harness/program-001.ts"
   },
   "dependencies": {
     "next": "^16.3.6",

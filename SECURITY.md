@@ -206,3 +206,31 @@ requires a matching `create_key`.
 ## 11. Reporting
 
 This is a prototype. Report issues through the repository's issue tracker.
+
+## 9. Program 001 (agent identities)
+
+* **Identity assertion is not authority.** Claiming a `session_id` or an
+  `agent_id` (for example `"agent-001"`) without a capability gets `401`.
+  Acting *as* an identity needs a capability bound to your session **and**
+  being its current embodiment (`403 not_embodied` otherwise). A revoked
+  capability fails even for the session that used to embody the identity.
+* **The principal is not the agent.** The owner capability cannot `embody`.
+  When it executes an accepted proposal, the record keeps the proposer as
+  source and records no embodiment.
+* **No code execution.** Substrates are closed operation sets over numbers
+  (binary64, exact rationals with a 4,096-bit bound). Scrolls are data,
+  validated against strict schemas; unknown fields are rejected. There is no
+  expression evaluation, shell, JavaScript or Python.
+* **Bounded work.** Per Scroll: 64 steps and 16 KiB of canonical JSON. Per
+  execution: 256 substrate steps and composition depth 8. Per discovery: 16
+  trials. Per identity: 1,000 Scroll versions, 200 aliases, 5,000 executions
+  and 1,000 embodiments. Compositions reference only existing explicit
+  versions, so cycles cannot be expressed.
+* **Immutable records.** `scrolls`, `alias_bindings` and `executions` share
+  the append-only trigger with `events` and `checkpoints`. Migration `0003`
+  applies the same API-role lockdown as `0002`.
+* **Secrets stay out of snapshots.** An identity's checkpoint includes
+  capability records (id, session, scopes, status) but never secrets or
+  hashes.
+* **Known gap:** the model and application on an embodiment are declared
+  by the session and cannot be verified by ACSP.

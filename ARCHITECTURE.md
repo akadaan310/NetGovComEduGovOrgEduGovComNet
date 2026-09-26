@@ -286,6 +286,31 @@ implemented in v0.1:
   (already representable as `validation` annotations).
 * **JSON-LD**: an `@context` mapping for the canonical document.
 
-## 10. Known limitations
+## 10. Program 001 additions
+
+```
+TRANSPORT     src/transport/     + /substrates, /r/{id}/{identity,substrates,scrolls,aliases,executions,transitions}
+CONTINUITY    src/continuity/    + identity.ts (embody, release, set_substrate, announce, Scrolls, aliases, execute, discover)
+              src/protocol/      + program001.ts (intent states, identity bootstrap), registry entries
+COMPUTATION   src/scrolls/       Scroll schema, static validation, deterministic evaluation (pure)
+              src/substrates/    substrate manifests and implementations (pure)
+RESEARCH      src/research/      + phenotype.ts (observation vocabulary derived from events)
+```
+
+Design decisions:
+
+* **An agent identity is a resource kind, not a new system.** It reuses the
+  engine's transaction, idempotency, versioning, capabilities, proposals,
+  prepare intents and checkpoints. `applies_to` in the registry keeps the
+  identity-only and TOK-only operations apart (for example, `fork` does not
+  apply to identities).
+* **Principal = owner; sessions = embodiments.** Because a capability is
+  bound to a session, a later session continues with its *own* delegated
+  capability. It never needs to impersonate an earlier one.
+* **Observation vocabulary, not personality.** `/r/{id}/transitions` derives
+  labels from the event log for an external instrument. SubstrateIO reads it
+  (`substrate/acsp.py`) without either system importing the other.
+
+## 11. Known limitations
 
 See README § Known limitations.

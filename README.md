@@ -26,6 +26,7 @@ can open an HTTPS URL can use it.
 | [PROTOCOL.md](PROTOCOL.md) | The normative ACSP/0.1 specification: every operation's semantics |
 | [SECURITY.md](SECURITY.md) | Threat model, capabilities, headers, limits, known gaps |
 | [HARNESS.md](HARNESS.md) | The deterministic protocol harness and its scenarios |
+| [research/experiments/](research/experiments/) | Program 001: baseline, experiment specifications, results |
 
 ---
 
@@ -385,6 +386,69 @@ limits stored in Postgres · CSP, `nosniff`, `no-referrer`, `no-store`,
 
 ---
 
+## Program 001: agent identity, computational substrate, Scroll
+
+An additive extension (`extensions: ["program-001"]`) for studying what
+happens when persistent identity and state are decoupled from the transient
+session and model that perform each transition. Normative text:
+[PROTOCOL.md §13](PROTOCOL.md#13-program-001-extension-agent-identity-computational-substrate-scroll).
+Experiments and results: [research/experiments/](research/experiments/).
+
+```
+Agent identity ≠ model ≠ application ≠ session ≠ ownership ≠ capability ≠ substrate
+```
+
+| Primitive | Meaning |
+|---|---|
+| **Agent identity** | A continuity resource with `kind: "agent_identity"`. `identity.agent_id` is its id. It persists across sessions, models and substrates. It is self-asserted and capability-bound, not cryptographic. |
+| **Principal** | The owner (`owner_human`). It authorizes, delegates, revokes and releases. It **cannot embody** the identity. |
+| **Embodiment** | A session attached to the identity (`embody` → `release`), with a declared model and application. Only the embodied session acts *as* the identity; a capability alone gives `403 not_embodied`. |
+| **Computational substrate** | Where operations execute. Discovered from manifests (`GET /substrates`): `deterministic-calculator` (binary64), `exact-rational-calculator`, and `model-session` (declared, unavailable). Nothing evaluates code. |
+| **Self · Announce · Propose · Commit** | Private state never reaches ACSP. `announce` grants nothing. `propose` is not a commit. Only an operation's event commits; a checkpoint covering it *persists* it. |
+| **Scroll** | An immutable, versioned computational artifact of inputs, symbols and steps. Each step is a substrate operation or a call to an explicit earlier Scroll version. Lineage is recorded with `parent_version` and `content_sha256`. |
+| **Alias** | A name bound to an explicit Scroll version. Rebinding appends to its history. |
+| **Execution** | An append-only record of one run: identity, session, embodiment, model, substrates, inputs, step sequence, outputs, status. Computational failures are recorded. |
+| **Checkpoint / recovery** | An identity's snapshot adds Scrolls, aliases, executions, authority (no secrets) and substrate context. A new session recovers from it with its **own** capability. |
+
+### Example: kill a session and continue in another
+
+```bash
+op() {  # op <capability|-> <idempotency key> <operation> <payload> [expected_version]
+  local auth=(); [ "$1" != - ] && auth=(-H "Authorization: Bearer $1")
+  curl -sX POST "$HOST/r${ID:+/$ID/operations}" -H 'Content-Type: application/json' "${auth[@]}" \
+    -d "{\"protocol\":\"ACSP/0.1\",\"idempotency_key\":\"$2\",\"operation\":\"$3\",\"actor\":{\"session_id\":\"$SESSION\"},\"payload\":$4${5:+,\"expected_version\":$5}}"; }
+
+# The principal creates the identity and keeps the owner capability.
+SESSION=principal; R=$(op - principal-0001 create '{"kind":"agent_identity","title":"Agent X","owner_human":"alice"}')
+ID=$(echo "$R" | jq -r .resource_id); OWNER=$(echo "$R" | jq -r .result.owner_capability.token)
+SCOPES='["embody","substrate","scroll","alias","execute","checkpoint"]'
+CAP_A=$(op $OWNER principal-0002 delegate "{\"to\":{\"session_id\":\"session-a\"},\"scopes\":$SCOPES}" | jq -r .result.capability.token)
+
+# Session A embodies, selects a substrate, commits a Scroll, names it, runs it, checkpoints, ends.
+SESSION=session-a
+op $CAP_A session-a-0001 embody        '{"model":{"provider":"x","model_id":"m1"}}'
+op $CAP_A session-a-0002 set_substrate '{"substrate_id":"deterministic-calculator"}'
+op $CAP_A session-a-0003 create_scroll '{"scroll":{"purpose":"multiply","inputs":["a","b"],"operations":[{"operation":"multiply","arguments":["a","b"]}]}}'
+op $CAP_A session-a-0004 set_alias     '{"name":"multiply","target":{"scroll_id":"SCR-001","version":1}}' 5
+op $CAP_A session-a-0005 execute       '{"target":{"alias":"multiply"},"inputs":{"a":6,"b":7}}'   # EXE-001 {"s1":42}
+op $CAP_A session-a-0006 checkpoint    '{"label":"A done"}'
+op $CAP_A session-a-0007 release       '{"embodiment_id":"EMB-001","reason":"session ending"}'
+
+# Session B gets its OWN capability from the principal, reads checkpoint 1, embodies, continues.
+SESSION=principal; CAP_B=$(op $OWNER principal-0003 delegate "{\"to\":{\"session_id\":\"session-b\"},\"scopes\":$SCOPES}" | jq -r .result.capability.token)
+curl -s "$HOST/r/$ID/checkpoints/1.json" | jq '.checkpoint.snapshot | {scrolls: [.scrolls[].ref], aliases: [.aliases[].target.ref]}'
+SESSION=session-b
+op $CAP_B session-b-0001 embody        '{"model":{"provider":"y","model_id":"m2"}}'
+op $CAP_B session-b-0002 execute       '{"target":{"alias":"multiply"},"inputs":{"a":6,"b":7}}'   # EXE-002 {"s1":42}, session-b, EMB-002
+```
+
+The same flow, with every falsification criterion asserted, is
+`npm run harness -- p001-exp-a-kill-recover -v`. `npm run program-001` runs
+every Program 001 scenario and writes the measurements to
+`research/experiments/results/`.
+
+---
+
 ## Local development
 
 Requirements: Node.js ≥ 20. PostgreSQL is optional locally.
@@ -408,7 +472,9 @@ Create a resource: open `http://localhost:3000/new`, or run
 ## Harness and testing
 
 ```bash
-npm run harness                        # 16 scenarios, ~400 checks, in-process, PGlite
+npm run harness                        # 29 scenarios, ~800 checks, in-process, PGlite
+npm run harness -- --program 001       # the 13 Program 001 scenarios
+npm run program-001                    # Program 001 + measurements → research/experiments/results/
 npm run harness -- core-demonstration -v
 npm run harness -- --db postgres       # against ACSP_TEST_DATABASE_URL (fresh schema per scenario)
 npm run harness -- --base-url https://your-deployment.example   # smoke-test a deployment
@@ -435,7 +501,8 @@ DATABASE_URL=postgres://… npm run db:migrate     # idempotent; safe to re-run
 
 Tables: `resources`, `events` (the append-only history), `toks`,
 `annotations`, `checkpoints`, `capabilities`, `handoffs`, `proposals`,
-`idempotency`, `rate_limits`.
+`idempotency`, `rate_limits`; Program 001 (migration `0003`): `embodiments`,
+and the append-only `scrolls`, `alias_bindings` and `executions`.
 
 ## Deployment (Vercel + Postgres)
 
@@ -553,4 +620,12 @@ graphs (TOK `refs` are already edges) · external computational verification
 * **Rate limiting** is per IP (from `X-Forwarded-For`). Behind non-Vercel
   proxies, make sure that header is trustworthy.
 * Checkpoint snapshots are stored **in full**, which is simple and
-  verifiable but not space-efficient.
+  verifiable but not space-efficient. An agent identity's snapshot contains
+  every execution record (at most 5,000).
+* **Program 001:** agent identity is self-asserted and capability-bound;
+  there is no cryptographic identity. At most one embodiment is active at a
+  time. Model and application are *declared* by the session and not
+  verified. Scroll lineage is linear (no branches). Aliases cannot be
+  deleted. The only substrates are two calculators; no model adapter exists.
+  The owner is still a session (the principal's), so a lost owner
+  capability still cannot be recovered.

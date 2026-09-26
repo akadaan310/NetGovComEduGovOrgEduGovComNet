@@ -185,6 +185,7 @@ export const p001ExpA: Scenario = {
       const rel = (await c.getJson(`/r/${rid}/events`)).body.events.filter((e: any) => e.operation === 'release');
       t.eq(rel.map((e: any) => [e.actor.session_id, e.data.session_id, e.data.by_owner]), [['session-a', 'session-a', false], ['principal-alice', 'session-b', true]], 'the record distinguishes self-release from termination by the principal');
       t.measure('arm2_ungraceful_recovered', r.outputs);
+      t.artifact('transitions', (await c.getJson(`/r/${rid}/transitions`)).body);
     });
   },
 };
@@ -272,6 +273,7 @@ export const p001ExpB: Scenario = {
       t.measure('substrate_change_observations', tr.observations);
       t.check(rows.some((r) => !r.numerically_equal), 'OBSERVED (not assumed): for some inputs the substrates disagree');
       t.check(rows.some((r) => r.numerically_equal), 'OBSERVED (not assumed): for other inputs they agree');
+      t.artifact('transitions', (await b.getJson(`/r/${rid}/transitions`)).body);
     });
   },
 };
