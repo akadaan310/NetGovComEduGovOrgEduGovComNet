@@ -16,6 +16,10 @@ ACSP is **not** an AI model, a memory system, or an agent framework. It does
 not merge conversations, move model state, or judge truth. Anything that
 can open an HTTPS URL can use it.
 
+**Live deployment:** https://acsp-one.vercel.app (Vercel `yul1` + Supabase Postgres, `ca-central-1`)
+· protocol: https://acsp-one.vercel.app/protocol
+· field-trial resource: https://acsp-one.vercel.app/r/8N2RXG1MW79S
+
 | Document | Contents |
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Design, the three layers, a critique of the original brief, data model, deviations |
