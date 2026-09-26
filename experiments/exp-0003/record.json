@@ -816,8 +816,31 @@
  },
  "llm_sessions": {
   "category": "observation",
-  "status": "pending",
-  "file": "experiments/exp-0003/llm-sessions.md"
+  "status": "attached",
+  "file": "experiments/exp-0003/llm-sessions.md",
+  "raw": [
+   "experiments/exp-0003/raw/llm/sessions.json",
+   "experiments/exp-0003/raw/llm/service-state-after-sessions.json"
+  ],
+  "summary_of_observed_facts": {
+   "sessions": 4,
+   "resource": "D36B29YE08TE",
+   "operations": 5,
+   "lineage_verification": {
+    "chain_ok": true,
+    "versions_contiguous": true,
+    "state_matches_latest": true,
+    "checkpoints_ok": true,
+    "records_schema_valid": true
+   },
+   "session_b_authority_determined_from": "viewer / how_to_continue.permitted_operations",
+   "session_b_action": "propose (asserted, causation = A's checkpoint operation)",
+   "session_a2_action": "resolve_proposal accept with owner capability read from the human's private file",
+   "session_c_action": "read-only reconstruction",
+   "capability_secret_in_any_served_document": false,
+   "capability_secret_in_session_a_tool_output": "yes, once, via owner_capability_url (reported by session A)"
+  },
+  "not_hashed": "one run with language models; not part of the reproducibility hash"
  },
  "raw": {
   "proposal-a1-output.json": "sha256:f125794a5be0c7fe2f76abc1d1a2685484cfcd97a9cbda4215d0c4f91b2b2fb7",
