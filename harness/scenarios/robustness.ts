@@ -286,6 +286,15 @@ export const humanFormPath: Scenario = {
     const d = await a.delegate(rid, { to: { session_id: 'session-g' }, scopes: ['append'] });
     const token = d.body.result.capability.token;
 
+    await t.step('a prepared proposal is validated as the server will validate it', async () => {
+      const inner = { operation: 'append', payload: { type: 'finding', title: 't', refs: [{ tok: 'P-005' }] } };
+      const url = `/r/${rid}?action=prepare_propose&session_id=session-g&payload=${encodeURIComponent(JSON.stringify(inner))}`;
+      const prepared = (await w.client.getJson(url)).body;
+      t.check(prepared.validation.valid === false && prepared.validation.issues.some((i: any) => i.path === 'payload.payload.refs.0.tok'), 'an invalid inner payload is reported, with its path');
+      const submitted = await w.client.postJson(`/r/${rid}/operations`, prepared.request);
+      t.status(submitted, 422, 'and the server refuses the same request', 'invalid_payload');
+    });
+
     const intentUrl = `/r/${rid}?action=prepare_append&session_id=session-g&agent_id=browser-agent&type=observation&title=${encodeURIComponent('Seen from a browser')}&content=${encodeURIComponent('Composed as a URL.')}`;
     const intent = await t.step('the GET-only agent composes and opens an intent URL', async () => {
       const page = await w.client.getHtml(intentUrl);

@@ -101,11 +101,20 @@ function validationOf(spec: OperationSpec, request: Record<string, unknown>) {
   if ((request.actor as { session_id?: string }).session_id === PLACEHOLDER_SESSION) {
     issues.push({ path: 'actor.session_id', message: 'replace the placeholder with your session id (or add &session_id=… to this URL)' });
   }
-  try {
-    validatePayload(spec, request.payload);
-  } catch (e) {
-    if (!(e instanceof AcspError)) throw e;
-    issues.push(...(((e.details?.issues as unknown[]) ?? [e.message]).map((i) => (typeof i === 'object' ? { ...i, path: `payload.${(i as { path: string }).path}` } : i))));
+  const check = (s: OperationSpec, payload: unknown, prefix: string) => {
+    try {
+      validatePayload(s, payload);
+      return true;
+    } catch (e) {
+      if (!(e instanceof AcspError)) throw e;
+      issues.push(...(((e.details?.issues as unknown[]) ?? [e.message]).map((i) => (typeof i === 'object' ? { ...i, path: `${prefix}.${(i as { path: string }).path}` } : i))));
+      return false;
+    }
+  };
+  // `propose` validates the proposed operation's payload on submission, so the prepared request must too.
+  if (check(spec, request.payload, 'payload') && spec.name === 'propose') {
+    const inner = request.payload as { operation: string; payload: unknown };
+    check(OPERATIONS_BY_NAME[inner.operation], inner.payload, 'payload.payload');
   }
   return { valid: issues.length === 0, issues };
 }
