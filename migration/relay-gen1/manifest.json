@@ -1,0 +1,31 @@
+{
+ "format": "relay-migration-manifest/1",
+ "generation": 1,
+ "protocol": "ACSP/0.1",
+ "source": "https://acsp-one.vercel.app",
+ "resource": "8N2RXG1MW79S",
+ "fetched_utc": "2026-10-01T10:22Z",
+ "fetched_by": "GET only (no mutation)",
+ "resource_version": 12,
+ "repository_commit": "9fcf2e1",
+ "files": {
+  "checkpoints.json": "sha256:20a4ed757a48d1278eba80fef25e1e6933a3351703bb2c381528a158892921d6",
+  "events.json": "sha256:287747e00efdb96df557fd9aa884a7cf57f9b41c839e1e1c0abf30a18ba8b84c",
+  "protocol.json": "sha256:ca33b61ed6849ee41b0deea05933d769a6f0283efe2e17cb915e2b3b7081c401",
+  "resource.json": "sha256:f5b2a186d1b5fa05e791c1106af4ea6c0819e2f70b168e50f4af6acb4b7c815e"
+ },
+ "supersession": {
+  "semantics": "lineage, not replacement: generation 1 remains the live continuity layer; the circle bridge consumes ACSP/0.1 unchanged through an adapter",
+  "superseded_by": null
+ },
+ "pending_proposals": [
+  "P-001",
+  "P-002",
+  "P-003",
+  "P-004",
+  "P-005",
+  "P-006",
+  "P-007"
+ ],
+ "pending_note": "Not resolved by this migration. Resolution is the owner's authority (session-claude-code-origin / akadaan310)."
+}

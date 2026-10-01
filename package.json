@@ -15,7 +15,8 @@
     "test": "vitest run",
     "harness": "tsx harness/cli.ts",
     "db:migrate": "tsx scripts/migrate.ts",
-    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build"
+    "vercel-build": "ACSP_MIGRATE_OPTIONAL=1 tsx scripts/migrate.ts && next build",
+    "serve:local": "tsx scripts/serve-local.ts"
   },
   "dependencies": {
     "next": "^16.3.6",
