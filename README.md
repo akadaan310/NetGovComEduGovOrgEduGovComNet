@@ -533,6 +533,19 @@ describing communication style, never as transferred identity) · research
 graphs (TOK `refs` are already edges) · external computational verification
 (already representable as `validation` annotations) · JSON-LD `@context`.
 
+## Lineage and bridge (research branch)
+
+* Generation 1 of this service is frozen in [MIGRATION-FROM-RELAY.md](MIGRATION-FROM-RELAY.md)
+  (`migration/relay-gen1/`, content-hashed).
+* Production (`acsp-one.vercel.app`) serves commit `9fcf2e1` of
+  `claude/agent-continuity-protocol-doi4bn`: ACSP/0.1 without program-001 and without 0.2.
+  Those lines exist on `claude/acsp-program-001-k616hw` and `claude/acsp-purl-composition-adsbn6`.
+  They are unmerged, and both add a migration `0003`.
+* Other systems reach ACSP only through the purl circle's `AcspAdapter`, which
+  prepares and proposes, never commits. Contract: purl `circle/BRIDGE-CONTRACT.md`.
+* `npm run serve:local` serves the unchanged handler over in-memory PGlite
+  (`harness/serve.ts` on the composition branch does the same).
+
 ## Known limitations
 
 * **Identity** is only as strong as capability possession. There is no
