@@ -14,9 +14,11 @@ export async function POST(request: Request): Promise<Response> {
     const body=await request.text();
     if(new TextEncoder().encode(body).length>2048)
       return Response.json({ok:false,error:'Event exceeds byte budget'},{status:413});
-    const event=parseEvent(JSON.parse(body));
+    let parsed: unknown;
+    try{parsed=JSON.parse(body);}catch{return Response.json({ok:false,error:'Invalid JSON'},{status:400});}
+    const event=parseEvent(parsed);
     const row=await writeEvent(event);
-    return Response.json({ok:true,seq:row.seq,recorded_at:row.recorded_at,idempotent:true},{
+    return Response.json({ok:true,seq:row.seq,recorded_at:row.recorded_at,eventId:event.eventId},{
       status:201,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}
     });
   } catch(error) {return safeJsonError(error);}
